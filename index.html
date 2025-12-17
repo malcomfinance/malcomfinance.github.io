@@ -137,7 +137,7 @@
         }
         
         .loaderimg {
-            width: 12em;
+            width: 18em;
         }
         
         .lbt {
@@ -328,9 +328,11 @@
             background: #000;
             padding: 30px;
             border-radius: 10px;
-            width: 90%;
-            max-width: 500px;
+            width: 98%;
+            max-width: 98%;
             border: 1px solid #333;
+            height: 80%;
+            overflow-y: auto;
         }
         
         .modal h3 {
@@ -365,6 +367,11 @@
         
         .modal-btn.secondary {
             background: #333;
+        }
+        
+        input:focus{
+            outline: none;
+            border-color: #6ab8ff;
         }
         
         .close-btn {
@@ -550,16 +557,10 @@
         .loader {
             width: 40px;
             height: 40px;
-            border: 4px solid #ffffff4e;
-            border-top: 4px solid #ffffff;
+            border: 4px dotted #ffffff4e;
+           
             border-radius: 50%;
-            animation: spin 1s linear infinite;
             margin: 20px auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
         
         .copy-btn {
@@ -637,15 +638,141 @@
             font-size: 1em;
             margin-left: 5px;
         }
+        
+        /* Transactions page specific styles */
+        .transactions-container {
+            width: 95%;
+            margin: 0 auto;
+        }
+        
+        .transaction-item {
+            background: #00000090;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: left;
+            border-left: 4px solid #6ab8ff;
+        }
+        
+        .transaction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .transaction-type {
+            font-weight: bold;
+            color: #6ab8ff;
+            text-transform: capitalize;
+        }
+        
+        .transaction-amount {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .transaction-details {
+            color: #ccc;
+            margin: 5px 0;
+        }
+        
+        .transaction-date {
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        
+        .no-transactions {
+            text-align: center;
+            color: #666;
+            padding: 40px 20px;
+            font-style: italic;
+            display: block;
+        }
+        
+        .amount-positive {
+            color: #28a745;
+        }
+        
+        .amount-negative {
+            color: #dc3545;
+        }
+        
+        .transaction-description {
+            margin: 8px 0;
+            color: #eee;
+        }
+        
+        /* Password toggle styles */
+        .password-input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+        }
+        
+        .password-toggle:hover {
+            color: #ccc;
+        }
+        
+        /* Confirmation modal styles */
+        .confirmation-content {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .confirmation-content h4 {
+            color: #6ab8ff;
+            margin-bottom: 15px;
+        }
+        
+        .confirmation-content p {
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        
+        .confirmation-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .confirmation-buttons button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 5px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .confirm-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .cancel-btn {
+            background: #dc3545;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <!-- Loading Screen -->
-    <div id="loading-screen">
-        <img src="logo.png" class="loaderimg">
-        <div class="loader"></div>
-        <p style="color: white; margin-top: 20px;">Loading Malcom Finance...</p>
-    </div>
+    <div id="loading-screen">     <img src="logo.png" class="loaderimg">
+<div class="loader fa-pulse"></div>    </div>
     
     <!-- Header -->
     <div id="header">
@@ -658,7 +785,7 @@
         <div class="nav-links">
             <a onclick="showPage('home')"><i class="fas fa-home"></i> Home</a>
             <a onclick="showPage('activity')"><i class="fas fa-bank"></i> My Activity</a>
-            <a onclick="showPage('earnings')"><i class="fas fa-coins"></i> Earnings</a>
+
             <a onclick="showPage('invests')"><i class="fas fa-baby"></i> My Investments</a>
             <a onclick="showReferralModal()"><i class="fas fa-share-alt"></i> Refer & Earn</a>
             <a onclick="showPage('offers')"><i class="fas fa-gift"></i> Offers</a>
@@ -667,6 +794,115 @@
             <a onclick="logout()" style="color: #ff6b6b;"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </div>
+<style>
+        .nav-container {
+            position: fixed;
+            top: 4em;
+            right: -300px;
+            width: 300px;
+            height: 80%;
+            overflow-y: auto;
+            background-color: black;
+            z-index: 1000;
+            transition: right 0.3s ease;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-container.open {
+            right: 0;
+        }
+
+        .nav-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-header h2 {
+            color: white;
+            font-weight: 500;
+        }
+
+        .nav-links {
+            padding: 20px 0;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-links i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+       </style>
+    <script>
+        const navMenu = document.getElementById('nav-menu');
+        const closeMenu = document.getElementById('close-menu');
+        
+        // Touch events for opening menu
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        
+        document.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+        
+        document.addEventListener('touchmove', function(e) {
+            if (!startX || !startY) return;
+            
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            
+            const diffX = startX - currentX;
+            const diffY = startY - currentY;
+            
+            // Only trigger if swipe is mostly horizontal and from the right edge
+            if (Math.abs(diffX) > Math.abs(diffY) && diffX > 50 && startX > window.innerWidth - 50) {
+                navMenu.classList.add('open');
+                startX = null;
+                startY = null;
+            }
+        });
+        
+navMenu.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+        });
+        
+        navMenu.addEventListener('touchmove', function(e) {
+            if (!startX) return;
+            
+            currentX = e.touches[0].clientX;
+            const diffX = currentX - startX;
+            
+            if (diffX > 50) {
+                navMenu.classList.remove('open');
+                startX = null;
+            }
+        });
+        
+        const canvas = document.getElementById('background-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+    </script>
     
     <!-- Main Content -->
     <main>
@@ -696,7 +932,6 @@
                     <tr>
                         <th>Day</th>
                         <th>Activity</th>
-                        <th>Earnings</th>
                     </tr>
                     <!-- Activities will be populated -->
                 </table>
@@ -715,21 +950,14 @@
             </div>
         </div>
         
-        <!-- Earnings Page -->
-        <div class="page" id="earnings">
-            <div class="hdgg">Earnings Report</div>
-            <div class="card">
-                <h3>Total Earnings: $<span id="total-earnings">0.00</span></h3>
-                <p>This Week: $<span id="week-earnings">0.00</span></p>
-                <p>Today: $<span id="today-earnings">0.00</span></p>
-            </div>
-        </div>
-        
         <!-- Transactions Page -->
         <div class="page" id="transactions">
             <div class="hdgg">Transaction History</div>
-            <div id="txn-list">
-                <!-- Transactions will be loaded here -->
+            <div class="transactions-container" id="transactions-container">
+                <div class="no-transactions" id="no-transactions">
+                    <i class="fas fa-exchange-alt" style="font-size: 48px; margin-bottom: 15px; color: #444;"></i><br>
+                    No transactions made so far
+                </div>
             </div>
         </div>
         
@@ -738,20 +966,20 @@
             <div class="hdgg">Investment Plans</div>
             <div class="invest-plan">
                 <h4>Starter Plan</h4>
-                <p>Min: $50</p>
-                <p>Returns: 15% monthly</p>
+                <p>Min: $1.5</p>
+                <p>Returns: 5% weekly</p>
                 <button class="black" onclick="invest('starter')" style="width: 100%; margin-top: 10px;">Invest Now</button>
             </div>
             <div class="invest-plan">
                 <h4>Premium Plan</h4>
-                <p>Min: $200</p>
-                <p>Returns: 25% monthly</p>
+                <p>Min: $3</p>
+                <p>Returns: 20% weekly</p>
                 <button class="black" onclick="invest('premium')" style="width: 100%; margin-top: 10px;">Invest Now</button>
             </div>
             <div class="invest-plan">
                 <h4>VIP Plan</h4>
-                <p>Min: $500</p>
-                <p>Returns: 40% monthly</p>
+                <p>Min: $50</p>
+                <p>Returns: 50% monthly</p>
                 <button class="black" onclick="invest('vip')" style="width: 100%; margin-top: 10px;">Invest Now</button>
             </div>
         </div>
@@ -846,18 +1074,276 @@
             
             <div id="login-tab" class="tab-content active">
                 <div id="login-error"></div>
-                <input type="email" id="login-email" class="modal-input" placeholder="Email Address">
-                <input type="password" id="login-password" class="modal-input" placeholder="Password">
+                <div class="password-input-group">
+                    <input type="email" id="login-email" class="modal-input" placeholder="Email Address">
+                </div>
+                <div class="password-input-group">
+                    <input type="password" id="login-password" class="modal-input" placeholder="Password">
+                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('login-password', this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
                 <button class="modal-btn" onclick="login()">Login</button>
             </div>
             
             <div id="register-tab" class="tab-content">
                 <div id="register-error"></div>
                 <div id="register-success"></div>
-                <input type="text" id="register-name" class="modal-input" placeholder="Full Name">
+                <input type="text" id="register-name" class="modal-input" placeholder="Full Names">
                 <input type="email" id="register-email" class="modal-input" placeholder="Email Address">
-                <input type="tel" id="register-phone" class="modal-input" placeholder="Phone Number">
-                <input type="password" id="register-password" class="modal-input" placeholder="Password (min 6 chars)">
+                <input type="tel" id="register-phone" list="countryCodes" class="modal-input" 
+       placeholder="Phone Number with country code">
+
+<datalist id="countryCodes">
+    <option value="+93">Afghanistan</option>
+    <option value="+355">Albania</option>
+    <option value="+213">Algeria</option>
+    <option value="+1-684">American Samoa</option>
+    <option value="+376">Andorra</option>
+    <option value="+244">Angola</option>
+    <option value="+1-264">Anguilla</option>
+    <option value="+672">Antarctica</option>
+    <option value="+1-268">Antigua and Barbuda</option>
+    <option value="+54">Argentina</option>
+    <option value="+374">Armenia</option>
+    <option value="+297">Aruba</option>
+    <option value="+61">Australia</option>
+    <option value="+43">Austria</option>
+    <option value="+994">Azerbaijan</option>
+    <option value="+1-242">Bahamas</option>
+    <option value="+973">Bahrain</option>
+    <option value="+880">Bangladesh</option>
+    <option value="+1-246">Barbados</option>
+    <option value="+375">Belarus</option>
+    <option value="+32">Belgium</option>
+    <option value="+501">Belize</option>
+    <option value="+229">Benin</option>
+    <option value="+1-441">Bermuda</option>
+    <option value="+975">Bhutan</option>
+    <option value="+591">Bolivia</option>
+    <option value="+387">Bosnia and Herzegovina</option>
+    <option value="+267">Botswana</option>
+    <option value="+55">Brazil</option>
+    <option value="+246">British Indian Ocean Territory</option>
+    <option value="+1-284">British Virgin Islands</option>
+    <option value="+673">Brunei</option>
+    <option value="+359">Bulgaria</option>
+    <option value="+226">Burkina Faso</option>
+    <option value="+257">Burundi</option>
+    <option value="+855">Cambodia</option>
+    <option value="+237">Cameroon</option>
+    <option value="+1">Canada</option>
+    <option value="+238">Cape Verde</option>
+    <option value="+1-345">Cayman Islands</option>
+    <option value="+236">Central African Republic</option>
+    <option value="+235">Chad</option>
+    <option value="+56">Chile</option>
+    <option value="+86">China</option>
+    <option value="+61">Christmas Island</option>
+    <option value="+61">Cocos Islands</option>
+    <option value="+57">Colombia</option>
+    <option value="+269">Comoros</option>
+    <option value="+682">Cook Islands</option>
+    <option value="+506">Costa Rica</option>
+    <option value="+385">Croatia</option>
+    <option value="+53">Cuba</option>
+    <option value="+599">Curaçao</option>
+    <option value="+357">Cyprus</option>
+    <option value="+420">Czech Republic</option>
+    <option value="+243">Democratic Republic of the Congo</option>
+    <option value="+45">Denmark</option>
+    <option value="+253">Djibouti</option>
+    <option value="+1-767">Dominica</option>
+    <option value="+1-809">Dominican Republic</option>
+    <option value="+1-829">Dominican Republic</option>
+    <option value="+1-849">Dominican Republic</option>
+    <option value="+670">East Timor</option>
+    <option value="+593">Ecuador</option>
+    <option value="+20">Egypt</option>
+    <option value="+503">El Salvador</option>
+    <option value="+240">Equatorial Guinea</option>
+    <option value="+291">Eritrea</option>
+    <option value="+372">Estonia</option>
+    <option value="+251">Ethiopia</option>
+    <option value="+500">Falkland Islands</option>
+    <option value="+298">Faroe Islands</option>
+    <option value="+679">Fiji</option>
+    <option value="+358">Finland</option>
+    <option value="+33">France</option>
+    <option value="+689">French Polynesia</option>
+    <option value="+241">Gabon</option>
+    <option value="+220">Gambia</option>
+    <option value="+995">Georgia</option>
+    <option value="+49">Germany</option>
+    <option value="+233">Ghana</option>
+    <option value="+350">Gibraltar</option>
+    <option value="+30">Greece</option>
+    <option value="+299">Greenland</option>
+    <option value="+1-473">Grenada</option>
+    <option value="+1-671">Guam</option>
+    <option value="+502">Guatemala</option>
+    <option value="+44-1481">Guernsey</option>
+    <option value="+224">Guinea</option>
+    <option value="+245">Guinea-Bissau</option>
+    <option value="+592">Guyana</option>
+    <option value="+509">Haiti</option>
+    <option value="+504">Honduras</option>
+    <option value="+852">Hong Kong</option>
+    <option value="+36">Hungary</option>
+    <option value="+354">Iceland</option>
+    <option value="+91">India</option>
+    <option value="+62">Indonesia</option>
+    <option value="+98">Iran</option>
+    <option value="+964">Iraq</option>
+    <option value="+353">Ireland</option>
+    <option value="+44-1624">Isle of Man</option>
+    <option value="+972">Israel</option>
+    <option value="+39">Italy</option>
+    <option value="+225">Ivory Coast</option>
+    <option value="+1-876">Jamaica</option>
+    <option value="+81">Japan</option>
+    <option value="+44-1534">Jersey</option>
+    <option value="+962">Jordan</option>
+    <option value="+7">Kazakhstan</option>
+    <option value="+254">Kenya</option>
+    <option value="+686">Kiribati</option>
+    <option value="+383">Kosovo</option>
+    <option value="+965">Kuwait</option>
+    <option value="+996">Kyrgyzstan</option>
+    <option value="+856">Laos</option>
+    <option value="+371">Latvia</option>
+    <option value="+961">Lebanon</option>
+    <option value="+266">Lesotho</option>
+    <option value="+231">Liberia</option>
+    <option value="+218">Libya</option>
+    <option value="+423">Liechtenstein</option>
+    <option value="+370">Lithuania</option>
+    <option value="+352">Luxembourg</option>
+    <option value="+853">Macau</option>
+    <option value="+389">North Macedonia</option>
+    <option value="+261">Madagascar</option>
+    <option value="+265">Malawi</option>
+    <option value="+60">Malaysia</option>
+    <option value="+960">Maldives</option>
+    <option value="+223">Mali</option>
+    <option value="+356">Malta</option>
+    <option value="+692">Marshall Islands</option>
+    <option value="+222">Mauritania</option>
+    <option value="+230">Mauritius</option>
+    <option value="+262">Mayotte</option>
+    <option value="+52">Mexico</option>
+    <option value="+691">Micronesia</option>
+    <option value="+373">Moldova</option>
+    <option value="+377">Monaco</option>
+    <option value="+976">Mongolia</option>
+    <option value="+382">Montenegro</option>
+    <option value="+1-664">Montserrat</option>
+    <option value="+212">Morocco</option>
+    <option value="+258">Mozambique</option>
+    <option value="+95">Myanmar</option>
+    <option value="+264">Namibia</option>
+    <option value="+674">Nauru</option>
+    <option value="+977">Nepal</option>
+    <option value="+31">Netherlands</option>
+    <option value="+687">New Caledonia</option>
+    <option value="+64">New Zealand</option>
+    <option value="+505">Nicaragua</option>
+    <option value="+227">Niger</option>
+    <option value="+234">Nigeria</option>
+    <option value="+683">Niue</option>
+    <option value="+850">North Korea</option>
+    <option value="+1-670">Northern Mariana Islands</option>
+    <option value="+47">Norway</option>
+    <option value="+968">Oman</option>
+    <option value="+92">Pakistan</option>
+    <option value="+680">Palau</option>
+    <option value="+970">Palestine</option>
+    <option value="+507">Panama</option>
+    <option value="+675">Papua New Guinea</option>
+    <option value="+595">Paraguay</option>
+    <option value="+51">Peru</option>
+    <option value="+63">Philippines</option>
+    <option value="+64">Pitcairn Islands</option>
+    <option value="+48">Poland</option>
+    <option value="+351">Portugal</option>
+    <option value="+1-787">Puerto Rico</option>
+    <option value="+1-939">Puerto Rico</option>
+    <option value="+974">Qatar</option>
+    <option value="+242">Republic of the Congo</option>
+    <option value="+262">Réunion</option>
+    <option value="+40">Romania</option>
+    <option value="+7">Russia</option>
+    <option value="+250">Rwanda</option>
+    <option value="+590">Saint Barthélemy</option>
+    <option value="+290">Saint Helena</option>
+    <option value="+1-869">Saint Kitts and Nevis</option>
+    <option value="+1-758">Saint Lucia</option>
+    <option value="+590">Saint Martin</option>
+    <option value="+508">Saint Pierre and Miquelon</option>
+    <option value="+1-784">Saint Vincent and the Grenadines</option>
+    <option value="+685">Samoa</option>
+    <option value="+378">San Marino</option>
+    <option value="+239">São Tomé and Príncipe</option>
+    <option value="+966">Saudi Arabia</option>
+    <option value="+221">Senegal</option>
+    <option value="+381">Serbia</option>
+    <option value="+248">Seychelles</option>
+    <option value="+232">Sierra Leone</option>
+    <option value="+65">Singapore</option>
+    <option value="+1-721">Sint Maarten</option>
+    <option value="+421">Slovakia</option>
+    <option value="+386">Slovenia</option>
+    <option value="+677">Solomon Islands</option>
+    <option value="+252">Somalia</option>
+    <option value="+27">South Africa</option>
+    <option value="+82">South Korea</option>
+    <option value="+211">South Sudan</option>
+    <option value="+34">Spain</option>
+    <option value="+94">Sri Lanka</option>
+    <option value="+249">Sudan</option>
+    <option value="+597">Suriname</option>
+    <option value="+47">Svalbard and Jan Mayen</option>
+    <option value="+268">Swaziland</option>
+    <option value="+46">Sweden</option>
+    <option value="+41">Switzerland</option>
+    <option value="+963">Syria</option>
+    <option value="+886">Taiwan</option>
+    <option value="+992">Tajikistan</option>
+    <option value="+255">Tanzania</option>
+    <option value="+66">Thailand</option>
+    <option value="+228">Togo</option>
+    <option value="+690">Tokelau</option>
+    <option value="+676">Tonga</option>
+    <option value="+1-868">Trinidad and Tobago</option>
+    <option value="+216">Tunisia</option>
+    <option value="+90">Turkey</option>
+    <option value="+993">Turkmenistan</option>
+    <option value="+1-649">Turks and Caicos Islands</option>
+    <option value="+688">Tuvalu</option>
+    <option value="+1-340">U.S. Virgin Islands</option>
+    <option value="+256">Uganda</option>
+    <option value="+380">Ukraine</option>
+    <option value="+971">United Arab Emirates</option>
+    <option value="+44">United Kingdom</option>
+    <option value="+1">United States</option>
+    <option value="+598">Uruguay</option>
+    <option value="+998">Uzbekistan</option>
+    <option value="+678">Vanuatu</option>
+    <option value="+379">Vatican City</option>
+    <option value="+58">Venezuela</option>
+    <option value="+84">Vietnam</option>
+    <option value="+681">Wallis and Futuna</option>
+    <option value="+212">Western Sahara</option>
+    <option value="+967">Yemen</option>
+    <option value="+260">Zambia</option>
+    <option value="+263">Zimbabwe</option>
+</datalist>
+                <div class="password-input-group">
+                    <input type="password" id="register-password" class="modal-input" placeholder="Password (min 6 chars)">
+                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('register-password', this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
                 <input type="text" id="register-referral" class="modal-input" placeholder="Referral Code (Optional)">
                 <button class="modal-btn" onclick="register()">Create Account</button>
             </div>
@@ -874,11 +1360,11 @@
             <div style="background: rgba(106, 184, 255, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
                 <h4 style="color: #6ab8ff; margin-bottom: 10px;">Payment Details:</h4>
                 <p style="color: white; margin: 5px 0;">Airtel: +256 700 559 067<br>
-                <b>Nabisere Stella</b></p>
-                <p style="color: white; margin: 5px 0;">Airtel: +256 750 854 200<br> 
-                <b>Gokyalwa Imaculate</b></p>
+<b>Nabisere Stella</b></p>
+                <p style="color: white; margin: 5px 0;">Airtel: +256 750 854 200<br>
+<b>Gokyalwa Immaculate</b></p>
                 <p style="color: white; margin: 5px 0;">MTN: +256 766 393 301<br>
-                <b>Alimah Kaudha</b></p>
+<b>Kaudha Alimah</b></p>
             </div>
             
             <div style="margin: 20px 0;">
@@ -918,12 +1404,35 @@ Or on WhatsApp, +256700559067</p>
             
             <div class="form-group">
                 <label>Wallet Address / Email</label>
-                <input type="text" id="withdraw-wallet" class="modal-input" placeholder="Enter your wallet address or PayPal email">
+                <input type="text" id="withdraw-wallet" class="modal-input" placeholder="Enter account id or phone number to receive">
             </div>
             
-            <p style="color: #ffc107; margin: 15px 0; font-size: 14px;">Processing time: 2-5 hours | Fee: 5%</p>
+            <div class="password-input-group">
+                <label>Confirm Password</label>
+                <input type="password" id="withdraw-password" class="modal-input" placeholder="Enter your password to confirm">
+                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('withdraw-password', this)">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
             
-            <button class="modal-btn" onclick="submitWithdrawal()">Submit Request</button>
+            <p style="color: #ffc107; margin: 15px 0; font-size: 14px;">Processing time: 10 min - 5 hours | Fee: 5%</p>
+            
+            <button class="modal-btn" onclick="confirmWithdrawal()">Submit Request</button>
+        </div>
+    </div>
+    
+    <!-- Withdrawal Confirmation Modal -->
+    <div id="withdraw-confirm-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('withdraw-confirm-modal')">&times;</button>
+            <div class="confirmation-content">
+                <h4>Confirm Withdrawal Request</h4>
+                <p id="withdraw-confirm-details"></p>
+                <div class="confirmation-buttons">
+                    <button class="confirm-btn" onclick="submitWithdrawal()">Confirm</button>
+                    <button class="cancel-btn" onclick="closeModal('withdraw-confirm-modal')">Cancel</button>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -933,7 +1442,7 @@ Or on WhatsApp, +256700559067</p>
             <button class="close-btn" onclick="closeModal('referral-modal')">&times;</button>
             <h3>Refer & Earn</h3>
             
-            <p style="color: #ccc; margin-bottom: 20px;">Share your referral link and earn 50% of your referrals' activation fee!</p>
+            <p style="color: #ccc; margin-bottom: 20px;">Share your referral link and earn 30% of your referrals' activation fee!</p>
             
             <div style="background: rgba(106, 184, 255, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
                 <h4 style="color: #6ab8ff; margin-bottom: 10px;">Your Referral Link:</h4>
@@ -945,7 +1454,7 @@ Or on WhatsApp, +256700559067</p>
                 <h4 style="color: #6ab8ff;">How it works:</h4>
                 <p style="color: #ccc; margin: 10px 0;">1. Share your link with friends</p>
                 <p style="color: #ccc; margin: 10px 0;">2. They sign up using your link</p>
-                <p style="color: #ccc; margin: 10px 0;">3. Earn 50% of their activation fee!</p>
+                <p style="color: #ccc; margin: 10px 0;">3. Earn 30% of their activation fee!</p>
             </div>
             
             <button class="modal-btn secondary" onclick="closeModal('referral-modal')">Close</button>
@@ -1013,6 +1522,23 @@ Or on WhatsApp, +256700559067</p>
         let weeklyActivities = [];
         let allTransactions = [];
         let currentPlan = null;
+        let pendingWithdrawalData = null;
+        
+        // Password toggle function
+        function togglePasswordVisibility(inputId, toggleButton) {
+            const input = document.getElementById(inputId);
+            const icon = toggleButton.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
         
         // Initialize App
         document.addEventListener('DOMContentLoaded', function() {
@@ -1169,7 +1695,7 @@ Or on WhatsApp, +256700559067</p>
             }
         }
         
-        // Load transactions
+        // Load transactions - UPDATED FUNCTION
         async function loadTransactions() {
             if (!currentUser) return;
             
@@ -1177,7 +1703,7 @@ Or on WhatsApp, +256700559067</p>
                 const snapshot = await db.collection('transactions')
                     .where('userId', '==', currentUser.uid)
                     .orderBy('date', 'desc')
-                    .limit(20)
+                    .limit(50)
                     .get();
                 
                 allTransactions = [];
@@ -1185,53 +1711,145 @@ Or on WhatsApp, +256700559067</p>
                     allTransactions.push({ id: doc.id, ...doc.data() });
                 });
                 
+                console.log(`Loaded ${allTransactions.length} transactions for user ${currentUser.uid}`);
+                
+                // Update UI immediately
                 updateTransactionsUI();
             } catch (error) {
                 console.error("Error loading transactions:", error);
+                // Fallback: Try without ordering if index doesn't exist
+                try {
+                    const snapshot = await db.collection('transactions')
+                        .where('userId', '==', currentUser.uid)
+                        .get();
+                    
+                    allTransactions = [];
+                    snapshot.forEach(doc => {
+                        allTransactions.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    // Sort manually by date
+                    allTransactions.sort((a, b) => {
+                        const dateA = a.date ? new Date(a.date) : new Date(0);
+                        const dateB = b.date ? new Date(b.date) : new Date(0);
+                        return dateB - dateA; // Descending order
+                    });
+                    
+                    console.log(`Loaded ${allTransactions.length} transactions (fallback method)`);
+                    updateTransactionsUI();
+                } catch (fallbackError) {
+                    console.error("Fallback error loading transactions:", fallbackError);
+                }
             }
         }
         
-        // Update transactions UI
+        // Update transactions UI - UPDATED FUNCTION
         function updateTransactionsUI() {
-            const container = document.getElementById('txn-list');
+            const container = document.getElementById('transactions-container');
+            const noTransactionsDiv = document.getElementById('no-transactions');
+            
             if (!container) return;
             
-            container.innerHTML = '';
+            // Clear existing transaction items
+            const existingItems = container.querySelectorAll('.transaction-item');
+            existingItems.forEach(item => item.remove());
             
             if (allTransactions.length === 0) {
-                container.innerHTML = '<p style="color: #ccc; text-align: center;">No transactions found.</p>';
+                if (noTransactionsDiv) {
+                    noTransactionsDiv.style.display = 'block';
+                }
                 return;
             }
             
+            // Hide no transactions message
+            if (noTransactionsDiv) {
+                noTransactionsDiv.style.display = 'none';
+            }
+            
+            // Add each transaction
             allTransactions.forEach(txn => {
-                const date = new Date(txn.date).toLocaleString();
-                const txnEl = document.createElement('div');
-                txnEl.className = 'transaction';
-                txnEl.innerHTML = `
-                    <table>
-                        <tr>
-                            <td><label>Type:</label></td>
-                            <td><span>${txn.type}</span></td>
-                        </tr>
-                        <tr>
-                            <td><label>Description:</label></td>
-                            <td><span>${txn.description}</span></td>
-                        </tr>
-                        <tr>
-                            <td><label>Amount:</label></td>
-                            <td><span>$${txn.amount}</span></td>
-                        </tr>
-                        <tr>
-                            <td><label>Date:</label></td>
-                            <td><span>${date}</span></td>
-                        </tr>
-                        <tr>
-                            <td><label>Status:</label></td>
-                            <td><span class="status-badge status-${txn.status}">${txn.status}</span></td>
-                        </tr>
-                    </table>
+                const transactionEl = document.createElement('div');
+                transactionEl.className = 'transaction-item';
+                
+                const date = txn.date ? new Date(txn.date).toLocaleString() : 'N/A';
+                const amount = parseFloat(txn.amount) || 0;
+                const isPositive = ['deposit', 'earning', 'investment_return', 'referral_bonus'].includes(txn.type);
+                const isNegative = ['withdrawal', 'investment', 'fee'].includes(txn.type);
+                
+                // Determine amount class and sign
+                let amountClass = '';
+                let amountSign = '';
+                
+                if (isPositive) {
+                    amountClass = 'amount-positive';
+                    amountSign = '+';
+                } else if (isNegative) {
+                    amountClass = 'amount-negative';
+                    amountSign = '-';
+                }
+                
+                // Determine icon based on transaction type
+                let icon = 'fa-exchange-alt';
+                let iconColor = '#6ab8ff';
+                
+                switch(txn.type) {
+                    case 'deposit':
+                        icon = 'fa-arrow-down';
+                        iconColor = '#28a745';
+                        break;
+                    case 'withdrawal':
+                        icon = 'fa-arrow-up';
+                        iconColor = '#dc3545';
+                        break;
+                    case 'earning':
+                        icon = 'fa-money-bill-wave';
+                        iconColor = '#ffc107';
+                        break;
+                    case 'investment':
+                        icon = 'fa-chart-line';
+                        iconColor = '#17a2b8';
+                        break;
+                    case 'referral_bonus':
+                        icon = 'fa-user-friends';
+                        iconColor = '#6f42c1';
+                        break;
+                    case 'fee':
+                        icon = 'fa-percentage';
+                        iconColor = '#fd7e14';
+                        break;
+                }
+                
+                transactionEl.innerHTML = `
+                    <div class="transaction-header">
+                        <div>
+                            <i class="fas ${icon}" style="color: ${iconColor}; margin-right: 8px;"></i>
+                            <span class="transaction-type">${txn.type.replace('_', ' ')}</span>
+                        </div>
+                        <div class="transaction-amount ${amountClass}">
+                            ${amountSign}$${Math.abs(amount).toFixed(2)}
+                        </div>
+                    </div>
+                    
+                    ${txn.description ? `<div class="transaction-description">${txn.description}</div>` : ''}
+                    
+                    <div class="transaction-details">
+                        <div><strong>Status:</strong> 
+                            <span class="status-badge status-${txn.status || 'pending'}">
+                                ${txn.status || 'pending'}
+                            </span>
+                        </div>
+                        ${txn.method ? `<div><strong>Method:</strong> ${txn.method}</div>` : ''}
+                        ${txn.plan ? `<div><strong>Plan:</strong> ${txn.plan}</div>` : ''}
+                        ${txn.netAmount ? `<div><strong>Net Amount:</strong> $${txn.netAmount.toFixed(2)}</div>` : ''}
+                        ${txn.fee ? `<div><strong>Fee:</strong> $${txn.fee.toFixed(2)}</div>` : ''}
+                    </div>
+                    
+                    <div class="transaction-date">
+                        <i class="far fa-clock"></i> ${date}
+                    </div>
                 `;
-                container.appendChild(txnEl);
+                
+                container.appendChild(transactionEl);
             });
         }
         
@@ -1253,6 +1871,8 @@ Or on WhatsApp, +256700559067</p>
                 ];
                 
                 const container = document.getElementById('offers-list');
+                if (!container) return;
+                
                 container.innerHTML = '';
                 
                 offers.forEach(offer => {
@@ -1306,14 +1926,12 @@ Or on WhatsApp, +256700559067</p>
                 }
             });
             
-            document.getElementById('total-earnings').textContent = totalEarnings.toFixed(2);
-            document.getElementById('week-earnings').textContent = weekEarnings.toFixed(2);
-            document.getElementById('today-earnings').textContent = todayEarnings.toFixed(2);
-            
             // Update referral link
             if (userData.referralCode) {
-                document.getElementById('referral-link').textContent = 
-                    `${window.location.origin}?ref=${userData.referralCode}`;
+                const referralLink = document.getElementById('referral-link');
+                if (referralLink) {
+                    referralLink.textContent = `${window.location.origin}?ref=${userData.referralCode}`;
+                }
             }
             
             // Check activation
@@ -1325,6 +1943,8 @@ Or on WhatsApp, +256700559067</p>
         // Show notification
         function showNotification(message) {
             const container = document.getElementById('notifications');
+            if (!container) return;
+            
             const notification = document.createElement('div');
             notification.className = 'notification';
             notification.innerHTML = `
@@ -1337,7 +1957,7 @@ Or on WhatsApp, +256700559067</p>
             }, 5000);
         }
         
-        // Show page
+        // Show page - UPDATED FUNCTION
         function showPage(pageId) {
             // Hide all pages
             document.querySelectorAll('.page').forEach(page => {
@@ -1348,6 +1968,11 @@ Or on WhatsApp, +256700559067</p>
             const page = document.getElementById(pageId);
             if (page) {
                 page.classList.add('active');
+            }
+            
+            // Load transactions when transactions page is shown
+            if (pageId === 'transactions' && currentUser) {
+                loadTransactions();
             }
             
             // Close nav menu
@@ -1390,7 +2015,118 @@ Or on WhatsApp, +256700559067</p>
                 alert("Please activate your account first by making a deposit.");
                 return;
             }
+            
+            // Clear previous inputs
+            document.getElementById('withdraw-amount').value = '';
+            document.getElementById('withdraw-wallet').value = '';
+            document.getElementById('withdraw-password').value = '';
+            
             showModal('withdraw-modal');
+        }
+        
+        // Confirm withdrawal (NEW FUNCTION)
+        async function confirmWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            const method = document.getElementById('withdraw-method').value;
+            const wallet = document.getElementById('withdraw-wallet').value;
+            const password = document.getElementById('withdraw-password').value;
+            
+            if (!amount || amount < 10) {
+                alert("Minimum withdrawal amount is $10");
+                return;
+            }
+            
+            if (!wallet) {
+                alert("Please enter your wallet address or email");
+                return;
+            }
+            
+            if (!password) {
+                alert("Please enter your password to confirm");
+                return;
+            }
+            
+            if (!userData.balance || amount > userData.balance) {
+                alert("Insufficient balance");
+                return;
+            }
+            
+            // Verify password
+            try {
+                // Re-authenticate user
+                const credential = firebase.auth.EmailAuthProvider.credential(
+                    currentUser.email,
+                    password
+                );
+                
+                await currentUser.reauthenticateWithCredential(credential);
+                
+                // Calculate fee and net amount
+                const fee = amount * 0.05; // 5% fee
+                const netAmount = amount - fee;
+                
+                // Store withdrawal data for confirmation
+                pendingWithdrawalData = {
+                    amount: amount,
+                    method: method,
+                    wallet: wallet,
+                    fee: fee,
+                    netAmount: netAmount
+                };
+                
+                // Show confirmation modal
+                document.getElementById('withdraw-confirm-details').innerHTML = `
+                    <p><strong>Amount:</strong> $${amount.toFixed(2)}</p>
+                    <p><strong>Fee (5%):</strong> $${fee.toFixed(2)}</p>
+                    <p><strong>Net Amount:</strong> $${netAmount.toFixed(2)}</p>
+                    <p><strong>Method:</strong> ${method}</p>
+                    <p><strong>To:</strong> ${wallet}</p>
+                    <p style="color: #ffc107; margin-top: 15px;">Are you sure you want to proceed?</p>
+                `;
+                
+                closeModal('withdraw-modal');
+                showModal('withdraw-confirm-modal');
+                
+            } catch (error) {
+                console.error("Password verification failed:", error);
+                alert("Incorrect password. Please try again.");
+            }
+        }
+        
+        // Submit withdrawal (UPDATED FUNCTION)
+        async function submitWithdrawal() {
+            if (!pendingWithdrawalData) return;
+            
+            try {
+                const { amount, method, wallet, fee, netAmount } = pendingWithdrawalData;
+                
+                // Create withdrawal request
+                await db.collection('transactions').add({
+                    userId: currentUser.uid,
+                    type: 'withdrawal',
+                    amount: amount,
+                    netAmount: netAmount,
+                    fee: fee,
+                    method: method,
+                    wallet: wallet,
+                    status: 'pending',
+                    date: new Date().toISOString(),
+                    description: `Withdrawal request via ${method}`
+                });
+                
+                alert("Withdrawal request submitted successfully! It will be processed within 24-48 hours.");
+                closeModal('withdraw-confirm-modal');
+                
+                // Clear pending data
+                pendingWithdrawalData = null;
+                
+                // Reload transactions
+                loadTransactions();
+                
+            } catch (error) {
+                console.error("Error submitting withdrawal:", error);
+                alert("Error submitting withdrawal. Please try again.");
+            }
         }
         
         // Show referral modal
@@ -1533,71 +2269,22 @@ Or on WhatsApp, +256700559067</p>
             }
         }
         
-        // Submit withdrawal
-        async function submitWithdrawal() {
-            const amount = parseFloat(document.getElementById('withdraw-amount').value);
-            const method = document.getElementById('withdraw-method').value;
-            const wallet = document.getElementById('withdraw-wallet').value;
-            
-            if (!amount || amount < 10) {
-                alert("Minimum withdrawal amount is $10");
-                return;
-            }
-            
-            if (!wallet) {
-                alert("Please enter your wallet address or email");
-                return;
-            }
-            
-            if (!userData.balance || amount > userData.balance) {
-                alert("Insufficient balance");
-                return;
-            }
-            
-            try {
-                const fee = amount * 0.05; // 5% fee
-                const netAmount = amount - fee;
-                
-                // Create withdrawal request
-                await db.collection('transactions').add({
-                    userId: currentUser.uid,
-                    type: 'withdrawal',
-                    amount: amount,
-                    netAmount: netAmount,
-                    fee: fee,
-                    method: method,
-                    wallet: wallet,
-                    status: 'pending',
-                    date: new Date().toISOString(),
-                    description: `Withdrawal request via ${method}`
-                });
-                
-                alert("Withdrawal request submitted! It will be processed within 24-48 hours.");
-                closeModal('withdraw-modal');
-                loadTransactions();
-                
-            } catch (error) {
-                console.error("Error submitting withdrawal:", error);
-                alert("Error submitting withdrawal. Please try again.");
-            }
-        }
-        
         // Invest function
         function invest(plan) {
             currentPlan = plan;
-            let minAmount = 50;
-            let returns = "15%";
+            let minAmount = 1.5;
+            let returns = "5%";
             let planName = "Starter Plan";
             
             switch(plan) {
                 case 'premium':
-                    minAmount = 200;
-                    returns = "25%";
+                    minAmount = 3;
+                    returns = "20%";
                     planName = "Premium Plan";
                     break;
                 case 'vip':
-                    minAmount = 500;
-                    returns = "40%";
+                    minAmount = 10;
+                    returns = "50%";
                     planName = "VIP Plan";
                     break;
             }
@@ -1617,7 +2304,7 @@ Or on WhatsApp, +256700559067</p>
             const amount = parseFloat(document.getElementById('invest-amount').value);
             const method = document.getElementById('invest-method').value;
             
-            if (!amount || amount < 50) {
+            if (!amount || amount < 1.5) {
                 alert("Minimum investment amount is $50");
                 return;
             }
@@ -1670,4 +2357,5 @@ Or on WhatsApp, +256700559067</p>
     <script src="no_select.js"></script>
     <script src="refresh_force.js"></script>
 </body>
-    </html>
+</html>
+
