@@ -1587,18 +1587,19 @@ Or on WhatsApp, +256700559067</p>
             <button class="close-btn" onclick="closeModal('referral-modal')">&times;</button>
             <h3>Refer & Earn</h3>
             
-            <p style="color: #ccc; margin-bottom: 20px;">Share your referral link and earn 30% of your referrals' activation fee!</p>
+            <p style="color: #ccc; margin-bottom: 20px;">Share your referral code and earn 30% of your referrals' activation fee!</p>
             
             <div style="background: rgba(106, 184, 255, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
-                <h4 style="color: #6ab8ff; margin-bottom: 10px;">Your Referral Link:</h4>
+                <h4 style="color: #6ab8ff; margin-bottom: 10px;">Your Referral Code:</h4>
                 <div id="referral-link">Loading...</div>
-                <button class="copy-btn" onclick="copyReferralLink()" style="width: 100%; margin-top: 10px;">Copy Link</button>
+                <button class="copy-btn" onclick="copyReferralLink()" style="width: 100%; margin-top: 10px;">Copy</button>
             </div>
             
             <div style="margin: 20px 0;">
                 <h4 style="color: #6ab8ff;">How it works:</h4>
-                <p style="color: #ccc; margin: 10px 0;">1. Share your link with friends</p>
-                <p style="color: #ccc; margin: 10px 0;">2. They sign up using your link</p>
+                <p style="color: #ccc; margin: 10px 0;">1. Share your code with friends</p>
+                <p style="color: #ccc; margin: 10px 0;">2. They sign up and input your code.</p>
+         <img src="rfr.png" style="width: 100%;">
                 <p style="color: #ccc; margin: 10px 0;">3. Earn 30% of their activation fee!</p>
             </div>
             
@@ -2076,7 +2077,7 @@ Or on WhatsApp, +256700559067</p>
             if (userData.referralCode) {
                 const referralLink = document.getElementById('referral-link');
                 if (referralLink) {
-                    referralLink.textContent = `${window.location.origin}?ref=${userData.referralCode}`;
+                    referralLink.textContent = `${userData.referralCode}`;
                 }
             }
             
@@ -2487,7 +2488,7 @@ Or on WhatsApp, +256700559067</p>
         function copyReferralLink() {
             const link = document.getElementById('referral-link').textContent;
             navigator.clipboard.writeText(link).then(() => {
-                alert("Referral link copied to clipboard!");
+                alert("Referral code copied to clipboard!");
             });
         }
         
@@ -2500,8 +2501,8 @@ Or on WhatsApp, +256700559067</p>
             }
         }
     </script>
-    <script src="no_select.js"></script>
+  
     <script src="refresh_force.js"></script>
+    <script src="no_select.js"></script>
 </body>
-</html>
-
+        </html>
