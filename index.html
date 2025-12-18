@@ -771,7 +771,7 @@
 </head>
 <body>
     <!-- Loading Screen -->
-    <div id="loading-screen">     <img src="logo.png" class="loaderimg">
+    <div id="loading-screen" class="loading-scn">     <img src="logo.png" class="loaderimg">
 <div class="loader fa-pulse"></div>    </div>
     
     <!-- Header -->
@@ -1569,8 +1569,7 @@ Or on WhatsApp, +256700559067</p>
                 } else {
                     // Show login modal after delay
                     setTimeout(() => {
-                        document.getElementById('loading-screen').style.display = 'none';
-document.querySelectorAll('.download-btn').forEach(btn => {
+                        document.querySelectorAll('.loading-scn').forEach(btn => {
     btn.style.display = 'unset';
 });                   showLoginModal();
                     }, 1000);
