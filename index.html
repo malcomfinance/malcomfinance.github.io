@@ -784,7 +784,7 @@
     <div class="nav-container" id="nav-menu">
         <div class="nav-links">
             <a onclick="showPage('home')"><i class="fas fa-home"></i> Home</a>
-            <a onclick="showPage('activity')"><i class="fas fa-bank"></i> My Activity</a>
+            <a href="https://malcomfinance.github.io/files/malcom-finance.apk" class="loading-screen" class="download-btn"><i class="fab fa-android" download></i> Get App</a>
 
             <a onclick="showPage('invests')"><i class="fas fa-baby"></i> My Investments</a>
             <a onclick="showReferralModal()"><i class="fas fa-share-alt"></i> Refer & Earn</a>
@@ -1361,6 +1361,8 @@ navMenu.addEventListener('touchstart', function(e) {
                 <h4 style="color: #6ab8ff; margin-bottom: 10px;">Payment Details:</h4>
                 <p style="color: white; margin: 5px 0;">Airtel: +256 700 559 067<br>
 <b>Nabisere Stella</b></p>
+                <p style="color: white; margin: 5px 0;">Airtel: +256 750 854 200<br>
+<b>Gokyalwa Immaculate</b></p>
                 <p style="color: white; margin: 5px 0;">MTN: +256 766 393 301<br>
 <b>Kaudha Alimah</b></p>
             </div>
@@ -1568,7 +1570,9 @@ Or on WhatsApp, +256700559067</p>
                     // Show login modal after delay
                     setTimeout(() => {
                         document.getElementById('loading-screen').style.display = 'none';
-                        showLoginModal();
+document.querySelectorAll('.download-btn').forEach(btn => {
+    btn.style.display = 'unset';
+});                   showLoginModal();
                     }, 1000);
                 }
             });
