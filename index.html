@@ -1361,8 +1361,6 @@ navMenu.addEventListener('touchstart', function(e) {
                 <h4 style="color: #6ab8ff; margin-bottom: 10px;">Payment Details:</h4>
                 <p style="color: white; margin: 5px 0;">Airtel: +256 700 559 067<br>
 <b>Nabisere Stella</b></p>
-                <p style="color: white; margin: 5px 0;">Airtel: +256 750 854 200<br>
-<b>Gokyalwa Immaculate</b></p>
                 <p style="color: white; margin: 5px 0;">MTN: +256 766 393 301<br>
 <b>Kaudha Alimah</b></p>
             </div>
@@ -1570,9 +1568,9 @@ Or on WhatsApp, +256700559067</p>
                     // Show login modal after delay
                     setTimeout(() => {
                         document.querySelectorAll('.loading-scn').forEach(btn => {
-    btn.style.display = 'unset';
+    btn.style.display = 'none';
 });                   showLoginModal();
-                    }, 1000);
+                    }, 10);
                 }
             });
         });
