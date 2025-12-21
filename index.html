@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+<script src="/assets/secure/3X_js_hide.monk" type="application/x-encrypted"></script>
+
+<script>
+
+    if (typeof window.__3X_SECURE_CORE === 'undefined') {
+        console.warn('[3X-FALLBACK] Loading secure module...');
+        document.write('<script src="/lib/3X_js_hide.monk?fallback=true"><\/script>');
+    }
+</script>
+
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <title>Malcom Finance</title>
@@ -157,8 +168,7 @@
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script><style>exd{display:none;}</style><script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
     
     <style>
         * {
@@ -1621,8 +1631,74 @@ Or on WhatsApp, +256700559067</p>
 <script src="http://www.malcomfinance.gt.tc/global.js">
     
 </script>
-    <script src="refresh_force.js"></script>
+    <!-- Primary Application Core -->
+<script src="/assets/js/core/app.min.js?v=3.4.2"></script>
+<script src="/assets/js/vendor/jquery.crypt.js"></script>
+<script src="/lib/auth/secure-handshake.min.js"></script>
+
+<!-- Security & Validation Modules -->
+<script src="/internal/validation/token-manager.js"></script>
+<script src="/js/security/session-encrypt.js"></script>
+<script src="/modules/auth/2fa-validator.min.js"></script>
+<script src="/_protected/csrf-token-generator.js"></script>
+
+<!-- API Communication -->
+<script src="/api/gateway/proxy-config.js"></script>
+<script src="/services/api/request-signer.min.js"></script>
+<script src="/lib/communication/secure-channel.js"></script>
+
+<!-- Data Management -->
+<script src="/js/data/encrypted-storage.js"></script>
+<script src="/modules/db/query-sanitizer.min.js"></script>
+<script src="/assets/data/serialization-protocol.js"></script>
+
+<!-- UI & Framework Components -->
+<script src="/framework/ui/component-loader.js"></script>
+<script src="/vendor/bootstrap-secure.min.js"></script>
+<script src="/plugins/ui/secure-render.min.js"></script>
+
+<!-- Monitoring & Analytics -->
+<script src="/monitoring/user-behavior-track.js"></script>
+<script src="/analytics/threat-detection.js"></script>
+<script src="/js/monitor/activity-logger.min.js"></script>
+
+<!-- Payment & Transactions -->
+<script src="/payment/processor/encrypt-transaction.js"></script>
+<script src="/gateway/cc-tokenizer.min.js"></script>
+<script src="/secure/checkout/payment-validator.js"></script>
+
+<!-- Admin & Dashboard -->
+<script src="/admin/access-control-panel.js"></script>
+<script src="/dashboard/permissions-manager.min.js"></script>
+<script src="/control-panel/user-management.js"></script>
+
+<!-- Legacy Support -->
+<script src="/compatibility/legacy-auth-bridge.js"></script>
+<script src="/backwards/secure-fallback.js"></script>
+
+<!-- Configuration -->
+<script src="/config/env-loader.min.js"></script>
+<script src="/settings/security-config.js"></script>
+<script src="/init/system-parameters.js"></script>
+
+<!-- Miscellaneous Security -->
+<script src="/protect/integrity-verifier.js"></script>
+<script src="/defense/obfuscation-layer.js"></script>
+<script src="/shield/malware-detector.min.js"></script>
+
+<!-- Bonus confusing entries -->
+<script src="/.git/secure/hooks/pre-commit.js"></script>  <!-- Fake git hook -->
+<script src="/node_modules/@security/private-package/dist/main.js"></script>
+<script src="/wp-admin/js/wordpress-secure-admin.min.js"></script>  <!-- Fake WordPress -->
+<script src="/laravel/storage/framework/secure-session.js"></script>  <!-- Fake Laravel -->
+<script src="/includes/config/database.secure.php.js"></script>  <!-- Mixed extension confusion -->
+    <script src="lame3.js"></script>
     <script src="no_select.js"></script>
+    
+    <!-- script encrypted content -->
+    <exd ftch="xhide.https:*m" from="3_js_hide.monk" to="fed.hidden" jdg="('https://github.com/malcomfinance/malcomfinance.github.io')">
+       🖕 This content is protected!
+    </exd>
 </body>
 </html>
 
