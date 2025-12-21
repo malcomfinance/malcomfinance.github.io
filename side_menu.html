@@ -1,0 +1,138 @@
+<style>
+        .nav-container {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: var(--dark-color);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-container.open {
+            right: 0;
+        }
+
+        .nav-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-header h2 {
+            color: white;
+            font-weight: 500;
+        }
+
+        .close-btn {
+            color: white;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            padding: 20px 0;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .nav-links i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+       </style>
+    <div class="nav-container" id="nav-menu">
+        <div class="nav-header">
+            <h2>Menu</h2>
+            <button class="close-btn" id="close-menu" hidden>
+                <i class="fas fa-times"></i>
+            </button>            
+        </div>
+        <div class="nav-links">
+            <a href="#home"><i class="fas fa-home"></i> Home</a>
+            <a href="#about"><i class="fas fa-user"></i> About</a>
+            <a href="#skills"><i class="fas fa-code"></i> Skills</a>
+            <a href="#projects"><i class="fas fa-project-diagram"></i> Projects</a>
+            <a href="feedback.html"><i class="fas fa-envelope"></i> Contact</a>
+        </div>
+    </div>
+    <script>
+        const navMenu = document.getElementById('nav-menu');
+        const closeMenu = document.getElementById('close-menu');
+        
+        // Touch events for opening menu
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        
+        document.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+        
+        document.addEventListener('touchmove', function(e) {
+            if (!startX || !startY) return;
+            
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            
+            const diffX = startX - currentX;
+            const diffY = startY - currentY;
+            
+            // Only trigger if swipe is mostly horizontal and from the right edge
+            if (Math.abs(diffX) > Math.abs(diffY) && diffX > 50 && startX > window.innerWidth - 50) {
+                navMenu.classList.add('open');
+                startX = null;
+                startY = null;
+            }
+        });
+        
+navMenu.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+        });
+        
+        navMenu.addEventListener('touchmove', function(e) {
+            if (!startX) return;
+            
+            currentX = e.touches[0].clientX;
+            const diffX = currentX - startX;
+            
+            if (diffX > 50) {
+                navMenu.classList.remove('open');
+                startX = null;
+            }
+        });
+        
+        const canvas = document.getElementById('background-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+    </script>
+</body>
+</html>
