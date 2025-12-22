@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <title>Monday Activities</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Sofia+Sans+Condensed:ital,wght@0,1..1000;1,1..1000&display=swap" rel="stylesheet">     <style>  *{   font-family: "Sofia Sans Condensed", sans-serif;}     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <style>
         * {
-            font-family: system-ui, -apple-system, sans-serif;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -16,7 +16,7 @@
         body {
             min-height: 100vh;
             color: white;
-            background: linear-gradient(135deg, #6A5ACD, #483D8B);
+            background: linear-gradient(135deg, #6A5ACD, #4169E1);
         }
         
         .container {
@@ -438,7 +438,7 @@
             font-size: 14px;
             z-index: 1000;
             transition: all 0.3s;
-           }
+        }
         
         .back-home-btn:hover {
             background: rgba(106, 184, 255, 0.8);
@@ -491,7 +491,7 @@
         }
     </style>
 </head>
-<body class="day-specific-bg">
+<body>
     <div class="container">
         <!-- Header -->
         <div class="day-header">
@@ -508,11 +508,11 @@
             <h2 class="wrong-day-title">The Activities For Monday Were Reset.</h2>
             <p class="wrong-day-text">Please come back on Monday to complete today's activities.</p>
             <button class="today-activities-btn" onclick="goToToday()">
-            <i class="fas fa-calendar-day"></i> <b>Today's Activities</b>
+                 <i class="fas fa-calendar-day"></i> <b>Today's Activities</b>
             </button>
         </div>
         
-        <!-- Activities Container (Hidden until checked) -->
+        <!-- Activities Container -->
         <div id="activities-container" class="activities-container" style="display: none;">
             <!-- Stats Section -->
             <div class="stats-grid" id="stats-section" style="display: none;">
@@ -617,17 +617,14 @@
         </div>
     </div>
 
-    <!-- Back to Home Button (Fixed) -->
     <button class="back-home-btn" onclick="goToHome()">
         <i class="fas fa-arrow-left"></i>
     </button>
 
-    <!-- Firebase -->
+    <!-- Firebase CDN -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    
-    <script src="days.js"></script>
     
     <script>
         // Day-specific configuration
@@ -635,10 +632,11 @@
         const PAGE_DAY_NAME = 'Monday';
         const DAY_COLORS = {
             start: '#6A5ACD',
-            end: '#483D8B'
+            end: '#4169E1'
         };
         const DAY_ICON = 'fa-moon';
         
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
             authDomain: "malcolm-finance.firebaseapp.com",
@@ -649,23 +647,29 @@
             measurementId: "G-1CEG3BWFBP"
         };
 
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        // Global variables
+        let auth = null;
+        let db = null;
+        let currentUser = null;
+        let userData = null;
+        let activities = [];
         
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        
-        // Initialize Page
+        // ==============================================
+        // INITIALIZATION
+        // ==============================================
         document.addEventListener('DOMContentLoaded', function() {
-            document.title = PAGE_DAY_NAME + ' Activities';
-            document.querySelector('.day-badge').textContent = PAGE_DAY_NAME;
-            document.querySelector('.wrong-day-title').innerHTML = 
-                'The Activities For ' + PAGE_DAY_NAME + ' Were Reset.';
-            document.querySelector('.wrong-day-text').innerHTML = 
-                'Please come back on ' + PAGE_DAY_NAME + ' to complete today\'s activities.';
+            // Initialize Firebase
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
             
+            auth = firebase.auth();
+            db = firebase.firestore();
+            
+            // Set page title
+            document.title = PAGE_DAY_NAME + ' Activities';
+            
+            // Update date display
             const now = new Date();
             document.getElementById('current-date').textContent = 
                 now.toLocaleDateString('en-US', { 
@@ -675,16 +679,23 @@
                     day: 'numeric' 
                 });
             
+            // Initialize page
             initializePage();
         });
         
+        // ==============================================
+        // PAGE INITIALIZATION
+        // ==============================================
         async function initializePage() {
+            // Hide loading spinner after delay
             setTimeout(() => {
                 document.getElementById('loading-spinner').style.display = 'none';
             }, 1000);
             
+            // Check authentication state
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
+                    currentUser = user;
                     await checkUserAccess(user.uid);
                 } else {
                     showLoginRequired();
@@ -692,6 +703,9 @@
             });
         }
         
+        // ==============================================
+        // CHECK USER ACCESS
+        // ==============================================
         async function checkUserAccess(userId) {
             try {
                 const userDoc = await db.collection('users').doc(userId).get();
@@ -701,13 +715,15 @@
                     return;
                 }
                 
-                const userData = userDoc.data();
+                userData = userDoc.data();
                 
+                // Check if account is activated
                 if (!userData.isActive) {
                     showInactiveAccount();
                     return;
                 }
                 
+                // Check if it's the right day
                 const today = new Date().getDay();
                 const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
                 const currentDay = days[today];
@@ -717,8 +733,11 @@
                     return;
                 }
                 
-                await checkExistingSubmission(userId);
-                await loadActivities();
+                // Check if user has already submitted today
+                const hasSubmitted = await checkExistingSubmission(userId);
+                if (!hasSubmitted) {
+                    await loadActivities();
+                }
                 
             } catch (error) {
                 console.error('Error checking user access:', error);
@@ -727,17 +746,27 @@
             }
         }
         
+        // ==============================================
+        // CHECK EXISTING SUBMISSION
+        // ==============================================
         async function checkExistingSubmission(userId) {
             try {
-                const snapshot = await db.collection('activity_submissions')
-                    .where('userId', '==', userId)
-                    .where('day', '==', PAGE_DAY)
-                    .where('status', 'in', ['pending', 'approved'])
-                    .limit(1)
-                    .get();
+                // Get all submissions and filter manually
+                const snapshot = await db.collection('activity_submissions').get();
                 
-                if (!snapshot.empty) {
+                let hasSubmission = false;
+                snapshot.forEach(doc => {
+                    const submission = doc.data();
+                    if (submission.userId === userId && 
+                        submission.day === PAGE_DAY && 
+                        (submission.status === 'pending' || submission.status === 'approved')) {
+                        hasSubmission = true;
+                    }
+                });
+                
+                if (hasSubmission) {
                     document.getElementById('already-submitted').style.display = 'block';
+                    document.getElementById('loading-spinner').style.display = 'none';
                     return true;
                 }
                 return false;
@@ -747,55 +776,84 @@
             }
         }
         
+        // ==============================================
+        // LOAD ACTIVITIES - FIXED VERSION
+        // ==============================================
         async function loadActivities() {
             try {
-                const snapshot = await db.collection('daily_activities')
-                    .where('day', '==', PAGE_DAY)
-                    .orderBy('order', 'asc')
-                    .get();
+                console.log(`Loading activities for ${PAGE_DAY}...`);
                 
-                const activitiesList = document.getElementById('activities-list');
-                activitiesList.innerHTML = '';
+                // Hide loading spinner
+                document.getElementById('loading-spinner').style.display = 'none';
                 
-                if (snapshot.empty) {
-                    activitiesList.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">
-                                <i class="fas fa-calendar-plus"></i>
-                            </div>
-                            <h3 class="empty-state-title">No Activities Yet</h3>
-                            <p class="empty-state-text">
-                                No activities have been set for today. Check back later or contact support.
-                            </p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                const activities = [];
-                let totalEarnings = 0;
-                
-                snapshot.forEach((doc, index) => {
-                    const activity = { id: doc.id, ...doc.data() };
-                    activities.push(activity);
-                    totalEarnings += activity.earnings || 0;
-                    
-                    createActivityElement(activity, index + 1);
-                });
-                
-                document.getElementById('total-activities').textContent = activities.length;
-                document.getElementById('total-earnings').textContent = '$' + totalEarnings.toFixed(2);
-                document.getElementById('completion-time').textContent = (activities.length * 5) + ' min';
-                
-                document.getElementById('stats-section').style.display = 'grid';
-                document.getElementById('progress-section').style.display = 'block';
-                document.getElementById('completion-section').style.display = 'block';
+                // Show activities container
                 document.getElementById('activities-container').style.display = 'block';
                 
-                setupCompletionTracking(activities);
+                // Try to get activities from Firestore
+                let snapshot;
+                try {
+                    // Try with indexed query first
+                    snapshot = await db.collection('daily_activities')
+                        .where('day', '==', PAGE_DAY)
+                        .orderBy('order', 'asc')
+                        .get();
+                } catch (queryError) {
+                    console.warn('Indexed query failed, trying fallback method:', queryError);
+                    
+                    // Fallback: Get all activities and filter manually
+                    const allSnapshot = await db.collection('daily_activities').get();
+                    const allActivities = [];
+                    allSnapshot.forEach(doc => {
+                        allActivities.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    // Filter by day and sort
+                    const filteredActivities = allActivities
+                        .filter(activity => activity.day === PAGE_DAY)
+                        .sort((a, b) => (a.order || 0) - (b.order || 0));
+                    
+                    snapshot = { 
+                        empty: filteredActivities.length === 0,
+                        forEach: (callback) => filteredActivities.forEach((activity, index) => {
+                            callback({ id: activity.id, data: () => activity });
+                        })
+                    };
+                }
+                
+                activities = [];
+                
+                if (snapshot.empty) {
+                    // No activities found - create sample activities
+                    console.log('No activities found, creating sample activities...');
+                    await createSampleActivities();
+                    
+                    // Try loading again
+                    return await loadActivities();
+                } else {
+                    // Process activities
+                    snapshot.forEach((doc, index) => {
+                        const activityData = doc.data();
+                        const activity = {
+                            id: doc.id,
+                            type: activityData.type || 'link',
+                            title: activityData.title || 'Untitled Activity',
+                            earnings: parseFloat(activityData.earnings) || 0.10,
+                            url: activityData.url || '',
+                            content: activityData.content || '',
+                            order: activityData.order || index
+                        };
+                        activities.push(activity);
+                    });
+                    
+                    console.log(`Found ${activities.length} activities`);
+                }
+                
+                // Display activities
+                displayActivities();
                 
             } catch (error) {
                 console.error('Error loading activities:', error);
+                document.getElementById('loading-spinner').style.display = 'none';
                 document.getElementById('activities-list').innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">
@@ -803,13 +861,117 @@
                         </div>
                         <h3 class="empty-state-title">Error Loading Activities</h3>
                         <p class="empty-state-text">
-                            Unable to load activities. Please try again later.
+                            Unable to load activities. Please try again later.<br>
+                            <small style="color: #888;">Error: ${error.message}</small>
                         </p>
                     </div>
                 `;
             }
         }
         
+        // ==============================================
+        // CREATE SAMPLE ACTIVITIES
+        // ==============================================
+        async function createSampleActivities() {
+            try {
+                const sampleActivities = [
+                    {
+                        day: PAGE_DAY,
+                        type: 'link',
+                        title: 'Watch our beginner investment tutorial',
+                        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                        earnings: 0.15,
+                        order: 0,
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        day: PAGE_DAY,
+                        type: 'text',
+                        title: 'Read about financial planning basics',
+                        content: 'Financial planning is the process of taking a comprehensive look at your financial situation and building a specific financial plan to reach your goals. It involves setting objectives, assessing assets and resources, estimating future financial needs, and making plans to achieve monetary goals.',
+                        earnings: 0.10,
+                        order: 1,
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        day: PAGE_DAY,
+                        type: 'video',
+                        title: 'Learn about stock market fundamentals',
+                        url: 'https://www.youtube.com/watch?v=3UF0ymVdYLA',
+                        earnings: 0.20,
+                        order: 2,
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        day: PAGE_DAY,
+                        type: 'link',
+                        title: 'Visit financial education website',
+                        url: 'https://www.investopedia.com',
+                        earnings: 0.12,
+                        order: 3,
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+                
+                // Create sample activities in Firestore
+                for (const activity of sampleActivities) {
+                    await db.collection('daily_activities').add(activity);
+                }
+                
+                console.log('Sample activities created successfully');
+                
+            } catch (error) {
+                console.error('Error creating sample activities:', error);
+            }
+        }
+        
+        // ==============================================
+        // DISPLAY ACTIVITIES
+        // ==============================================
+        function displayActivities() {
+            const activitiesList = document.getElementById('activities-list');
+            activitiesList.innerHTML = '';
+            
+            if (activities.length === 0) {
+                activitiesList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-calendar-plus"></i>
+                        </div>
+                        <h3 class="empty-state-title">No Activities Yet</h3>
+                        <p class="empty-state-text">
+                            No activities have been set for today. Check back later or contact support.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Create activity elements
+            activities.forEach((activity, index) => {
+                createActivityElement(activity, index + 1);
+            });
+            
+            // Update stats
+            const totalEarnings = activities.reduce((sum, activity) => 
+                sum + (parseFloat(activity.earnings) || 0), 0);
+            
+            document.getElementById('total-activities').textContent = activities.length;
+            document.getElementById('total-earnings').textContent = '$' + totalEarnings.toFixed(2);
+            document.getElementById('completion-time').textContent = (activities.length * 5) + ' min';
+            
+            // Show sections
+            document.getElementById('stats-section').style.display = 'grid';
+            document.getElementById('progress-section').style.display = 'block';
+            document.getElementById('completion-section').style.display = 'block';
+            
+            // Setup completion tracking
+            setupCompletionTracking();
+        }
+        
+        // ==============================================
+        // CREATE ACTIVITY ELEMENT
+        // ==============================================
         function createActivityElement(activity, number) {
             const activitiesList = document.getElementById('activities-list');
             
@@ -818,13 +980,17 @@
             activityCard.dataset.activityId = activity.id;
             
             let content = '';
+            let typeBadgeColor = '';
+            let typeBadgeText = '';
             
             switch (activity.type) {
                 case 'link':
+                    typeBadgeColor = 'rgba(106, 184, 255, 0.2)';
+                    typeBadgeText = 'Link';
                     content = `
                         <div class="activity-content">
                             <p>${activity.title}</p>
-                            <a href="${activity.url}" target="_blank" class="activity-link">
+                            <a href="${activity.url || '#'}" target="_blank" class="activity-link">
                                 <i class="fas fa-external-link-alt"></i> Open Link
                             </a>
                         </div>
@@ -832,11 +998,13 @@
                     break;
                     
                 case 'video':
+                    typeBadgeColor = 'rgba(220, 53, 69, 0.2)';
+                    typeBadgeText = 'Video';
                     content = `
                         <div class="activity-content">
                             <p>${activity.title}</p>
                             <div class="video-container">
-                                <iframe src="${activity.url}" 
+                                <iframe src="${activity.url || '#'}" 
                                         frameborder="0" 
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                                         allowfullscreen>
@@ -850,11 +1018,13 @@
                     break;
                     
                 case 'text':
+                    typeBadgeColor = 'rgba(40, 167, 69, 0.2)';
+                    typeBadgeText = 'Text';
                     content = `
                         <div class="activity-content">
                             <p>${activity.title}</p>
                             <div class="text-content">
-                                ${activity.content.replace(/\n/g, '<br>')}
+                                ${(activity.content || 'No content available').replace(/\n/g, '<br>')}
                             </div>
                             <p style="margin-top: 10px; color: #888; font-size: 14px;">
                                 <i class="fas fa-info-circle"></i> Read all content carefully
@@ -862,16 +1032,25 @@
                         </div>
                     `;
                     break;
+                    
+                default:
+                    typeBadgeColor = 'rgba(106, 184, 255, 0.2)';
+                    typeBadgeText = 'Activity';
+                    content = `
+                        <div class="activity-content">
+                            <p>${activity.title}</p>
+                        </div>
+                    `;
             }
             
             activityCard.innerHTML = `
                 <div class="activity-header">
                     <div class="activity-number">${number}</div>
                     <div>
-                        <span class="activity-type-badge" style="background: rgba(106, 184, 255, 0.2); color: #6ab8ff;">
-                            ${activity.type.charAt(0).toUpperCase() + activity.type.slice(1)}
+                        <span class="activity-type-badge" style="background: ${typeBadgeColor}; color: ${typeBadgeColor === 'rgba(106, 184, 255, 0.2)' ? '#6ab8ff' : typeBadgeColor === 'rgba(220, 53, 69, 0.2)' ? '#dc3545' : '#28a745'}">
+                            ${typeBadgeText}
                         </span>
-                        <span class="activity-earnings">$${activity.earnings.toFixed(2)}</span>
+                        <span class="activity-earnings">$${(activity.earnings || 0).toFixed(2)}</span>
                     </div>
                 </div>
                 <div class="activity-title">${activity.title}</div>
@@ -880,7 +1059,7 @@
                     <input type="checkbox" id="complete-${activity.id}" 
                            class="activity-complete-check" 
                            data-activity-id="${activity.id}"
-                           data-earnings="${activity.earnings}">
+                           data-earnings="${activity.earnings || 0}">
                     <label for="complete-${activity.id}">
                         <i class="far fa-square"></i> Mark as completed
                     </label>
@@ -890,7 +1069,10 @@
             activitiesList.appendChild(activityCard);
         }
         
-        function setupCompletionTracking(activities) {
+        // ==============================================
+        // SETUP COMPLETION TRACKING
+        // ==============================================
+        function setupCompletionTracking() {
             const checkboxes = document.querySelectorAll('.activity-complete-check');
             const totalActivities = activities.length;
             let completedCount = 0;
@@ -917,24 +1099,20 @@
                     completedCount = isChecked ? completedCount + 1 : completedCount - 1;
                     updateProgress(completedCount, totalActivities);
                     
-                    const submitBtn = document.getElementById('submit-btn');
-                    const confirmComplete = document.getElementById('confirm-completion');
-                    const confirmHonest = document.getElementById('confirm-honest');
-                    
-                    if (completedCount === totalActivities && confirmComplete.checked && confirmHonest.checked) {
-                        submitBtn.disabled = false;
-                    } else {
-                        submitBtn.disabled = true;
-                    }
+                    updateSubmitButton();
                 });
             });
             
             updateProgress(completedCount, totalActivities);
             
+            // Add event listeners for confirmation checkboxes
             document.getElementById('confirm-completion').addEventListener('change', updateSubmitButton);
             document.getElementById('confirm-honest').addEventListener('change', updateSubmitButton);
         }
         
+        // ==============================================
+        // UPDATE PROGRESS BAR
+        // ==============================================
         function updateProgress(completed, total) {
             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
             
@@ -942,6 +1120,9 @@
             document.getElementById('progress-fill').style.width = percentage + '%';
         }
         
+        // ==============================================
+        // UPDATE SUBMIT BUTTON STATE
+        // ==============================================
         function updateSubmitButton() {
             const totalActivities = document.querySelectorAll('.activity-complete-check').length;
             const completedCount = document.querySelectorAll('.activity-complete-check:checked').length;
@@ -952,6 +1133,9 @@
                 !(completedCount === totalActivities && confirmComplete && confirmHonest);
         }
         
+        // ==============================================
+        // SUBMIT COMPLETION
+        // ==============================================
         async function submitCompletion() {
             if (!auth.currentUser) {
                 alert('Please login to submit');
@@ -982,16 +1166,19 @@
                     status: 'pending',
                     submittedAt: new Date().toISOString(),
                     reviewed: false,
-                    userName: auth.currentUser.email
+                    userName: auth.currentUser.email || 'Unknown User'
                 };
                 
+                // Save submission to Firestore
                 await db.collection('activity_submissions').add(submissionData);
                 
+                // Clear local storage for these activities
                 activityCheckboxes.forEach(checkbox => {
                     const activityId = checkbox.dataset.activityId;
                     localStorage.removeItem(`completed_${PAGE_DAY}_${activityId}`);
                 });
                 
+                // Show success message
                 document.getElementById('activities-container').style.display = 'none';
                 document.getElementById('already-submitted').style.display = 'block';
                 
@@ -1003,6 +1190,9 @@
             }
         }
         
+        // ==============================================
+        // NAVIGATION FUNCTIONS
+        // ==============================================
         function goToToday() {
             const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
             const today = new Date().getDay();
@@ -1018,6 +1208,9 @@
             window.location.href = 'index.html#login';
         }
         
+        // ==============================================
+        // MESSAGE DISPLAY FUNCTIONS
+        // ==============================================
         function showWrongDayMessage() {
             document.getElementById('loading-spinner').style.display = 'none';
             document.getElementById('wrong-day-message').style.display = 'block';
@@ -1032,6 +1225,20 @@
             document.getElementById('loading-spinner').style.display = 'none';
             document.getElementById('inactive-account').style.display = 'block';
         }
+        
+        // ==============================================
+        // UTILITY FUNCTIONS
+        // ==============================================
+        function showError(message) {
+            alert('Error: ' + message);
+        }
+        
+        function showSuccess(message) {
+            alert('Success: ' + message);
+        }
+        
+        // Initialize on page load
+        window.onload = initializePage;
     </script>
 </body>
 </html>
