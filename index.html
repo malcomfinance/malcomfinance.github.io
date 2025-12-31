@@ -89,14 +89,22 @@
             min-height: 100vh;
             margin: 0;
             padding: 0;
+            width: 100vw;
         }
-        
+        .close-btn{
+            background: transparent;
+            color: white;
+            font-weight: 900;
+            border: none;
+            border-radius: 30px;
+            backdrop-filter: blur(20px);
+        }
         body::before {
             content: '';
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
+            width: 100vw;
             height: 100%;
             background-image: url('bg.jpg');
             background-size: cover;
@@ -144,6 +152,9 @@
             margin-top: 5em;
             text-align: center;
             padding-bottom: 80px;
+            width: 100%;
+            padding-left: 0;
+            padding-right: 0;
         }
         
         h2 {
@@ -266,7 +277,7 @@
             text-align: center;
             align-items: center;
             justify-content: center;
-            width: 95%;
+            width: 100%;
             padding: 7px;
             display: none;
         }
@@ -367,11 +378,14 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            color: white;
             background: none;
-            border: none;
             font-size: 24px;
             cursor: pointer;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
         }
         
         .notification {
@@ -838,28 +852,684 @@
             border-left: 4px solid #28a745;
             display: none;
         }
+        
+       
+        .daily-activities-section {
+            width: 100%;
+            margin: 25px auto;
+            text-align: center;
+        }
+        
+        .daily-activities-card {
+            background: black;
+            border-radius: 15px;
+            padding: 25px;
+            border: nome;
+            margin-bottom: 20px;
+        }
+        
+        .date-display {
+            font-size: 0.7em;
+            font-weight: 700;
+            color: lightblue;
+            margin-bottom: 15px;
+        }
+        
+        .quote-container {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .quote-text {
+            font-size: 0.8em;
+            line-height: 1.6;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        
+        .quote-author {
+            text-align: right;
+            color: #6ab8ff;
+            font-weight: 600;
+            font-size: 0.8em;
+        }
+        
+        .today-activities-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 40px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: 700;
+            cursor: pointer;           
+            align-items: center;
+            width: 90%;
+            justify-content: center;
+        }
+        
+        .today-activities-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(40, 167, 69, 0.4);
+        }
+        
+        .today-activities-btn:disabled {
+            background: linear-gradient(135deg, #666, #777);
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        .activities-loading {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .activities-loading .loader {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(106, 184, 255, 0.3);
+            border-top: 4px solid #6ab8ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .no-activities-message {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            color: #ffc107;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .no-activities-message i {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
-    <style>
-        .loading-scn{
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: black;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
-        }
-    </style>
     
-    <!-- Header -->
+    
+    <script>
+const LOCK_STORAGE_KEY = 'malcom_finance_lock';
+const DEFAULT_LOCK_SETTINGS = {enabled: false, passcode: null, question: null, answer: null};
+let lockSettings = {...DEFAULT_LOCK_SETTINGS};
+let lockScreenActive = false;
+let setupPin = '';
+let setupStep = 1;
+let firstPasscode = '';
+
+function loadLockSettings() {
+    try {
+        const saved = localStorage.getItem(LOCK_STORAGE_KEY);
+        if (saved) lockSettings = JSON.parse(saved);
+    } catch (e) {
+        console.error('Lock load error:', e);
+        lockSettings = {...DEFAULT_LOCK_SETTINGS};
+    }
+}
+
+function saveLockSettings() {
+    try {
+        localStorage.setItem(LOCK_STORAGE_KEY, JSON.stringify(lockSettings));
+    } catch (e) {
+        console.error('Lock save error:', e);
+    }
+}
+
+function initializeLockFeature() {
+    loadLockSettings();
+    createLockUI();
+    addSecurityToAccountPage();
+    
+    if (lockSettings.enabled && !isSecurityPage()) {
+        setTimeout(showLockScreen, 300);
+    }
+}
+
+function createLockUI() {
+    const lockHTML = `
+        <div id="lock-screen-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000 url('assets/lock.png') no-repeat center center; background-size: cover; z-index: 99999;">
+            <div class="pin-container" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px;">
+              <br><br><br>  <div class="title">Enter Passcode</div>
+                <div class="display">
+                    <div class="pin-circle" id="lock-circle1"></div>
+                    <div class="pin-circle" id="lock-circle2"></div>
+                    <div class="pin-circle" id="lock-circle3"></div>
+                    <div class="pin-circle" id="lock-circle4"></div>
+                </div>
+                <div class="keypad">
+                    <div class="keyrow">
+                        <div class="key" data-value="1">1</div>
+                        <div class="key" data-value="2">2</div>
+                        <div class="key" data-value="3">3</div>
+                    </div>
+                    <div class="keyrow">  
+                        <div class="key" data-value="4">4</div>
+                        <div class="key" data-value="5">5</div>
+                        <div class="key" data-value="6">6</div>
+                    </div>
+                    <div class="keyrow">
+                        <div class="key" data-value="7">7</div>
+                        <div class="key" data-value="8">8</div>
+                        <div class="key" data-value="9">9</div>
+                    </div>
+                    <div class="keyrow">
+                        <div class="key" data-value="0">0</div>
+                    </div>
+                </div>
+                <div class="status" id="lock-status"></div>
+                <p style="Font-weight: 900; color: white; backdrop-filter: blur(20px); padding: 10px 30px; border-radius: 50px; border: 1px solid white;" onclick="showForgotPasscodeFromLock()">Forgot Password</p>
+                <div style="margin-top: 30px; text-align: center;">
+                    <button onclick="showForgotPasscodeFromLock()" style="background: none; border: none; color: #6ab8ff; font-size: 14px; cursor: pointer; padding: 10px;">
+                        <i class="fas fa-unlock-alt"></i> Forgot Passcode?
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="security-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <button class="close-btn" onclick="closeModal('security-modal')">&times;</button>
+                <h3>Security Settings</h3>
+                <div style="margin: 20px 0; padding: 15px; background: rgba(106, 184, 255, 0.1); border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <span style="color: white; font-weight: bold;">Passcode Lock</span>
+                        <label class="switch">
+                            <input type="checkbox" id="passcode-toggle" onchange="togglePasscodeLock(this.checked)">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <p style="color: #ccc; font-size: 14px; margin: 0;">
+                        ${lockSettings.enabled ? 'Passcode is ON. Required to access app.' : 'Passcode is OFF. Turn on to secure app.'}
+                    </p>
+                </div>
+                <div style="margin: 25px 0;">
+                    <button class="modal-btn secondary" onclick="showChangePasscodeModal()" ${!lockSettings.enabled ? 'disabled' : ''} style="${!lockSettings.enabled ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                        <i class="fas fa-key"></i> Change Passcode
+                    </button>
+                    <button class="modal-btn secondary" onclick="showSecurityQuestionModal()" style="margin-top: 10px;">
+                        <i class="fas fa-question-circle"></i> ${lockSettings.question ? 'Change Security Question' : 'Set Security Question'}
+                    </button>
+                    <button class="modal-btn" onclick="forgotPasscode()" ${!lockSettings.enabled ? 'disabled' : ''} style="margin-top: 10px; background: #ff6b6b; ${!lockSettings.enabled ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                        <i class="fas fa-unlock-alt"></i> Forgot Passcode?
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="set-passcode-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <button class="close-btn" onclick="closeModal('set-passcode-modal'); resetSetup();">&times;</button>
+                <h3>Set Passcode</h3>
+                <div style="margin: 20px 0; text-align: center;">
+                    <p style="color: #ccc; margin-bottom: 20px;" id="passcode-instruction">Enter your new 4-digit passcode</p>
+                    <div class="pin-container" style="margin: 30px auto; max-width: 300px;">
+                        <div class="display">
+                            <div class="pin-circle" id="setup-circle1"></div>
+                            <div class="pin-circle" id="setup-circle2"></div>
+                            <div class="pin-circle" id="setup-circle3"></div>
+                            <div class="pin-circle" id="setup-circle4"></div>
+                        </div>
+                        <div class="keypad">
+                            <div class="keyrow">
+                                <div class="key" data-value="1">1</div>
+                                <div class="key" data-value="2">2</div>
+                                <div class="key" data-value="3">3</div>
+                            </div>
+                            <div class="keyrow">  
+                                <div class="key" data-value="4">4</div>
+                                <div class="key" data-value="5">5</div>
+                                <div class="key" data-value="6">6</div>
+                            </div>
+                            <div class="keyrow">
+                                <div class="key" data-value="7">7</div>
+                                <div class="key" data-value="8">8</div>
+                                <div class="key" data-value="9">9</div>
+                            </div>
+                            <div class="keyrow">
+                                <div class="key" data-value="0">0</div>
+                            </div>
+                        </div>
+                        <div class="status" id="setup-status"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="security-question-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <button class="close-btn" onclick="closeModal('security-question-modal')">&times;</button>
+                <h3>Security Question</h3>
+                <p style="color: #ccc; margin-bottom: 20px;">Set a security question for passcode recovery.</p>
+                <div class="form-group">
+                    <label>Select a question:</label>
+                    <select id="question-select" class="modal-input" onchange="toggleCustomQuestion()">
+                        <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                        <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+                        <option value="What city were you born in?">What city were you born in?</option>
+                        <option value="What is your favorite book?">What is your favorite book?</option>
+                        <option value="custom">Create custom question</option>
+                    </select>
+                </div>
+                <div class="form-group" id="custom-question-group" style="display: none;">
+                    <label>Your custom question:</label>
+                    <input type="text" id="custom-question" class="modal-input" placeholder="Enter your security question">
+                </div>
+                <div class="form-group">
+                    <label>Your answer:</label>
+                    <input type="text" id="security-answer" class="modal-input" placeholder="Enter your answer">
+                </div>
+                <div class="form-group">
+                    <label>Confirm answer:</label>
+                    <input type="text" id="confirm-answer" class="modal-input" placeholder="Enter answer again">
+                </div>
+                <div id="question-error" class="validation-error" style="display: none;"></div>
+                <button class="modal-btn" onclick="saveSecurityQuestion()">Save Security Question</button>
+            </div>
+        </div>
+        
+        <div id="forgot-passcode-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <button class="close-btn" onclick="closeModal('forgot-passcode-modal'); window.location='index.html'">&times;</button>
+                <h3>Reset Passcode</h3>
+                <div style="margin: 20px 0; padding: 15px; background: rgba(255, 107, 107, 0.1); border-radius: 8px;">
+                    <p style="color: #ffc107; margin: 0;">Answer security question to reset passcode.</p>
+                </div>
+                <div class="form-group">
+                    <label id="forgot-question-label">${lockSettings.question || 'Security Question'}</label>
+                </div>
+                <div class="form-group">
+                    <label>Your answer:</label>
+                    <input type="text" id="forgot-answer" class="modal-input" placeholder="Enter your answer">
+                </div>
+                <div id="forgot-error" class="validation-error" style="display: none;"></div>
+                <button class="modal-btn" onclick="verifySecurityAnswer()">Verify Answer</button>
+            </div>
+        </div>
+        
+        <style>
+            .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+            .switch input { opacity: 0; width: 0; height: 0; }
+            .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; }
+            .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; }
+            input:checked + .slider { background-color: #28a745; }
+            input:checked + .slider:before { transform: translateX(26px); }
+            .slider.round { border-radius: 34px; }
+            .slider.round:before { border-radius: 50%; }
+            .pin-container { padding: 0 20px; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; }
+            @media (max-width: 767px) { .pin-container { width: 90%; } }
+            @media (min-width: 768px) and (max-width: 1023px) { .pin-container { width: 400px; } }
+            @media (min-width: 1024px) { .pin-container { width: 400px; } }
+            .display { height: 72px; width: 100%; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; gap: 24px; }
+            .pin-circle { width: 15px; height: 15px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.6); }
+            .pin-circle.filled { background-color: white; border-color: rgba(255, 255, 255, 0.9); }
+            .keypad { text-align: center; justify-content: center; align-items: center; gap: 10px; width: 100%; display: flex; flex-direction: column; }
+            .keyrow { display: flex; gap: 10px; margin: auto; text-align: center; width: 100%; justify-content: center; }
+            .key { aspect-ratio: 1; width: 60px; height: 60px; background: rgba(255, 255, 255, 0.1); border-radius: 100%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: normal; color: rgba(255, 255, 255, 0.9); cursor: pointer; transition: all 120ms cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(20px); position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.2); }
+            
+            .status { margin-top: 32px; color: cyan; font-size: 17px; font-weight: 900; letter-spacing: 0.4px; text-align: center; min-height: 24px; }
+            .status.error { color: orange; animation: shake 0.5s ease-in-out; }
+            .status.success { color: yellowgreen; animation: successGlow 600ms ease-out; }
+            @keyframes shake { 0%,100% { transform: translateX(0); } 10%,30%,50%,70%,90% { transform: translateX(-5px); } 20%,40%,60%,80% { transform: translateX(5px); } }
+            @keyframes successGlow { 0% { text-shadow: 0 0 0 rgba(74, 222, 128, 0); } 50% { text-shadow: 0 0 20px rgba(74, 222, 128, 0.6); } 100% { text-shadow: 0 0 0 rgba(74, 222, 128, 0); } }
+            .title { color: rgba(255, 255, 255, 0.9); font-size: 24px; font-weight: 600; margin-bottom: 40px; text-align: center; }
+            .keyrow:last-child { justify-content: center; }
+            .keyrow:last-child .key { max-width: 33.33%; }
+            .keyrow:last-child::before, .keyrow:last-child::after { content: ''; flex: 1; visibility: hidden; }
+        </style>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', lockHTML);
+    initializeLockScreen();
+    initializeSetupScreen();
+}
+
+function addSecurityToAccountPage() {
+    const accountPage = document.getElementById('nav-menu');
+    if (accountPage) {
+        const buttons = accountPage.querySelector('nav-links');
+        if (buttons) {
+            const securityBtn = document.createElement('a');
+            securityBtn.className = 'white';
+            securityBtn.style.marginTop = '10px';
+            securityBtn.onclick = showSecuritySettingsModal;
+            securityBtn.innerHTML = '<i class="fas fa-shield-alt"></i> Security';
+            buttons.parentNode.insertBefore(securityBtn, buttons.nextSibling);
+        }
+    }
+}
+
+function showSecuritySettingsModal() {
+    updateSecurityModal();
+    showModal('security-modal');
+}
+
+function updateSecurityModal() {
+    const toggle = document.getElementById('passcode-toggle');
+    if (toggle) toggle.checked = lockSettings.enabled;
+    const statusText = document.querySelector('#security-modal p[style*="color: #ccc"]');
+    if (statusText) {
+        statusText.textContent = lockSettings.enabled 
+            ? 'Passcode is ON. Required to access app.' 
+            : 'Passcode is OFF. Turn on to secure app.';
+    }
+}
+
+function togglePasscodeLock(enabled) {
+    if (enabled) {
+        if (!lockSettings.passcode) {
+            showSetPasscodeModal();
+            document.getElementById('passcode-toggle').checked = false;
+            return;
+        }
+        lockSettings.enabled = true;
+        saveLockSettings();
+        alert('Passcode lock is now ON. Required to access app.');
+    } else {
+        const entered = prompt('Enter passcode to turn off lock:');
+        if (entered === lockSettings.passcode) {
+            lockSettings.enabled = false;
+            saveLockSettings();
+            alert('Passcode lock is now OFF.');
+        } else {
+            document.getElementById('passcode-toggle').checked = true;
+            alert('Incorrect passcode.');
+            return;
+        }
+    }
+    updateSecurityModal();
+}
+
+function showSetPasscodeModal() {
+    resetSetup();
+    showModal('set-passcode-modal');
+}
+
+function resetSetup() {
+    setupPin = '';
+    setupStep = 1;
+    firstPasscode = '';
+    updateSetupCircles();
+    document.getElementById('setup-status').textContent = '';
+    document.getElementById('passcode-instruction').textContent = 'Enter your new 4-digit passcode';
+    document.getElementById('setup-status').className = 'status';
+}
+
+function updateSetupCircles() {
+    for (let i = 1; i <= 4; i++) {
+        const circle = document.getElementById(`setup-circle${i}`);
+        if (circle) circle.classList.toggle('filled', i <= setupPin.length);
+    }
+}
+
+function initializeSetupScreen() {
+    setTimeout(() => {
+        const setupKeys = document.querySelectorAll('#set-passcode-modal .key');
+        setupKeys.forEach(key => {
+            key.addEventListener('click', (e) => {
+                const value = key.dataset.value;
+                handleSetupDigit(value);
+            });
+            key.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const value = key.dataset.value;
+                handleSetupDigit(value);
+            }, { passive: false });
+        });
+    }, 100);
+}
+
+function handleSetupDigit(digit) {
+    if (setupPin.length < 4) {
+        setupPin += digit;
+        updateSetupCircles();
+        if (setupPin.length === 4) {
+            if (setupStep === 1) {
+                firstPasscode = setupPin;
+                setupPin = '';
+                setupStep = 2;
+                document.getElementById('passcode-instruction').textContent = 'Confirm your passcode';
+                updateSetupCircles();
+                document.getElementById('setup-status').textContent = 'Now confirm your passcode';
+                document.getElementById('setup-status').className = 'status';
+            } else if (setupStep === 2) {
+                if (setupPin === firstPasscode) {
+                    document.getElementById('setup-status').textContent = 'Passcode set!';
+                    document.getElementById('setup-status').className = 'status success';
+                    lockSettings.passcode = setupPin;
+                    saveLockSettings();
+                    setTimeout(() => {
+                        closeModal('set-passcode-modal');
+                        if (!lockSettings.question) {
+                            showSecurityQuestionModal();
+                        } else {
+                            alert('Passcode set! Enable lock in Security settings.');
+                            updateSecurityModal();
+                        }
+                    }, 1000);
+                } else {
+                    document.getElementById('setup-status').textContent = 'Passcodes do not match.';
+                    document.getElementById('setup-status').className = 'status error';
+                    setTimeout(resetSetup, 1500);
+                }
+            }
+        }
+    }
+}
+
+function showSecurityQuestionModal() {
+    if (lockSettings.question) {
+        document.getElementById('question-select').value = 'custom';
+        document.getElementById('custom-question').value = lockSettings.question;
+        toggleCustomQuestion();
+    } else {
+        document.getElementById('question-select').value = 'What is your mother\'s maiden name?';
+    }
+    document.getElementById('security-answer').value = '';
+    document.getElementById('confirm-answer').value = '';
+    document.getElementById('question-error').style.display = 'none';
+    showModal('security-question-modal');
+}
+
+function toggleCustomQuestion() {
+    const select = document.getElementById('question-select');
+    const customGroup = document.getElementById('custom-question-group');
+    customGroup.style.display = select.value === 'custom' ? 'block' : 'none';
+}
+
+function saveSecurityQuestion() {
+    const select = document.getElementById('question-select');
+    const customQuestion = document.getElementById('custom-question').value.trim();
+    const answer = document.getElementById('security-answer').value.trim();
+    const confirmAnswer = document.getElementById('confirm-answer').value.trim();
+    const errorDiv = document.getElementById('question-error');
+    
+    let question = '';
+    if (select.value === 'custom') {
+        if (!customQuestion) {
+            errorDiv.textContent = 'Enter a security question';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        question = customQuestion;
+    } else {
+        question = select.value;
+    }
+    
+    if (!answer) {
+        errorDiv.textContent = 'Enter an answer';
+        errorDiv.style.display = 'block';
+        return;
+    }
+    
+    if (answer !== confirmAnswer) {
+        errorDiv.textContent = 'Answers do not match';
+        errorDiv.style.display = 'block';
+        return;
+    }
+    
+    lockSettings.question = question;
+    lockSettings.answer = answer.toLowerCase();
+    saveLockSettings();
+    alert('Security question saved!');
+    closeModal('security-question-modal');
+    updateSecurityModal();
+}
+
+function forgotPasscode() {
+    if (!lockSettings.question) {
+        alert('No security question set. Set one first.');
+        showSecurityQuestionModal();
+        return;
+    }
+    document.getElementById('forgot-question-label').textContent = lockSettings.question;
+    document.getElementById('forgot-answer').value = '';
+    document.getElementById('forgot-error').style.display = 'none';
+    closeModal('security-modal');
+    showModal('forgot-passcode-modal');
+}
+
+function showForgotPasscodeFromLock() {
+    hideLockScreen();
+    showModal('forgot-passcode-modal');
+}
+
+function verifySecurityAnswer() {
+    const answer = document.getElementById('forgot-answer').value.trim().toLowerCase();
+    const errorDiv = document.getElementById('forgot-error');
+    
+    if (!answer) {
+        errorDiv.textContent = 'Enter your answer';
+        errorDiv.style.display = 'block';
+        return;
+    }
+    
+    if (answer === lockSettings.answer) {
+        closeModal('forgot-passcode-modal');
+        lockSettings.passcode = null;
+        lockSettings.enabled = false;
+        saveLockSettings();
+        alert('Passcode reset! Set a new passcode in Security settings.');
+        showSetPasscodeModal();
+    } else {
+        errorDiv.textContent = 'Incorrect answer. Try again.';
+        errorDiv.style.display = 'block';
+    }
+}
+
+function showChangePasscodeModal() {
+    if (!lockSettings.enabled || !lockSettings.passcode) {
+        alert('Enable passcode lock first.');
+        return;
+    }
+    const current = prompt('Enter current passcode:');
+    if (!current) return;
+    if (current !== lockSettings.passcode) {
+        alert('Incorrect passcode.');
+        return;
+    }
+    showSetPasscodeModal();
+}
+
+function showLockScreen() {
+    lockScreenActive = true;
+    document.getElementById('lock-screen-overlay').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function hideLockScreen() {
+    lockScreenActive = false;
+    document.getElementById('lock-screen-overlay').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function isSecurityPage() {
+    return document.querySelector('.modal[style*="display: flex"]') || window.location.href.includes('security');
+}
+
+function initializeLockScreen() {
+    let lockPin = '';
+    
+    function clearLockState() {
+        lockPin = '';
+        updateLockCircles();
+        document.getElementById('lock-status').textContent = '';
+        document.getElementById('lock-status').className = 'status';
+    }
+    
+    function updateLockCircles() {
+        for (let i = 1; i <= 4; i++) {
+            const circle = document.getElementById(`lock-circle${i}`);
+            if (circle) circle.classList.toggle('filled', i <= lockPin.length);
+        }
+    }
+    
+    function handleLockDigit(digit) {
+        if (lockPin.length < 4) {
+            lockPin += digit;
+            updateLockCircles();
+            if (lockPin.length === 4) {
+                if (lockPin === lockSettings.passcode) {
+                    document.getElementById('lock-status').textContent = 'UNLOCKED';
+                    document.getElementById('lock-status').className = 'status success';
+                    setTimeout(() => {
+                        hideLockScreen();
+                        clearLockState();
+                    }, 500);
+                } else {
+                    vibrate();
+                    document.getElementById('lock-status').textContent = 'Wrong passcode. Try again.';
+                    document.getElementById('lock-status').className = 'status error';
+                    setTimeout(clearLockState, 1500);
+                }
+            }
+        }
+    }
+    
+    setTimeout(() => {
+        const lockKeys = document.querySelectorAll('#lock-screen-overlay .key');
+        lockKeys.forEach(key => {
+            key.addEventListener('click', (e) => {
+                if (lockScreenActive) {
+                    const value = key.dataset.value;
+                    handleLockDigit(value);
+                }
+            });
+            key.addEventListener('touchstart', (e) => {
+                if (lockScreenActive) {
+                    e.preventDefault();
+                    const value = key.dataset.value;
+                    handleLockDigit(value);
+                }
+            }, { passive: false });
+        });
+    }, 100);
+}
+
+function vibrate() {
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(initializeLockFeature, 500);
+});
+</script>
+    
+    
+   
     <div id="header">
         <img src="logo.png" class="logo">
         <i class="fas fa-bars fa-fade" onclick="openNav()"></i>
@@ -870,7 +1540,7 @@
         <div class="nav-links">
             <a onclick="showPage('home')"><i class="fas fa-home"></i> Home</a>
             <a class="loading-screen" id="loading-screen" href="https://malcomfinance.github.io/files/malcom-finance.apk" download><i class="fab fa-android"></i> Get App</a>
-            <a onclick="showPage('activity')"><i class="fas fa-hammer"></i> My Activities</a>
+            <a onclick="showSecuritySettingsModal()"><i class="fas fa-shield"></i> Security</a>
             <a onclick="showReferralModal()"><i class="fas fa-share-alt"></i> Refer & Earn</a>
             <a onclick="showPage('offers')"><i class="fas fa-gift"></i> Offers</a>
             <a onclick="showPage('account')"><i class="fas fa-users"></i> My Account</a>
@@ -958,6 +1628,33 @@
                         <button class="black" onclick="showDepositModal()">Deposit</button>
                         <button class="white" onclick="showWithdrawModal()">Withdraw</button>
                     </buttons>
+                </div>
+            </div>
+            
+            <!-- Daily Activities Section -->
+            <div class="daily-activities-section">
+                <div class="daily-activities-card glass-effect">
+                    <div class="date-display" id="today-date-display">Loading...</div>
+                    
+                    <div id="quote-container" class="quote-container" style="display: none;">
+                        <div class="quote-text" id="quote-of-the-day">"The best time to start was yesterday. The next best time is now."</div>
+                        <div class="quote-author" id="quote-author-name"> Icii White</div>
+                    </div>
+                    
+                    <div id="activities-loading" class="activities-loading">
+                        <div class="loader"></div>
+                        <p>Loading today's activities...</p>
+                    </div>
+                    
+                    <div id="no-activities-message" class="no-activities-message" style="display: none;">
+                        <i class="fas fa-calendar-plus"></i>
+                        <h3>No Activities Available Today</h3>
+                        <p>Check back tomorrow for new activities!</p>
+                    </div>
+                    
+                    <button class="today-activities-btn" id="today-activities-btn" onclick="goToDailyActivities()" disabled>
+                        Today's Activities
+                    </button>
                 </div>
             </div>
         </div>
@@ -1588,6 +2285,8 @@ Or on WhatsApp, +256700559067</p>
         let allTransactions = [];
         let pendingWithdrawalData = null;
         let cropper = null;
+        let todayActivities = null;
+        let todaysQuote = null;
         
         // Common fake email domains and patterns to reject
         const INVALID_EMAIL_PATTERNS = [
@@ -1632,6 +2331,29 @@ Or on WhatsApp, +256700559067</p>
             'disposable.com'
         ];
         
+        // Get today's date string in format YYYY-MM-DD
+        function getTodayDateString() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // Format date nicely
+        function formatTodayDate() {
+            const now = new Date();
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            const dayName = days[now.getDay()];
+            const monthName = months[now.getMonth()];
+            const date = now.getDate();
+            const year = now.getFullYear();
+            
+            return `${dayName}, ${monthName} ${date}, ${year}`;
+        }
+        
         // Validation Functions
         function validateUsername(name) {
             // Allow only letters, numbers, and spaces
@@ -1675,6 +2397,113 @@ Or on WhatsApp, +256700559067</p>
             }
             
             return { valid: true, message: "" };
+        }
+        
+        // Load today's activities and quote
+        async function loadTodaysActivities() {
+            if (!currentUser) return;
+            
+            const todayDate = getTodayDateString();
+            const dateDisplay = document.getElementById('today-date-display');
+            const quoteContainer = document.getElementById('quote-container');
+            const quoteText = document.getElementById('quote-of-the-day');
+            const quoteAuthor = document.getElementById('quote-author-name');
+            const activitiesLoading = document.getElementById('activities-loading');
+            const noActivitiesMessage = document.getElementById('no-activities-message');
+            const todayActivitiesBtn = document.getElementById('today-activities-btn');
+            
+            // Update date display
+            dateDisplay.textContent = formatTodayDate();
+            
+            try {
+                const doc = await db.collection('daily_activities').doc(todayDate).get();
+                
+                if (doc.exists) {
+                    const data = doc.data();
+                    todayActivities = data.activities || [];
+                    todaysQuote = data.quote || { text: "The best time to start was yesterday. The next best time is now.", author: "Icii White" };
+                    
+                    // Show quote
+                    quoteText.textContent = `${todaysQuote.text}`;
+                    quoteAuthor.textContent = `${todaysQuote.author}`;
+                    quoteContainer.style.display = 'block';
+                    
+                    // Hide loading
+                    activitiesLoading.style.display = 'none';
+                    noActivitiesMessage.style.display = 'none';
+                    
+                    // Enable or disable button based on user activation
+                    if (userData && userData.isActive) {
+                        todayActivitiesBtn.disabled = false;
+                        todayActivitiesBtn.innerHTML = ' Today\'s Activities';
+                    } else {
+                        todayActivitiesBtn.disabled = true;
+                        todayActivitiesBtn.innerHTML = '<i class="fas fa-lock"></i> Account Not Activated';
+                    }
+                    
+                } else {
+                    // No activities for today
+                    todaysQuote = { text: "The best time to start was yesterday. The next best time is now.", author: "Icii White" };
+                    
+                    // Show quote
+                    quoteText.textContent = `${todaysQuote.text}`;
+                    quoteAuthor.textContent = `${todaysQuote.author}`;
+                    quoteContainer.style.display = 'block';
+                    
+                    // Hide loading, show no activities message
+                    activitiesLoading.style.display = 'none';
+                    noActivitiesMessage.style.display = 'block';
+                    
+                    // Disable button
+                    todayActivitiesBtn.disabled = true;
+                    todayActivitiesBtn.innerHTML = '<i class="fas fa-calendar-times"></i> No Activities Today';
+                }
+                
+            } catch (error) {
+                console.error("Error loading today's activities:", error);
+                
+                // Show default quote
+                todaysQuote = { text: "The best time to start was yesterday. The next best time is now.", author: "Icii White" };
+                quoteText.textContent = `${todaysQuote.text}`;
+                quoteAuthor.textContent = `${todaysQuote.author}`;
+                quoteContainer.style.display = 'block';
+                
+                // Hide loading, show error message
+                activitiesLoading.style.display = 'none';
+                noActivitiesMessage.style.display = 'block';
+                noActivitiesMessage.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Error Loading Activities</h3>
+                    <p>Please try again later</p>
+                `;
+                
+                // Disable button
+                todayActivitiesBtn.disabled = true;
+                todayActivitiesBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error Loading';
+            }
+        }
+        
+        // Go to daily activities page
+        function goToDailyActivities() {
+            if (!currentUser) {
+                showLoginModal();
+                return;
+            }
+            
+            if (!userData || !userData.isActive) {
+                alert('Please activate your account to access today\'s activities. Make a deposit to activate your account.');
+                showDepositModal();
+                return;
+            }
+            
+            // Check if there are activities for today
+            if (!todayActivities || todayActivities.length === 0) {
+                alert('No activities available for today. Please check back tomorrow!');
+                return;
+            }
+            
+            // Redirect to daily activities page
+            window.location.href = 'customer-care.html';
         }
         
         // Profile Picture Management - Now using Firebase Storage
@@ -1907,6 +2736,7 @@ Or on WhatsApp, +256700559067</p>
                     await loadUserData(user.uid);
                     updateUI();
                     loadProfilePicture();
+                    loadTodaysActivities();
                     loadWeeklyActivitiesGrid();
                     loadTransactions();
                     loadOffers();
@@ -2309,6 +3139,18 @@ Or on WhatsApp, +256700559067</p>
             // Load activities grid
             loadWeeklyActivitiesGrid();
             
+            // Update today's activities button
+            const todayActivitiesBtn = document.getElementById('today-activities-btn');
+            if (todayActivitiesBtn) {
+                if (userData.isActive) {
+                    todayActivitiesBtn.disabled = false;
+                    todayActivitiesBtn.innerHTML = '<i class="fas fa-calendar-day"></i> Today\'s Activities';
+                } else {
+                    todayActivitiesBtn.disabled = true;
+                    todayActivitiesBtn.innerHTML = '<i class="fas fa-lock"></i> Account Not Activated';
+                }
+            }
+            
             if (!userData.isActive) {
                 showNotification("Please activate your account by making a deposit to access daily activities.");
             }
@@ -2359,6 +3201,10 @@ Or on WhatsApp, +256700559067</p>
             
             if (pageId === 'account' && currentUser) {
                 updateUI();
+            }
+            
+            if (pageId === 'home' && currentUser) {
+                loadTodaysActivities();
             }
             
             closeNav();
@@ -2687,4 +3533,3 @@ Or on WhatsApp, +256700559067</p>
     <script src="no_select.js"></script>
 </body>
 </html>
-
