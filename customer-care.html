@@ -1,0 +1,2236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+        
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tagesschrift&display=swap" rel="stylesheet">
+    
+    <!-- YouTube IFrame API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    
+    <style>
+        * {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-image: url('assets/2.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+        }
+        
+        main {
+            margin-top: 100px;
+            padding: 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .day-header {
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 0;
+            border-radius: 20px;
+            background: none;
+            border: none;
+            overflow: hidden;
+        }
+        
+        .day-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: none;
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: calc(200px + 100%) 0; }
+        }
+        
+        .day-title {display: none;}
+        
+        .current-date {
+            font-size: 0.8em;
+            color: yellow;
+            margin-bottom: 1px;
+            margin-left: 10px;
+            text-align: start;
+            font-weight: 900;
+            font-family: orbitron, sans-serif;
+        }
+        
+        .quote-container {
+            margin: 0 auto;
+            padding: 2px;
+            border-radius: 15px;
+            background: #00000087;
+            width: 100%;
+        }
+        
+        .quote-container::before {
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-size: 4em;
+            color: rgba(106, 184, 255, 0.2);
+           font-family: "Tagesschrift", system-ui;
+        }
+        
+        .quote-text {
+            font-size: 0.7em;
+            line-height: 1.6;
+            color: #fff;
+            z-index: 1;
+            font-family: "Tagesschrift", system-ui; 
+        }
+        
+        .quote-author {
+            color: #6ab8ff;
+            font-weight: 600;
+            font-family: "Tagesschrift", system-ui;
+        }
+        
+        .activities-container {
+            display: grid;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .activity-card {
+            border-radius: 18px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            min-height: 200px;
+        }
+        
+        .activity-card.completed {
+            opacity: 0.9;
+            transform: translateY(-5px);
+        }
+        
+        .activity-card.locked {
+            opacity: 0.6;
+            filter: grayscale(0.5);
+            pointer-events: none;
+        }
+        
+        .activity-header {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .activity-type {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+        
+        .video-icon { background: rgba(255, 87, 87, 0.2); color: #ff5757; }
+        .text-icon { background: rgba(76, 175, 80, 0.2); color: #4CAF50; }
+        .link-icon { background: rgba(33, 150, 243, 0.2); color: #2196F3; }
+        .share-icon { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+        .survey-icon { background: rgba(156, 39, 176, 0.2); color: #9C27B0; }
+        .blog-icon { background: rgba(255, 152, 0, 0.2); color: #FF9800; }
+        .custom-icon { background: rgba(0, 188, 212, 0.2); color: #00BCD4; }
+        
+        .activity-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .activity-reward {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1em;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .activity-content {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .video-container {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+            background: #000;
+        }
+        
+        /* Regular video styling */
+        .activity-video {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #000;
+        }
+        
+        /* Hide all video controls except play/pause for regular videos */
+        .activity-video::-webkit-media-controls {
+            display: none !important;
+        }
+        
+        .activity-video::-webkit-media-controls-panel {
+            display: none !important;
+        }
+        
+        .activity-video::-webkit-media-controls-play-button {
+            display: none !important;
+        }
+        
+        .activity-video::-webkit-media-controls-timeline {
+            display: none !important;
+        }
+        
+        .activity-video::-webkit-media-controls-current-time-display {
+            display: none !important;
+        }
+        
+        .activity-video::-webkit-media-controls-time-remaining-display {
+            display: none !important;
+        }
+        
+        .activity-video::-webkit-media-controls-timeline-container {
+            display: none !important;
+        }
+        
+        .activity-video::-webkit-media-controls-volume-slider {
+            display: none !important;
+        }
+        
+        .activity-video::-webkit-media-controls-mute-button {
+            display: none !important;
+        }
+        
+        .activity-video::-webkit-media-controls-fullscreen-button {
+            display: none !important;
+        }
+        
+        /* YouTube iframe styling */
+        .youtube-iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 12px;
+            background: #000;
+        }
+        
+        /* Custom video controls container - MOVED BELOW VIDEO */
+        .custom-video-controls {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 0 0 12px 12px;
+            margin-top: -4px; /* Connect with video container */
+        }
+        
+        .custom-control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+        
+        .custom-control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .custom-control-btn.play-pause {
+            background: rgba(106, 184, 255, 0.3);
+            border-color: rgba(106, 184, 255, 0.5);
+        }
+        
+        /* YouTube video wrapper */
+        .youtube-video-wrapper {
+            width: 100%;
+            position: relative;
+        }
+        
+        /* YouTube controls - MOVED BELOW VIDEO */
+        .youtube-controls {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 0 0 12px 12px;
+            margin-top: -4px; /* Connect with video container */
+        }
+        
+        .text-content {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            line-height: 1.8;
+            color: #ddd;
+            font-size: 1.1em;
+        }
+        
+        .link-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+        }
+        
+        .link-button {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .link-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(33, 150, 243, 0.3);
+        }
+        
+        .share-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+        }
+        
+        .share-button {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .share-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+        }
+        
+        .share-button.facebook { border-color: rgba(59, 89, 152, 0.5); }
+        .share-button.twitter { border-color: rgba(29, 161, 242, 0.5); }
+        .share-button.whatsapp { border-color: rgba(37, 211, 102, 0.5); }
+        .share-button.telegram { border-color: rgba(0, 136, 204, 0.5); }
+        
+        .survey-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+        }
+        
+        .survey-question {
+            font-size: 1.2em;
+            color: white;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .survey-option {
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .survey-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .survey-option.selected {
+            background: rgba(106, 184, 255, 0.2);
+            border-color: #6ab8ff;
+        }
+        
+        .progress-container {
+            width: 100%;
+            padding: 0;
+            margin-left: 10px;
+        }
+        
+        .progress-card {
+            background: none;
+            border-radius: 0;
+            padding: 0;
+            width: 100%;
+        }
+        
+        .progress-header {
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .progress-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #6ab8ff;
+        }
+        
+        .progress-count {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: white;
+        }
+        
+        /* CSS-only dashed progress bar */
+        .progress-bar {
+            height: 4px;
+            background: white;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 0;
+            position: relative;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #404040;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+            width: 0%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Main color gradient */
+        .progress-fill::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                #ff4d4d 0%,    /* Red */
+                #ff4d4d 25%,   /* Red ends at 25% */
+                #ff944d 25%,   /* Orange starts at 25% */
+                #ff944d 50%,   /* Orange ends at 50% */
+                #ffd24d 50%,   /* Yellow starts at 50% */
+                #ffd24d 75%,   /* Yellow ends at 75% */
+                #a3ff4d 75%,   /* Yellow-green starts at 75% */
+                #a3ff4d 100%   /* Yellow-green ends at 100% */
+            );
+        }
+
+        /* Dashed overlay */
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0,
+                    transparent 4.5%,
+                    rgba(255, 255, 255, 0.3) 4.5%,
+                    rgba(255, 255, 255, 0.3) 5%
+                );
+            /* Creates the dashed effect */
+            mask: linear-gradient(90deg, 
+                transparent 0,
+                transparent 4.5%,
+                #fff 4.5%,
+                #fff 5%
+            );
+            mask-repeat: repeat;
+            mask-size: 5% 100%; /* 20 segments = 100% ÷ 20 = 5% each */
+        }
+
+        .total-reward {
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #4CAF50;
+            margin-top: 10px;
+        }
+        
+        .submit-section {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .submit-btn {
+            background: green;
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 15px;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(40, 167, 69, 0.4);
+        }
+        
+        .submit-btn:disabled {
+            display: none;
+        }
+        
+        .submitted-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: 18px;
+        }
+        
+        .submitted-icon {
+            font-size: 4em;
+            color: #28a745;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .submitted-text {
+            font-size: 1.5em;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .submitted-message {
+            color: #ccc;
+            text-align: center;
+            max-width: 400px;
+            line-height: 1.5;
+        }
+        
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 4em;
+            color: rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+            z-index: 100;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        
+        .countdown-timer {
+            padding: 7px 15px;
+            border-radius: 12px;
+            border: 1px solid white;
+            width: 80%;
+            display: flex;
+            flex-direction: column;
+            background: black;
+        }
+        
+        #header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: transparent;
+            padding: 10px auto;
+            text-align: center;
+        }
+        
+        .timer-text {
+            display: flex;
+            gap: 10px;
+            margin-left: 10px;
+        }
+        
+        .timer-title {
+            color: #6ab8ff;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .timer-display, #total-reward {
+            font-size: 0.8em;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .activity-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+        }
+        
+        .status-completed {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            border: 2px solid #4CAF50;
+        }
+        
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 2px solid #ffc107;
+        }
+        
+        /* Scrollbar Styling */
+        .text-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .text-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        .text-content::-webkit-scrollbar-thumb {
+            background: rgba(106, 184, 255, 0.5);
+            border-radius: 4px;
+        }
+        
+        .text-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(106, 184, 255, 0.7);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            main {
+                margin-top: 80px;
+                padding: 15px;
+            }
+            
+            .day-title {
+                font-size: 2em;
+            }
+            
+            .quote-text {
+                font-size: 1.2em;
+            }
+            
+            .progress-container {
+                bottom: 80px;
+                width: 95%;
+            }
+            
+            .countdown-timer {
+                position: relative;
+                top: 0;
+                right: 0;
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            
+            .activity-card {
+                min-height: 180px;
+            }
+            
+            .custom-control-btn {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .youtube-iframe {
+                height: 250px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .activity-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .activity-reward {
+                align-self: flex-start;
+            }
+            
+            .share-button {
+                min-width: 100%;
+            }
+            
+            .custom-control-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1em;
+            }
+            
+            .youtube-iframe {
+                height: 200px;
+            }
+        }
+        
+        /* Prevent right-click on video */
+        .activity-video {
+            pointer-events: none;
+        }
+        
+        .video-container {
+            cursor: default;
+        }
+        
+        .video-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #ff5757;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Video and controls wrapper */
+        .video-wrapper {
+            display: flex;
+            flex-direction: column;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Day Header -->
+        <div class="day-header">
+            <h1 class="day-title" id="day-title"></h1>
+            
+            <div class="quote-container">
+                <div class="quote-text" id="quote-text">"The best time to start was yesterday. The next best time is now."</div>
+                <span class="quote-author" id="quote-author"> Icii White</span>
+            </div>
+        </div>
+
+        <!-- Activities Container -->
+        <div class="activities-container" id="activities-container">
+            <!-- Activities will be loaded here -->
+            <div class="loader" style="text-align: center; padding: 50px;">
+                <div style="width: 50px; height: 50px; border: 4px solid rgba(106, 184, 255, 0.3); border-top: 4px solid #6ab8ff; border-radius: 50%; margin: 0 auto; animation: spin 1s linear infinite;"></div>
+                <p style="margin-top: 20px; color: #ccc;">Loading today's activities...</p>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="submit-section">
+            <button class="submit-btn" id="submit-btn" disabled onclick="submitActivities()">
+                <i class="fas fa-paper-plane"></i>
+                Submit Activities
+            </button>
+        </div>
+    </main>
+
+    <!-- Watermark (hidden by default) -->
+    <div class="watermark" id="watermark" style="display: none;">
+        ACTIVITIES SUBMITTED
+    </div>
+
+    <script>
+        // ==============================================
+        // ANDROID DEVICE STORAGE AND NOTIFICATION SETUP
+        // ==============================================
+        
+        // Request notification permission
+        async function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission !== 'granted') {
+                try {
+                    const permission = await Notification.requestPermission();
+                    console.log('Notification permission:', permission);
+                    
+                    if (permission === 'granted') {
+                        showNotification('Malcom Finance', 'Notifications enabled! You will receive updates about your activities.');
+                    }
+                } catch (error) {
+                    console.error('Error requesting notification permission:', error);
+                }
+            }
+        }
+        
+        // Show notification
+        function showNotification(title, body) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, {
+                    body: body,
+                    icon: 'logo.png'
+                });
+            }
+        }
+        
+        // Create Malcom Finance folder in device storage
+        function createAppFolder() {
+            // For Android WebView with file access
+            if (window.AndroidInterface && typeof window.AndroidInterface.createFolder === 'function') {
+                try {
+                    window.AndroidInterface.createFolder('Malcom Finance');
+                    console.log('Malcom Finance folder created in device storage');
+                } catch (error) {
+                    console.error('Error creating folder via Android interface:', error);
+                }
+            }
+            // For Capacitor/Cordova
+            else if (window.cordova && window.cordova.file) {
+                window.resolveLocalFileSystemURL(
+                    cordova.file.externalDataDirectory,
+                    function(fileSystem) {
+                        fileSystem.getDirectory(
+                            'Malcom Finance',
+                            { create: true, exclusive: false },
+                            function(directory) {
+                                console.log('Malcom Finance folder created:', directory.fullPath);
+                            },
+                            function(error) {
+                                console.error('Error creating folder:', error);
+                            }
+                        );
+                    },
+                    function(error) {
+                        console.error('Error accessing file system:', error);
+                    }
+                );
+            }
+            // For Capacitor Filesystem API
+            else if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
+                window.Capacitor.Plugins.Filesystem.mkdir({
+                    path: 'Malcom Finance',
+                    directory: 'EXTERNAL_STORAGE',
+                    recursive: true
+                }).then(() => {
+                    console.log('Malcom Finance folder created successfully');
+                }).catch(error => {
+                    console.error('Error creating folder:', error);
+                });
+            }
+            // For browsers with File System Access API
+            else if ('showDirectoryPicker' in window) {
+                window.showDirectoryPicker()
+                    .then(handle => {
+                        console.log('Directory access granted');
+                    })
+                    .catch(error => {
+                        console.log('Directory access not supported or denied:', error);
+                    });
+            }
+            // Fallback for browsers
+            else {
+                console.log('Device storage APIs not available. Downloads will go to default download folder.');
+            }
+        }
+        
+        // Initialize device features
+        function initializeDeviceFeatures() {
+            // Request notification permission
+            setTimeout(requestNotificationPermission, 2000);
+            
+            // Create app folder
+            setTimeout(createAppFolder, 3000);
+            
+            console.log('Device features initialized');
+        }
+        
+        // ==============================================
+        // LOCAL STORAGE MANAGEMENT
+        // ==============================================
+        
+        // Generate storage key for today
+        function getTodayStorageKey() {
+            const today = getTodayDateString();
+            return `malcom_finance_${today}_${currentUser?.uid || 'guest'}`;
+        }
+        
+        // Save completion status to local storage
+        function saveToLocalStorage() {
+            if (!currentUser) return;
+            
+            const storageKey = getTodayStorageKey();
+            const data = {
+                completionStatus: completionStatus,
+                activities: todayActivities,
+                timestamp: new Date().toISOString(),
+                userSubmitted: userSubmission ? true : false
+            };
+            
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(data));
+                console.log('Progress saved to local storage');
+            } catch (error) {
+                console.error('Error saving to local storage:', error);
+            }
+        }
+        
+        // Load completion status from local storage
+        function loadFromLocalStorage() {
+            if (!currentUser) return null;
+            
+            const storageKey = getTodayStorageKey();
+            try {
+                const savedData = localStorage.getItem(storageKey);
+                if (savedData) {
+                    return JSON.parse(savedData);
+                }
+            } catch (error) {
+                console.error('Error loading from local storage:', error);
+            }
+            return null;
+        }
+        
+        // Clear today's local storage
+        function clearLocalStorage() {
+            if (!currentUser) return;
+            
+            const storageKey = getTodayStorageKey();
+            try {
+                localStorage.removeItem(storageKey);
+                console.log('Local storage cleared for today');
+            } catch (error) {
+                console.error('Error clearing local storage:', error);
+            }
+        }
+        
+        // ==============================================
+        // FIREBASE CONFIGURATION
+        // ==============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
+            authDomain: "malcolm-finance.firebaseapp.com",
+            projectId: "malcolm-finance",
+            storageBucket: "malcolm-finance.firebasestorage.app",
+            messagingSenderId: "987613399580",
+            appId: "1:987613399580:web:0237b2c8c2c7df54222dd9",
+            measurementId: "G-1CEG3BWFBP"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // ==============================================
+        // GLOBAL VARIABLES
+        // ==============================================
+        let currentUser = null;
+        let userData = null;
+        let todayActivities = [];
+        let userSubmission = null;
+        let completionStatus = {};
+        let activityObservers = {};
+        let videoPlayers = {};
+        let youtubePlayers = {};
+        
+        // Days of week
+        const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        
+        // YouTube Player States
+        const YTPlayerState = {
+            UNSTARTED: -1,
+            ENDED: 0,
+            PLAYING: 1,
+            PAUSED: 2,
+            BUFFERING: 3,
+            CUED: 5
+        };
+        
+        // ==============================================
+        // UTILITY FUNCTIONS
+        // ==============================================
+        
+        // Get today's date string in format YYYY-MM-DD
+        function getTodayDateString() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // Get day of week
+        function getDayOfWeek() {
+            return DAYS[new Date().getDay()];
+        }
+        
+        // Format date nicely
+        function formatDate() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            return now.toLocaleDateString('en-US', options);
+        }
+        
+        // Calculate time until midnight
+        function updateCountdownTimer() {
+            const now = new Date();
+            const midnight = new Date();
+            midnight.setHours(24, 0, 0, 0);
+            
+            const diff = midnight - now;
+            
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('countdown-timer').textContent = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            // If less than 5 minutes, add warning class
+            const timerElement = document.querySelector('.countdown-timer');
+            if (diff < 5 * 60 * 1000) {
+                timerElement.style.borderColor = 'rgba(255, 87, 87, 0.5)';
+                timerElement.querySelector('.timer-title').style.color = '#ff5757';
+            } else if (diff < 30 * 60 * 1000) {
+                timerElement.style.borderColor = 'rgba(255, 193, 7, 0.5)';
+                timerElement.querySelector('.timer-title').style.color = '#ffc107';
+            }
+        }
+        
+        // Check if URL is YouTube
+        function isYouTubeUrl(url) {
+            if (!url) return false;
+            const cleanUrl = url.toLowerCase().trim();
+            const youtubePatterns = [
+                'youtube.com',
+                'youtu.be',
+                'youtube-nocookie.com',
+                'youtube.googleapis.com',
+                'y2u.be'
+            ];
+            return youtubePatterns.some(pattern => cleanUrl.includes(pattern));
+        }
+        
+        // Extract YouTube video ID from URL
+        function extractYouTubeId(url) {
+            if (!url) return null;
+            
+            try {
+                const cleanUrl = url.split('&')[0].split('#')[0];
+                
+                if (cleanUrl.includes('youtu.be/')) {
+                    const match = cleanUrl.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+                    if (match && match[1]) return match[1];
+                }
+                
+                if (cleanUrl.includes('youtube.com/watch')) {
+                    const match = cleanUrl.match(/v=([a-zA-Z0-9_-]+)/);
+                    if (match && match[1]) return match[1];
+                }
+                
+                if (cleanUrl.includes('youtube.com/embed/')) {
+                    const match = cleanUrl.match(/embed\/([a-zA-Z0-9_-]+)/);
+                    if (match && match[1]) return match[1];
+                }
+                
+                const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+                const match = cleanUrl.match(regExp);
+                if (match && match[6]) {
+                    const videoId = match[6].split('?')[0].split('&')[0];
+                    if (videoId && videoId.length >= 10 && videoId.length <= 12) {
+                        return videoId;
+                    }
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('Error extracting YouTube ID:', error);
+                return null;
+            }
+        }
+        
+        // ==============================================
+        // INITIALIZATION
+        // ==============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial date display
+            document.getElementById('day-title').textContent = `${getDayOfWeek()} Activities`;
+            document.getElementById('current-date').textContent = formatDate();
+            
+            // Update countdown timer every second
+            updateCountdownTimer();
+            setInterval(updateCountdownTimer, 1000);
+            
+            // Check authentication
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    await loadUserData();
+                    await loadTodayActivities();
+                    await checkUserSubmission();
+                    
+                    // Initialize device features after auth
+                    initializeDeviceFeatures();
+                } else {
+                    alert('Please login to access activities');
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+        
+        // Load user data from Firestore
+        async function loadUserData() {
+            try {
+                const doc = await db.collection('users').doc(currentUser.uid).get();
+                if (doc.exists) {
+                    userData = doc.data();
+                }
+            } catch (error) {
+                console.error("Error loading user data:", error);
+            }
+        }
+        
+        // Load today's activities from Firestore
+        async function loadTodayActivities() {
+            try {
+                const todayDate = getTodayDateString();
+                const doc = await db.collection('daily_activities').doc(todayDate).get();
+                
+                if (doc.exists) {
+                    const data = doc.data();
+                    todayActivities = data.activities || [];
+                    
+                    // Update quote
+                    if (data.quote) {
+                        document.getElementById('quote-text').textContent = data.quote.text || '';
+                        document.getElementById('quote-author').textContent = data.quote.author ? `${data.quote.author}` : 'Anonymous';
+                    }
+                    
+                    // Check local storage for saved progress
+                    const savedData = loadFromLocalStorage();
+                    if (savedData && !userSubmission) {
+                        // Restore completion status from local storage
+                        completionStatus = savedData.completionStatus || {};
+                        console.log('Progress restored from local storage');
+                    } else {
+                        // Initialize completion status
+                        todayActivities.forEach((_, index) => {
+                            completionStatus[index] = false;
+                        });
+                    }
+                    
+                    // Render activities
+                    renderActivities();
+                    
+                    // Update progress
+                    updateProgress();
+                    
+                    // Setup observers
+                    setTimeout(() => {
+                        setupActivityObservers();
+                    }, 500);
+                    
+                } else {
+                    showNoActivitiesMessage();
+                }
+            } catch (error) {
+                console.error("Error loading activities:", error);
+                showNoActivitiesMessage();
+            }
+        }
+        
+        // Check if user has already submitted today's activities
+        async function checkUserSubmission() {
+            try {
+                const todayDate = getTodayDateString();
+                const submissionRef = db.collection('activity_submissions')
+                    .where('userId', '==', currentUser.uid)
+                    .where('date', '==', todayDate);
+                
+                const snapshot = await submissionRef.get();
+                
+                if (!snapshot.empty) {
+                    userSubmission = snapshot.docs[0].data();
+                    userSubmission.id = snapshot.docs[0].id;
+                    
+                    // User has already submitted - lock the activities
+                    lockActivities();
+                } else {
+                    // Check local storage for submission flag
+                    const savedData = loadFromLocalStorage();
+                    if (savedData && savedData.userSubmitted) {
+                        // User submitted but Firestore might not have synced yet
+                        lockActivities();
+                    }
+                }
+            } catch (error) {
+                console.error("Error checking submission:", error);
+            }
+        }
+        
+        // Show message when no activities are available
+        function showNoActivitiesMessage() {
+            const container = document.getElementById('activities-container');
+            container.innerHTML = `
+                <div class="glass-effect" style="text-align: center; padding: 50px; border-radius: 20px;">
+                    <i class="fas fa-calendar-plus" style="font-size: 4em; color: #6ab8ff; margin-bottom: 20px;"></i>
+                    <h3 style="color: white; margin-bottom: 15px;">No Activities Available Today</h3>
+                    <p style="color: #ccc; max-width: 500px; margin: 0 auto; line-height: 1.6;">
+                        Check back tomorrow for new activities! Activities are updated daily at midnight.
+                    </p>
+                </div>
+            `;
+        }
+        
+        // ==============================================
+        // ACTIVITY RENDERING
+        // ==============================================
+        
+        // Render activities
+        function renderActivities() {
+            const container = document.getElementById('activities-container');
+            
+            if (todayActivities.length === 0) {
+                showNoActivitiesMessage();
+                return;
+            }
+            
+            let html = '';
+            
+            todayActivities.forEach((activity, index) => {
+                const isCompleted = completionStatus[index] || false;
+                const activityClass = isCompleted ? 'completed' : '';
+                
+                html += `
+                    <div class="activity-card glass-effect ${activityClass}" id="activity-${index}">
+                        <div class="activity-header">
+                            <div class="activity-type">
+                                <div class="activity-icon ${activity.type}-icon">
+                                    <i class="${getActivityIcon(activity.type)}"></i>
+                                </div>
+                                <div class="activity-title">${activity.title || 'Activity'}</div>
+                            </div>
+                            <div class="activity-reward">$${(activity.reward || 0).toFixed(2)}</div>
+                        </div>
+                        
+                        <div class="activity-content">
+                            ${renderActivityContent(activity, index)}
+                        </div>
+                        
+                        ${isCompleted ? `
+                            <div class="activity-status status-completed">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        ` : `
+                            <div class="activity-status status-pending">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        `}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Get appropriate icon for activity type
+        function getActivityIcon(type) {
+            switch(type) {
+                case 'video': return 'fas fa-video';
+                case 'text': return 'fas fa-file-alt';
+                case 'link': return 'fas fa-link';
+                case 'share': return 'fas fa-share-alt';
+                case 'survey': return 'fas fa-poll';
+                case 'blog': return 'fas fa-pen-fancy';
+                case 'custom': return 'fas fa-code';
+                default: return 'fas fa-tasks';
+            }
+        }
+        
+        // Render activity content based on type
+        function renderActivityContent(activity, index) {
+            switch(activity.type) {
+                case 'video':
+                    const videoUrl = activity.videoUrl || activity.content || '';
+                    const videoThumbnail = activity.videoThumbnail || '';
+                    
+                    if (isYouTubeUrl(videoUrl)) {
+                        const videoId = extractYouTubeId(videoUrl);
+                        if (videoId) {
+                            return `
+                                <div class="video-wrapper">
+                                    <div class="video-container">
+                                        <div id="youtube-player-${index}" class="youtube-iframe"></div>
+                                        <div class="video-loading" id="youtube-loading-${index}">
+                                            <div class="loader-spinner"></div>
+                                            <p style="color: white; margin-top: 10px;">Loading YouTube video...</p>
+                                        </div>
+                                    </div>
+                                    <div class="youtube-controls">
+                                        <button class="custom-control-btn play-pause" id="youtube-play-pause-${index}">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p style="color: #ccc; text-align: center; margin-top: 10px;">
+                                    Watch the video completely to complete this activity
+                                </p>
+                                <div style="color: #ffc107; text-align: center; font-size: 0.9em; margin-top: 10px;">
+                                    <i class="fas fa-info-circle"></i> Progress: <span id="video-progress-${index}">0%</span>
+                                </div>
+                            `;
+                        } else {
+                            return `
+                                <div style="padding: 20px; text-align: center; background: rgba(0,0,0,0.3); border-radius: 12px;">
+                                    <i class="fas fa-exclamation-triangle" style="color: #ffc107; font-size: 2em; margin-bottom: 10px;"></i>
+                                    <p style="color: #ffc107;">Unable to load YouTube video. Please check the video URL.</p>
+                                    <p style="color: #ccc; font-size: 0.9em; margin-top: 10px;">URL: ${videoUrl.substring(0, 50)}...</p>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    return `
+                        <div class="video-wrapper">
+                            <div class="video-container">
+                                <video class="activity-video" 
+                                       id="video-${index}"
+                                       ${videoThumbnail ? `poster="${videoThumbnail}"` : ''}
+                                       playsinline>
+                                    <source src="${videoUrl}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <div class="video-loading" id="video-loading-${index}" style="display: none;">
+                                    <div class="loader-spinner"></div>
+                                    <p style="color: white; margin-top: 10px;">Loading video...</p>
+                                </div>
+                            </div>
+                            <div class="custom-video-controls">
+                                <button class="custom-control-btn play-pause" id="play-pause-${index}">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p style="color: #ccc; text-align: center; margin-top: 10px;">
+                            Watch the video completely to complete this activity
+                        </p>
+                        <div style="color: #ffc107; text-align: center; font-size: 0.9em; margin-top: 10px;">
+                            <i class="fas fa-info-circle"></i> Progress: <span id="video-progress-${index}">0%</span>
+                        </div>
+                    `;
+                    
+                case 'text':
+                    const textContent = activity.textContent || activity.content || 'No content provided.';
+                    return `
+                        <div class="text-content" id="text-${index}">
+                            ${textContent}
+                        </div>
+                        <p style="color: #ccc; text-align: center; margin-top: 10px;">
+                            Scroll to the bottom of the text to complete this activity
+                        </p>
+                    `;
+                    
+                case 'link':
+                    const linkUrl = activity.linkUrl || activity.content || '#';
+                    const linkText = activity.linkText || 'Visit Link';
+                    return `
+                        <div class="link-container">
+                            <div style="flex: 1;">
+                                <p style="color: #ccc; margin-bottom: 10px;">${activity.description || 'Click the link below to visit:'}</p>
+                                <a href="${linkUrl}" 
+                                   target="_blank" 
+                                   class="link-button" 
+                                   id="link-${index}">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    ${linkText}
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    
+                case 'share':
+                    const shareUrl = activity.shareUrl || activity.content || window.location.href;
+                    const shareText = activity.shareText || 'Check this out!';
+                    return `
+                        <div class="share-container">
+                            <p style="color: #ccc; width: 100%; margin-bottom: 15px;">
+                                ${activity.description || 'Share this content on social media:'}
+                            </p>
+                            <button class="share-button facebook" onclick="shareToPlatform('facebook', ${index})">
+                                <i class="fab fa-facebook-f"></i> Facebook
+                            </button>
+                            <button class="share-button twitter" onclick="shareToPlatform('twitter', ${index})">
+                                <i class="fab fa-twitter"></i> Twitter
+                            </button>
+                            <button class="share-button whatsapp" onclick="shareToPlatform('whatsapp', ${index})">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </button>
+                            <button class="share-button telegram" onclick="shareToPlatform('telegram', ${index})">
+                                <i class="fab fa-telegram"></i> Telegram
+                            </button>
+                        </div>
+                        <div style="margin-top: 15px; color: #ffc107; text-align: center;">
+                            <i class="fas fa-info-circle"></i> Shares needed: <span id="share-count-${index}">0</span>/3
+                        </div>
+                    `;
+                    
+                case 'survey':
+                    const surveyQuestion = activity.surveyQuestion || activity.question || 'Select the correct answer:';
+                    const surveyOptions = activity.surveyOptions || activity.options || [];
+                    return `
+                        <div class="survey-container">
+                            <div class="survey-question">${surveyQuestion}</div>
+                            ${surveyOptions.map((option, optIndex) => `
+                                <div class="survey-option" 
+                                     id="survey-${index}-option-${optIndex}"
+                                     onclick="selectSurveyOption(${index}, ${optIndex})">
+                                    ${option}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    
+                case 'blog':
+                    const blogTopic = activity.blogTopic || activity.topic || '';
+                    const blogMinWords = activity.blogMinWords || activity.minWords || 200;
+                    return `
+                        <div style="padding: 20px; background: rgba(0,0,0,0.3); border-radius: 12px;">
+                            <h4 style="color: white; margin-bottom: 10px;">Write a blog post on: ${blogTopic}</h4>
+                            <p style="color: #ccc;">Minimum words required: ${blogMinWords}</p>
+                        </div>
+                        <div style="margin-top: 15px; color: #6ab8ff;">
+                            <i class="fas fa-info-circle"></i> ${activity.instructions || 'Write a blog post on the given topic.'}
+                        </div>
+                    `;
+                    
+                case 'custom':
+                    const customContent = activity.customContent || activity.content || 'Custom activity content will appear here.';
+                    return `
+                        <div style="padding: 20px; background: rgba(0,0,0,0.3); border-radius: 12px;">
+                            ${customContent}
+                        </div>
+                        <div style="margin-top: 15px; color: #6ab8ff;">
+                            <i class="fas fa-info-circle"></i> ${activity.customInstructions || activity.instructions || 'Complete the activity as instructed.'}
+                        </div>
+                    `;
+                    
+                default:
+                    return `<p style="color: #ccc; text-align: center;">Unknown activity type</p>`;
+            }
+        }
+        
+        // ==============================================
+        // ACTIVITY COMPLETION MANAGEMENT
+        // ==============================================
+        
+        // Setup observers for activity completion
+        function setupActivityObservers() {
+            todayActivities.forEach((activity, index) => {
+                if (completionStatus[index]) return;
+                
+                switch(activity.type) {
+                    case 'video':
+                        const videoUrl = activity.videoUrl || activity.content || '';
+                        if (isYouTubeUrl(videoUrl)) {
+                            setTimeout(() => {
+                                setupYouTubeObserver(index, videoUrl);
+                            }, 1000);
+                        } else {
+                            setTimeout(() => {
+                                setupRegularVideoObserver(index);
+                            }, 500);
+                        }
+                        break;
+                    case 'text':
+                        setTimeout(() => {
+                            setupTextObserver(index);
+                        }, 500);
+                        break;
+                    case 'link':
+                        setTimeout(() => {
+                            setupLinkObserver(index);
+                        }, 500);
+                        break;
+                    case 'share':
+                        setTimeout(() => {
+                            setupShareObserver(index);
+                        }, 500);
+                        break;
+                    case 'survey':
+                        // Survey completion is handled by selectSurveyOption function
+                        break;
+                    case 'blog':
+                    case 'custom':
+                        // These types require manual completion marking
+                        break;
+                }
+            });
+        }
+        
+        // Setup regular video completion observer - ALL ORIGINAL CODE RESTORED
+        function setupRegularVideoObserver(index) {
+            const video = document.getElementById(`video-${index}`);
+            if (!video) return;
+            
+            videoPlayers[index] = {
+                element: video,
+                isPlaying: false,
+                progress: 0,
+                completed: false
+            };
+            
+            const playPauseBtn = document.getElementById(`play-pause-${index}`);
+            if (playPauseBtn) {
+                playPauseBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleRegularVideoPlay(index);
+                });
+            }
+            
+            video.controls = false;
+            
+            video.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            video.addEventListener('timeupdate', function() {
+                if (video.duration && video.currentTime) {
+                    const progress = (video.currentTime / video.duration) * 100;
+                    videoPlayers[index].progress = progress;
+                    
+                    const progressElement = document.getElementById(`video-progress-${index}`);
+                    if (progressElement) {
+                        progressElement.textContent = `${Math.round(progress)}%`;
+                    }
+                    
+                    if (progress >= 95 && !videoPlayers[index].completed) {
+                        videoPlayers[index].completed = true;
+                        markActivityAsCompleted(index);
+                        
+                        video.pause();
+                        if (playPauseBtn) {
+                            playPauseBtn.innerHTML = '<i class="fas fa-check"></i>';
+                        }
+                    }
+                }
+            });
+            
+            video.addEventListener('ended', function() {
+                videoPlayers[index].completed = true;
+                videoPlayers[index].isPlaying = false;
+                markActivityAsCompleted(index);
+                
+                if (playPauseBtn) {
+                    playPauseBtn.innerHTML = '<i class="fas fa-check"></i>';
+                }
+                
+                const progressElement = document.getElementById(`video-progress-${index}`);
+                if (progressElement) {
+                    progressElement.textContent = "100%";
+                }
+            });
+            
+            video.addEventListener('pause', function() {
+                videoPlayers[index].isPlaying = false;
+                if (playPauseBtn && !videoPlayers[index].completed) {
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            });
+            
+            video.addEventListener('play', function() {
+                videoPlayers[index].isPlaying = true;
+                if (playPauseBtn && !videoPlayers[index].completed) {
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                }
+            });
+            
+            video.addEventListener('waiting', function() {
+                const loadingElement = document.getElementById(`video-loading-${index}`);
+                if (loadingElement) {
+                    loadingElement.style.display = 'flex';
+                }
+            });
+            
+            video.addEventListener('canplay', function() {
+                const loadingElement = document.getElementById(`video-loading-${index}`);
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                }
+            });
+            
+            video.addEventListener('keydown', function(e) {
+                e.preventDefault();
+            });
+            
+            // Preload video
+            video.load();
+        }
+        
+        // Toggle regular video play/pause
+        function toggleRegularVideoPlay(index) {
+            const video = videoPlayers[index]?.element;
+            if (!video) return;
+            
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        }
+        
+        // Setup YouTube video observer - ALL ORIGINAL CODE RESTORED
+        function setupYouTubeObserver(index, videoUrl) {
+            const videoId = extractYouTubeId(videoUrl);
+            if (!videoId) {
+                console.error('Could not extract YouTube ID from URL:', videoUrl);
+                return;
+            }
+            
+            setTimeout(() => {
+                const loadingElement = document.getElementById(`youtube-loading-${index}`);
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                }
+            }, 2000);
+            
+            youtubePlayers[index] = {
+                player: null,
+                isPlaying: false,
+                progress: 0,
+                completed: false,
+                duration: 0,
+                currentTime: 0
+            };
+            
+            youtubePlayers[index].player = new YT.Player(`youtube-player-${index}`, {
+                videoId: videoId,
+                playerVars: {
+                    'controls': 0,
+                    'modestbranding': 1,
+                    'rel': 0,
+                    'showinfo': 0,
+                    'iv_load_policy': 3,
+                    'disablekb': 1,
+                    'playsinline': 1
+                },
+                events: {
+                    'onReady': function(event) {
+                        onYouTubePlayerReady(index, event);
+                    },
+                    'onStateChange': function(event) {
+                        onYouTubePlayerStateChange(index, event);
+                    },
+                    'onError': function(event) {
+                        console.error('YouTube Player Error:', event.data);
+                        const loadingElement = document.getElementById(`youtube-loading-${index}`);
+                        if (loadingElement) {
+                            loadingElement.innerHTML = `
+                                <div style="text-align: center;">
+                                    <i class="fas fa-exclamation-triangle" style="color: #ff5757; font-size: 2em; margin-bottom: 10px;"></i>
+                                    <p style="color: #ff5757;">Error loading YouTube video. Video may be private or unavailable.</p>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+            });
+        }
+        
+        // YouTube Player Ready event
+        function onYouTubePlayerReady(index, event) {
+            const loadingElement = document.getElementById(`youtube-loading-${index}`);
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
+            
+            const playPauseBtn = document.getElementById(`youtube-play-pause-${index}`);
+            if (playPauseBtn) {
+                playPauseBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleYouTubePlay(index);
+                });
+            }
+            
+            youtubePlayers[index].duration = event.target.getDuration();
+            startYouTubeProgressTracking(index);
+        }
+        
+        // YouTube Player State Change event
+        function onYouTubePlayerStateChange(index, event) {
+            const player = youtubePlayers[index];
+            if (!player) return;
+            
+            const playPauseBtn = document.getElementById(`youtube-play-pause-${index}`);
+            
+            switch(event.data) {
+                case YTPlayerState.PLAYING:
+                    player.isPlaying = true;
+                    if (playPauseBtn) {
+                        playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    }
+                    startYouTubeProgressTracking(index);
+                    break;
+                    
+                case YTPlayerState.PAUSED:
+                    player.isPlaying = false;
+                    if (playPauseBtn) {
+                        playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    }
+                    break;
+                    
+                case YTPlayerState.ENDED:
+                    player.isPlaying = false;
+                    player.completed = true;
+                    player.progress = 100;
+                    markActivityAsCompleted(index);
+                    
+                    if (playPauseBtn) {
+                        playPauseBtn.innerHTML = '<i class="fas fa-check"></i>';
+                    }
+                    
+                    const progressElement = document.getElementById(`video-progress-${index}`);
+                    if (progressElement) {
+                        progressElement.textContent = "100%";
+                    }
+                    break;
+            }
+        }
+        
+        // Toggle YouTube video play/pause
+        function toggleYouTubePlay(index) {
+            const player = youtubePlayers[index];
+            if (!player || !player.player) return;
+            
+            if (player.isPlaying) {
+                player.player.pauseVideo();
+            } else {
+                player.player.playVideo();
+            }
+        }
+        
+        // Start tracking YouTube video progress
+        function startYouTubeProgressTracking(index) {
+            if (youtubePlayers[index].progressInterval) {
+                clearInterval(youtubePlayers[index].progressInterval);
+            }
+            
+            youtubePlayers[index].progressInterval = setInterval(() => {
+                const player = youtubePlayers[index];
+                if (!player || !player.player || !player.isPlaying) return;
+                
+                try {
+                    const currentTime = player.player.getCurrentTime();
+                    const duration = player.duration || player.player.getDuration();
+                    
+                    if (duration > 0) {
+                        const progress = (currentTime / duration) * 100;
+                        player.progress = progress;
+                        player.currentTime = currentTime;
+                        
+                        const progressElement = document.getElementById(`video-progress-${index}`);
+                        if (progressElement) {
+                            progressElement.textContent = `${Math.round(progress)}%`;
+                        }
+                        
+                        if (progress >= 95 && !player.completed) {
+                            player.completed = true;
+                            markActivityAsCompleted(index);
+                            player.player.pauseVideo();
+                            
+                            const playPauseBtn = document.getElementById(`youtube-play-pause-${index}`);
+                            if (playPauseBtn) {
+                                playPauseBtn.innerHTML = '<i class="fas fa-check"></i>';
+                            }
+                            
+                            clearInterval(player.progressInterval);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('YouTube progress tracking error:', e);
+                }
+            }, 1000);
+        }
+        
+        // Setup text completion observer (scroll to bottom)
+        function setupTextObserver(index) {
+            const textElement = document.getElementById(`text-${index}`);
+            if (!textElement) return;
+            
+            textElement.addEventListener('scroll', function() {
+                const scrollPercentage = (textElement.scrollTop / (textElement.scrollHeight - textElement.clientHeight)) * 100;
+                if (scrollPercentage >= 90) {
+                    markActivityAsCompleted(index);
+                }
+            });
+        }
+        
+        // Setup link completion observer
+        function setupLinkObserver(index) {
+            const link = document.getElementById(`link-${index}`);
+            if (!link) return;
+            
+            link.addEventListener('click', function() {
+                setTimeout(() => {
+                    markActivityAsCompleted(index);
+                }, 1000);
+            });
+        }
+        
+        // Setup share completion observer
+        function setupShareObserver(index) {
+            if (!activityObservers[index]) {
+                activityObservers[index] = { shareCount: 0 };
+            }
+            
+            const shareElement = document.getElementById(`share-count-${index}`);
+            if (shareElement) {
+                shareElement.textContent = '0';
+            }
+        }
+        
+        // ==============================================
+        // MARK ACTIVITY AS COMPLETED (WITH LOCAL STORAGE)
+        // ==============================================
+        
+        // Mark activity as completed
+        function markActivityAsCompleted(index) {
+            if (completionStatus[index]) return;
+            
+            completionStatus[index] = true;
+            
+            // Update UI
+            const activityElement = document.getElementById(`activity-${index}`);
+            if (activityElement) {
+                activityElement.classList.add('completed');
+                
+                const statusElement = activityElement.querySelector('.activity-status');
+                if (statusElement) {
+                    statusElement.className = 'activity-status status-completed';
+                    statusElement.innerHTML = '<i class="fas fa-check"></i>';
+                }
+            }
+            
+            updateProgress();
+            
+            // Save to local storage
+            saveToLocalStorage();
+            
+            // Show notification for completion
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const activity = todayActivities[index];
+                showNotification('Activity Completed', `You completed: ${activity.title || 'Activity'}!`);
+            }
+        }
+        
+        // Update progress bar and counts
+        function updateProgress() {
+            const totalActivities = todayActivities.length;
+            const completedCount = Object.values(completionStatus).filter(v => v).length;
+            
+            const progressCountElement = document.getElementById('progress-count');
+            if (progressCountElement) {
+                progressCountElement.textContent = `${completedCount}/${totalActivities}`;
+            }
+            
+            const progressPercentage = totalActivities > 0 ? (completedCount / totalActivities) * 100 : 0;
+            const progressFill = document.getElementById('progress-fill');
+            if (progressFill) {
+                progressFill.style.width = `${progressPercentage}%`;
+            }
+            
+            let totalReward = 0;
+            todayActivities.forEach((activity, index) => {
+                if (completionStatus[index]) {
+                    totalReward += parseFloat(activity.reward) || 0;
+                }
+            });
+            
+            const totalRewardElement = document.getElementById('total-reward');
+            if (totalRewardElement) {
+                totalRewardElement.textContent = `$${totalReward.toFixed(2)}`;
+            }
+            
+            // Enable submit button if at least one activity is completed
+            const submitBtn = document.getElementById('submit-btn');
+            if (completedCount > 0 && !userSubmission) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+        
+        // ==============================================
+        // ACTIVITY INTERACTIONS
+        // ==============================================
+        
+        // Share to platform
+        function shareToPlatform(platform, index) {
+            const activity = todayActivities[index];
+            const shareUrl = activity.shareUrl || window.location.href;
+            const shareText = activity.shareText || 'Check out this amazing opportunity!';
+            
+            let shareLink = '';
+            
+            switch(platform) {
+                case 'facebook':
+                    shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+                    break;
+                case 'twitter':
+                    shareLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+                    break;
+                case 'whatsapp':
+                    shareLink = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
+                    break;
+                case 'telegram':
+                    shareLink = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+                    break;
+            }
+            
+            window.open(shareLink, '_blank', 'width=600,height=400');
+            
+            if (!activityObservers[index]) {
+                activityObservers[index] = { shareCount: 0 };
+            }
+            
+            activityObservers[index].shareCount++;
+            const shareElement = document.getElementById(`share-count-${index}`);
+            if (shareElement) {
+                shareElement.textContent = activityObservers[index].shareCount;
+            }
+            
+            if (activityObservers[index].shareCount >= 3) {
+                markActivityAsCompleted(index);
+            }
+        }
+        
+        // Select survey option
+        function selectSurveyOption(activityIndex, optionIndex) {
+            const activity = todayActivities[activityIndex];
+            const correctAnswer = activity.surveyCorrect !== undefined ? activity.surveyCorrect : activity.correctAnswer;
+            
+            const optionsCount = activity.surveyOptions ? activity.surveyOptions.length : (activity.options ? activity.options.length : 0);
+            for (let i = 0; i < optionsCount; i++) {
+                const optionElement = document.getElementById(`survey-${activityIndex}-option-${i}`);
+                if (optionElement) {
+                    optionElement.classList.remove('selected');
+                }
+            }
+            
+            const selectedOption = document.getElementById(`survey-${activityIndex}-option-${optionIndex}`);
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+                
+                setTimeout(() => {
+                    markActivityAsCompleted(activityIndex);
+                }, 500);
+            }
+        }
+        
+        // ==============================================
+        // SUBMIT ACTIVITIES (ALLOW WITH AT LEAST ONE COMPLETED)
+        // ==============================================
+        
+        // Submit activities
+        async function submitActivities() {
+            const completedCount = Object.values(completionStatus).filter(v => v).length;
+            
+            // Allow submission with at least one completed activity
+            if (completedCount === 0) {
+                alert('Please complete at least one activity before submitting.');
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to submit today\'s activities? You will receive rewards only for completed activities.')) {
+                return;
+            }
+            
+            try {
+                const todayDate = getTodayDateString();
+                
+                // Calculate total reward for completed activities only
+                const totalReward = todayActivities.reduce((sum, activity, index) => {
+                    return sum + (completionStatus[index] ? parseFloat(activity.reward) || 0 : 0);
+                }, 0);
+                
+                // Prepare submission data
+                const submissionData = {
+                    userId: currentUser.uid,
+                    userName: userData ? userData.name : currentUser.displayName || 'User',
+                    userEmail: currentUser.email,
+                    date: todayDate,
+                    day: getDayOfWeek(),
+                    activities: todayActivities,
+                    completionStatus: completionStatus,
+                    totalReward: totalReward,
+                    submittedAt: new Date().toISOString(),
+                    status: 'pending',
+                    completedCount: completedCount,
+                    totalCount: todayActivities.length
+                };
+                
+                // Save submission to Firestore
+                await db.collection('activity_submissions').add(submissionData);
+                
+                // Update local storage with submission flag
+                const savedData = loadFromLocalStorage();
+                if (savedData) {
+                    savedData.userSubmitted = true;
+                    localStorage.setItem(getTodayStorageKey(), JSON.stringify(savedData));
+                }
+                
+                // Lock activities
+                lockActivities();
+                
+                // Show notification
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    showNotification('Activities Submitted', `You submitted ${completedCount} activities for review!`);
+                }
+                
+                alert(`Successfully submitted ${completedCount} activities! They will be reviewed by admin and rewards will be added to your account within 24 hours.`);
+                
+            } catch (error) {
+                console.error("Error submitting activities:", error);
+                alert('Error submitting activities. Please try again.');
+            }
+        }
+        
+        // Lock activities after submission
+        function lockActivities() {
+            userSubmission = { submitted: true };
+            
+            // Disable all activity cards
+            document.querySelectorAll('.activity-card').forEach(card => {
+                card.classList.add('locked');
+            });
+            
+            // Disable submit button
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-lock"></i> Already Submitted';
+            
+            // Show watermark
+            document.getElementById('watermark').style.display = 'block';
+            
+            // Add submitted overlay to each activity
+            document.querySelectorAll('.activity-card').forEach(card => {
+                if (!card.querySelector('.submitted-overlay')) {
+                    const overlay = document.createElement('div');
+                    overlay.className = 'submitted-overlay';
+                    overlay.innerHTML = `
+                        <div class="submitted-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="submitted-text">Submitted</div>
+                        <div class="submitted-message">
+                            Your activities have been submitted for review. You will receive your rewards once approved by admin.
+                        </div>
+                    `;
+                    card.appendChild(overlay);
+                }
+            });
+        }
+        
+        // ==============================================
+        // DEVELOPMENT/DEBUG FUNCTIONS
+        // ==============================================
+        
+        // For development/testing - simulate completion
+        window.simulateCompletion = function() {
+            todayActivities.forEach((_, index) => {
+                markActivityAsCompleted(index);
+            });
+        };
+        
+        // For development/testing - reset completion
+        window.resetCompletion = function() {
+            todayActivities.forEach((_, index) => {
+                completionStatus[index] = false;
+                const activityElement = document.getElementById(`activity-${index}`);
+                if (activityElement) {
+                    activityElement.classList.remove('completed');
+                    const statusElement = activityElement.querySelector('.activity-status');
+                    if (statusElement) {
+                        statusElement.className = 'activity-status status-pending';
+                        statusElement.innerHTML = '<i class="fas fa-clock"></i>';
+                    }
+                }
+            });
+            updateProgress();
+            setupActivityObservers();
+            
+            // Clear local storage for today
+            clearLocalStorage();
+        };
+    </script>
+    <script>
+        (function() {
+            const months = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            
+            const today = new Date();
+            const day = today.getDate();
+            const month = months[today.getMonth()];
+            const year = today.getFullYear();
+            
+            document.title = `Activities for ${day} ${month}, ${year}`;
+        })();
+    </script>
+    <div id="header">
+        <div class="countdown-timer glass-effect">
+            <div class="current-date" id="current-date">Loading...</div>
+            <div class="timer-text">
+                <div class="timer-title">TIME LEFT</div>
+                <div class="timer-display" id="countdown-timer">00:00:00</div>
+                <div id="total-reward">$0.00</div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-card glass-effect">
+                    <div class="progress-header">
+                        <div class="progress-title">Completion Progress</div>
+                        <div class="progress-count" id="progress-count">0/0</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
