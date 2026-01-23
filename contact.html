@@ -44,12 +44,13 @@
         .fab-btn { background: var(--accent-red); color: white; border: none; border-radius: 50px; padding: 15px 25px; font-weight: 600; box-shadow: 0 4px 20px rgba(255, 0, 51, 0.4); cursor: pointer; display: flex; align-items: center; gap: 10px; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0); backdrop-filter: blur(2px); z-index: 2000; display: none; align-items: center; justify-content: center; }
         .modal-overlay.active { display: flex; }
-        .modal-card { background: var(--background); border: 1px solid var(--border); border-radius: 16px; width: 90%; max-width: 500px; padding: 25px; }
-        .post-textarea { width: 100%; background: transparent; border: 1px solid var(--border); border-radius: 10px; padding: 15px; color: white; min-height: 150px; resize: none; margin-bottom: 10px; }
+        .modal-card { background: var(--background); border: 1px solid white; border-radius: 16px; width: 90%; max-width: 500px; padding: 25px; }
+        .post-textarea { width: 100%; background: transparent; border: 1px solid white; border-radius: 10px; padding: 15px; color: white; min-height: 150px; resize: none; margin-bottom: 10px; }
         .post-textarea:focus{
             outline: none;
             border-color: white;
         }
+        .post-textarea::placeholder{}
         .submit-btn { background: var(--text-primary); color: black; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
         .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
         .author-name { font-weight: 600; font-size: 1rem; color: var(--text-primary); display: flex; align-items: center; }
@@ -84,6 +85,19 @@
             outline: none;
             border: 1px solid var(--accent-red);
         }
+        .exit{
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: transparent;
+            backdrop-filter: blur(5px);
+            font-size: 2em;
+            font-weight: 900;
+            color: white;
+            padding: 1px 10px;
+            border-radius: 100%;
+            border: 1px solid white;
+        }
     </style>
 </head>
 <body>
@@ -102,11 +116,139 @@
     <div class="fab-container"><button class="fab-btn" onclick="openModal()"><i class="fas fa-pen"></i> Share Thoughts</button></div>
 
     <div class="modal-overlay" id="post-modal">
+        <button class="exit" onclick="closeModal()">&times;</button>
         <div class="modal-card">
             <textarea id="new-post-content" class="post-textarea" placeholder="What's on your mind?"></textarea>
             <button class="submit-btn" onclick="submitPost()" style="width: 100%;">Post</button>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes danceUpDown {
+            0%, 100% { transform: translateY(0px); }
+            25% { transform: translateY(-8px); }
+            50% { transform: translateY(0px); }
+            75% { transform: translateY(4px); }
+        }
+        
+        .post-textarea-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .dancing-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom:0;
+            pointer-events: none;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: inherit;
+            z-index: 1;
+            justify-content: center;
+        }
+        
+        .dance-letter {
+            display: inline-block;
+            animation: danceUpDown 1.8s infinite ease-in-out;
+        }
+        
+        .post-textarea {
+            position: relative;
+            z-index: 2;
+            background: transparent;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    function initDancingPlaceholder() {
+        const textareas = document.querySelectorAll('.post-textarea');
+        
+        textareas.forEach(textarea => {
+            if (textarea.hasAttribute('data-dance-processed')) return;
+            
+            const originalPlaceholder = textarea.getAttribute('placeholder');
+            if (!originalPlaceholder) return;
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'post-textarea-wrapper';
+            
+            textarea.parentNode.insertBefore(wrapper, textarea);
+            wrapper.appendChild(textarea);
+            
+            textarea.removeAttribute('placeholder');
+            
+            const placeholderDiv = document.createElement('div');
+            placeholderDiv.className = 'dancing-placeholder';
+            
+            const letters = originalPlaceholder.split('');
+            letters.forEach((letter, index) => {
+                const span = document.createElement('span');
+                span.className = 'dance-letter';
+                span.textContent = letter === ' ' ? '\u00A0' : letter;
+                
+                const delay = Math.random() * 2;
+                span.style.animationDelay = `${delay}s`;
+                
+                const duration = 1.2 + Math.random() * 1.2;
+                span.style.animationDuration = `${duration}s`;
+                
+                placeholderDiv.appendChild(span);
+            });
+            
+            wrapper.appendChild(placeholderDiv);
+            
+            function updateVisibility() {
+                placeholderDiv.style.display = textarea.value ? 'none' : 'flex';
+            }
+            
+            textarea.addEventListener('input', updateVisibility);
+            textarea.addEventListener('focus', updateVisibility);
+            textarea.addEventListener('blur', updateVisibility);
+            
+            placeholderDiv.addEventListener('mouseenter', function() {
+                const letters = this.querySelectorAll('.dance-letter');
+                letters.forEach(letter => {
+                    letter.style.animationPlayState = 'paused';
+                });
+            });
+            
+            placeholderDiv.addEventListener('mouseleave', function() {
+                const letters = this.querySelectorAll('.dance-letter');
+                letters.forEach(letter => {
+                    letter.style.animationPlayState = 'running';
+                });
+            });
+            
+            updateVisibility();
+            textarea.setAttribute('data-dance-processed', 'true');
+        });
+    }
+    
+    initDancingPlaceholder();
+    
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.addedNodes.length) {
+                initDancingPlaceholder();
+            }
+        });
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+});
+    </script>
 
     <script>
         const firebaseConfig = {
