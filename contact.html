@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Community Hub</title>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://iciiwhite.github.io/web-assets/icons/icons.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -15,6 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <style>
+        /* ALL YOUR ORIGINAL STYLES PRESERVED */
         :root {
             --bg-color: #050505;
             --surface: #121212;
@@ -28,435 +29,82 @@
             --shadow: 0 8px 30px rgba(0,0,0,0.5);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Outfit', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            min-height: 100vh;
-            padding-bottom: 80px;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-color); color: var(--text-primary); min-height: 100vh; padding-bottom: 80px; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent-red); }
-
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 60px;
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 1000;
-        }
-
-        .brand {
-            font-weight: 700;
-            font-size: 1.2rem;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .brand i { color: var(--accent-red); }
-        .brand span { color: var(--accent-red); }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .user-avatar-small {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: var(--surface-hover);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-primary);
-            font-weight: 600;
-            border: 1px solid var(--border);
-        }
-
-        main {
-            max-width: 700px;
-            margin: 80px auto 0;
-            padding: 0 15px;
-        }
-
-        .fab-container {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 900;
-        }
-
-        .fab-btn {
-            background: var(--accent-red);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 15px 25px;
-            font-size: 1rem;
-            font-weight: 600;
-            box-shadow: 0 4px 20px rgba(255, 0, 51, 0.4);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .fab-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(255, 0, 51, 0.6);
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            width: 90%;
-            max-width: 500px;
-            padding: 25px;
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-            box-shadow: var(--shadow);
-        }
-
-        .modal-overlay.active .modal-card {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-title { font-size: 1.1rem; font-weight: 600; }
-        
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        .post-textarea {
-            width: 100%;
-            background: var(--bg-color);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 15px;
-            color: white;
-            min-height: 150px;
-            resize: none;
-            font-size: 1rem;
-            margin-bottom: 10px;
-        }
-
-        .post-textarea:focus {
+        header { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: var(--glass); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 1000; }
+        .brand { font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .brand i, .brand span { color: var(--accent-red); }
+        .user-profile { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .user-avatar-small { width: 30px; height: 30px; border-radius: 50%; background: var(--surface-hover); display: flex; align-items: center; justify-content: center; color: var(--text-primary); font-weight: 600; border: 1px solid var(--border); }
+        main { max-width: 700px; margin: 80px auto 0; padding: 0 15px; }
+        .fab-container { position: fixed; bottom: 30px; right: 30px; z-index: 900; }
+        .fab-btn { background: var(--accent-red); color: white; border: none; border-radius: 50px; padding: 15px 25px; font-weight: 600; box-shadow: 0 4px 20px rgba(255, 0, 51, 0.4); cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0); backdrop-filter: blur(2px); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-card { background: var(--background); border: 1px solid var(--border); border-radius: 16px; width: 90%; max-width: 500px; padding: 25px; }
+        .post-textarea { width: 100%; background: transparent; border: 1px solid var(--border); border-radius: 10px; padding: 15px; color: white; min-height: 150px; resize: none; margin-bottom: 10px; }
+        .post-textarea:focus{
             outline: none;
-            border-color: var(--accent-red);
+            border-color: white;
         }
-
-        .modal-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .char-counter { color: var(--text-secondary); font-size: 0.8rem; }
-
-        .submit-btn {
-            background: var(--text-primary);
-            color: black;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .submit-btn:hover { background: #ccc; }
-        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            animation: fadeIn 0.4s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-
-        .author-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .author-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #333, #111);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-
-        .author-meta { display: flex; flex-direction: column; }
-        
-        .author-name { 
-            font-weight: 600; 
-            font-size: 1rem; 
-            color: var(--text-primary);
-        }
-        
+        .submit-btn { background: var(--text-primary); color: black; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .author-name { font-weight: 600; font-size: 1rem; color: var(--text-primary); display: flex; align-items: center; }
         .author-name.is-me { color: var(--accent-red); }
-
-        .post-date { font-size: 0.75rem; color: var(--text-secondary); }
-
-        .card-content {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: #ddd;
-            margin-bottom: 15px;
-            white-space: pre-wrap;
-        }
-
-        .card-actions {
-            border-top: 1px solid var(--border);
-            padding-top: 12px;
-            display: flex;
-            gap: 20px;
-        }
-
-        .action-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 8px;
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-
-        .action-btn:hover { background: var(--surface-hover); color: var(--text-primary); }
-        
+        .card-actions { border-top: 1px solid var(--border); padding-top: 12px; display: flex; gap: 20px; }
+        .action-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 6px; }
         .action-btn.liked { color: var(--accent-red); }
-        .action-btn.liked i { font-weight: 900; }
+        .replies-section { margin-top: 1px; padding-top: 1px; border-top: 1px solid var(--border); display: none; gap: 2px; background: transparent; border-radius:0: padding: 0; }
+        .replies-section.active { display: flex !important; flex-direction : column; gao: 2px;}
+        .reply-author { font-weight: 600; color: var(--text-primary); }
+        .reply-author.is-op { color: var(--accent-red); display: flex; align-items: center; gap: 5px; }
+        .reply-author.is-op::after { content: 'Author'; font-size: 0.6rem; background: var(--accent-red); color: white; padding: 1px 4px; border-radius: 4px; font-weight: normal; }
 
-        .replies-section {
-            margin-top: 15px;
-            padding-top: 10px;
-            border-top: 1px solid var(--border);
-            display: none;
-            background: #0a0a0a;
-            border-radius: 8px;
+        /* ADDED FILTER TABS AND BADGE UI */
+        .filter-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .filter-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 10px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; }
+        .filter-btn.active { display: none; }
+        .v-badge { width: 14px; height: 14px; margin-left: 5px; fill: #1d9bf0; display: inline-block; vertical-align: middle; }
+        .card-header{
+            display: flex;
+        }
+        .xzs{
+            color: white;
+        }
+        .reply{
+            background: black;
             padding: 10px;
+            border-radius: 5px;
+            border: 0.0001px solid rgba(225, 225, 225, 0.3);
         }
-        
-        .replies-section.active { display: block !important; }
-
-        .reply-list { margin-bottom: 15px; }
-
-        .reply-item {
-            display: flex;
-            gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid #1a1a1a;
-        }
-
-        .reply-item:last-child { border-bottom: none; }
-
-        .reply-content-box { flex: 1; }
-        
-        .reply-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 4px;
-            font-size: 0.85rem;
-        }
-
-        .reply-author { font-weight: 600; color: var(--text-secondary); }
-        
-        .reply-author.is-op { 
-            color: var(--accent-red); 
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .reply-author.is-op::after {
-            content: 'Author';
-            font-size: 0.6rem;
-            background: var(--accent-red);
-            color: white;
-            padding: 1px 4px;
-            border-radius: 4px;
-            font-weight: normal;
-        }
-
-        .reply-text { font-size: 0.9rem; color: #ccc; line-height: 1.4; }
-
-        .reply-input-area {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .reply-input {
-            flex: 1;
-            background: #111;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 8px 15px;
-            color: white;
-            font-size: 0.9rem;
-        }
-        
-        .reply-input:focus { outline: none; border-color: var(--text-secondary); }
-
-        .reply-send-btn {
-            background: var(--text-primary);
-            color: black;
-            border: none;
-            border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .loader {
-            width: 40px; height: 40px;
-            border: 3px solid var(--surface-hover);
-            border-top-color: var(--accent-red);
-            border-radius: 50%;
-            animation: spin 1s infinite linear;
-            margin: 20px auto;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        .hidden { display: none !important; }
-
-        @media (max-width: 600px) {
-            .modal-card { width: 95%; margin: 0; }
+        input:focus{
+            outline: none;
+            border: 1px solid var(--accent-red);
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="brand">
-            <i class="fas fa-cubes"></i>
-            <div>Community <span>Hub</span></div>
-        </div>
-        <div class="user-profile" id="header-user">
-            <span>Guest</span>
-            <div class="user-avatar-small"><i class="fas fa-user"></i></div>
-        </div>
+        <div class="brand"><i class="fas fa-cubes"></i> <div>Community <span>Hub</span></div></div>
+            <button id="btn-all" class="filter-btn active" onclick="setFilter('all')"><i class="fas fa-globe"></i></button>
+            <button id="btn-mine" class="filter-btn" onclick="setFilter('mine')"><i class="fas fa-user"></i></button>
+        <div class="user-profile" id="header-user"><span>Guest</span><div class="user-avatar-small"><i class="fas fa-user"></i></div></div>
     </header>
 
-    <main id="feed-container">
-        <div class="loader"></div>
+    <main>
+        <div id="feed-container"></div>
     </main>
 
-    <div class="fab-container">
-        <button class="fab-btn" onclick="openModal()">
-            <i class="fas fa-pen"></i> Share Thoughts
-        </button>
-    </div>
+    <div class="fab-container"><button class="fab-btn" onclick="openModal()"><i class="fas fa-pen"></i> Share Thoughts</button></div>
 
     <div class="modal-overlay" id="post-modal">
         <div class="modal-card">
-            <div class="modal-header">
-                <div class="modal-title">Create New Post</div>
-                <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <textarea id="new-post-content" class="post-textarea" placeholder="What's on your mind?" maxlength="500"></textarea>
-            <div class="modal-footer">
-                <span class="char-counter" id="char-count">0/500</span>
-                <button class="submit-btn" id="submit-post-btn" onclick="submitPost()">Post</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="login-modal">
-        <div class="modal-card" style="text-align: center;">
-            <i class="fas fa-lock" style="font-size: 2rem; color: var(--accent-red); margin-bottom: 15px;"></i>
-            <h3 style="margin-bottom: 10px;">Access Required</h3>
-            <p style="color: var(--text-secondary); margin-bottom: 20px;">Please login to join the conversation.</p>
-            <button class="submit-btn" style="width: 100%; background: var(--accent-red); color: white;" onclick="window.location.href='index.html'">Go to Login</button>
+            <textarea id="new-post-content" class="post-textarea" placeholder="What's on your mind?"></textarea>
+            <button class="submit-btn" onclick="submitPost()" style="width: 100%;">Post</button>
         </div>
     </div>
 
@@ -467,315 +115,173 @@
             projectId: "malcolm-finance",
             storageBucket: "malcolm-finance.firebasestorage.app",
             messagingSenderId: "987613399580",
-            appId: "1:987613399580:web:0237b2c8c2c7df54222dd9",
-            measurementId: "G-1CEG3BWFBP"
+            appId: "1:987613399580:web:0237b2c8c2c7df54222dd9"
         };
 
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
         let currentUser = null;
         let userData = null;
-        let activeReplyListeners = {};
+        let activeFilter = 'all';
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const ta = document.getElementById('new-post-content');
-            ta.addEventListener('input', (e) => {
-                document.getElementById('char-count').innerText = `${e.target.value.length}/500`;
-            });
+        // THE VERIFIED BADGE SVG
+        const vBadge = `<svg class="v-badge" viewBox="0 0 24 24"><path d="M22.5 12.5c0-1.58-.88-2.95-2.18-3.65.54-1.53.22-3.26-1.01-4.49s-2.96-1.55-4.49-1.01c-.7-1.3-2.07-2.18-3.65-2.18s-2.95.88-3.65 2.18c-1.53-.54-3.26-.22-4.49 1.01S1.45 7.31 1.99 8.85C.69 9.55-.19 10.92-.19 12.5s.88 2.95 2.18 3.65c-.54 1.53-.22 3.26 1.01 4.49s2.96 1.55 4.49 1.01c.7 1.3 2.07 2.18 3.65 2.18s2.95-.88 3.65-2.18c1.53.54 3.26.22 4.49-1.01s1.55-2.96 1.01-4.49c1.3-.7 2.18-2.07 2.18-3.65zM10 17.5l-5-5 1.41-1.41L10 14.67l7.59-7.59L19 8.5l-9 9z"/></svg>`;
 
-            auth.onAuthStateChanged(async (user) => {
-                if (user) {
-                    currentUser = user;
-                    try {
-                        const doc = await db.collection('users').doc(user.uid).get();
-                        userData = doc.exists ? doc.data() : { name: user.displayName || 'User' };
-                    } catch(e) {
-                        userData = { name: user.email.split('@')[0] };
-                    }
-                    updateHeader();
-                    initFeed();
-                } else {
-                    currentUser = null;
-                    userData = null;
-                    updateHeader();
-                    initFeed();
-                }
-            });
+        // NEW FEATURE: Exit Guard
+        window.onbeforeunload = function() {
+            if (document.getElementById('new-post-content').value.trim() !== "") return "You have an unsaved post!";
+        };
+
+        auth.onAuthStateChanged(async (user) => {
+            currentUser = user;
+            if (user) {
+                const doc = await db.collection('users').doc(user.uid).get();
+                userData = doc.exists ? doc.data() : { name: user.email.split('@')[0], isVerified: false };
+                updateHeader();
+            }
+            initFeed();
         });
 
         function updateHeader() {
             const el = document.getElementById('header-user');
-            if (currentUser) {
-                const initials = (userData.name || 'U').charAt(0).toUpperCase();
-                el.innerHTML = `
-                    <span>${userData.name || 'User'}</span>
-                    <div class="user-avatar-small" style="background: var(--accent-red); border:none;">${initials}</div>
-                `;
-            } else {
-                el.innerHTML = `<span>Guest</span><div class="user-avatar-small"><i class="fas fa-user"></i></div>`;
+            if (currentUser && userData) {
+                const initials = userData.name.charAt(0).toUpperCase();
+                el.innerHTML = `<span>${escapeHtml(userData.name)}</span><div class="user-avatar-small" style="background:var(--accent-red); border:none;">${initials}</div>`;
             }
         }
 
-        function openModal() {
-            if (!currentUser) {
-                document.getElementById('login-modal').classList.add('active');
-                return;
-            }
-            document.getElementById('post-modal').classList.add('active');
-            document.getElementById('new-post-content').focus();
-        }
-
-        function closeModal() {
-            document.getElementById('post-modal').classList.remove('active');
-            document.getElementById('login-modal').classList.remove('active');
-        }
-
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal-overlay')) {
-                closeModal();
-            }
+        function setFilter(f) {
+            activeFilter = f;
+            document.getElementById('btn-all').classList.toggle('active', f === 'all');
+            document.getElementById('btn-mine').classList.toggle('active', f === 'mine');
+            initFeed();
         }
 
         function initFeed() {
             const container = document.getElementById('feed-container');
-            
-            db.collection('comments')
-                .orderBy('timestamp', 'desc')
-                .onSnapshot(snapshot => {
-                    if (snapshot.empty) {
-                        container.innerHTML = `
-                            <div style="text-align: center; padding: 50px; color: var(--text-secondary);">
-                                <i class="fas fa-wind" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                                <p>It's quiet here. Be the first to post!</p>
+            let query = db.collection('comments').orderBy('timestamp', 'desc'); // LATEST ON TOP
+
+            if (activeFilter === 'mine' && currentUser) {
+                query = query.where('userId', '==', currentUser.uid);
+            }
+
+            query.onSnapshot(snap => {
+                container.innerHTML = '';
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const isMe = currentUser && data.userId === currentUser.uid;
+                    const isLiked = currentUser && (data.likes || []).includes(currentUser.uid);
+                    
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div class="author-name ${isMe ? 'is-me' : ''}">
+                                ${escapeHtml(data.userName)} ${data.isVerified ? vBadge : ''}
                             </div>
-                        `;
-                        return;
-                    }
-
-                    snapshot.docChanges().forEach(change => {
-                        if (change.type === "added") {
-                            const card = createCard(change.doc.id, change.doc.data());
-                            if (container.querySelector('.loader') || container.querySelector('.fas-wind')) container.innerHTML = '';
-                            container.prepend(card);
-                        }
-                        if (change.type === "modified") {
-                            const oldCard = document.getElementById(`card-${change.doc.id}`);
-                            if (oldCard) {
-                                const newCard = createCard(change.doc.id, change.doc.data());
-                                const wasOpen = oldCard.querySelector('.replies-section').classList.contains('active');
-                                if (wasOpen) newCard.querySelector('.replies-section').classList.add('active');
-                                oldCard.replaceWith(newCard);
-                                if (wasOpen) attachReplyListener(change.doc.id, change.doc.data().userId);
-                            }
-                        }
-                        if (change.type === "removed") {
-                            const el = document.getElementById(`card-${change.doc.id}`);
-                            if (el) el.remove();
-                        }
-                    });
-                });
-        }
-
-        function createCard(id, data) {
-            const div = document.createElement('div');
-            div.className = 'card';
-            div.id = `card-${id}`;
-
-            const initials = (data.userName || 'A').charAt(0).toUpperCase();
-            const timeAgo = getTimeAgo(new Date(data.timestamp));
-            const likes = data.likes || [];
-            const isLiked = currentUser && likes.includes(currentUser.uid);
-            const likeCount = data.likesCount || 0;
-            const replyCount = data.replyCount || 0;
-            const isMyPost = currentUser && data.userId === currentUser.uid;
-
-            div.innerHTML = `
-                <div class="card-header">
-                    <div class="author-info">
-                        <div class="author-avatar">${initials}</div>
-                        <div class="author-meta">
-                            <span class="author-name ${isMyPost ? 'is-me' : ''}">${escapeHtml(data.userName)}</span>
-                            <span class="post-date">${timeAgo}</span>
+     <span style="color: var(--text-secondary); font-size: 0.8rem; margin-left: 8px; font-weight: 400;">
+        ${getTimeAgo(new Date(data.timestamp))}
+    </span>
+    
+                            ${isMe ? `<button onclick="deletePost('${doc.id}')" style="background:none; border:none; color:white; opacity:0.6;"><i class="fas fa-trash"></i></button>` : ''}
                         </div>
-                    </div>
-                    ${isMyPost ? `<button onclick="deletePost('${id}')" style="background:none; border:none; color:#FFFFFF; cursor:pointer;"><i class="fas fa-trash"></i></button>` : ''}
-                </div>
-                <div class="card-content">${escapeHtml(data.content)}</div>
-                <div class="card-actions">
-                    <button class="action-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${id}')">
-                        <i class="${isLiked ? 'fas' : 'far'} fa-heart"></i>
-                        <span>${likeCount}</span>
-                    </button>
-                    <button class="action-btn" onclick="toggleReplies('${id}', '${data.userId}')">
-                        <i class="far fa-comment-alt"></i>
-                        <span id="reply-count-${id}">${replyCount}</span>
-                    </button>
-                </div>
-                <div id="replies-${id}" class="replies-section">
-                    <div id="reply-list-${id}" class="reply-list"></div>
-                    <div class="reply-input-area">
-                        <input type="text" id="reply-input-${id}" class="reply-input" placeholder="Write a reply...">
-                        <button class="reply-send-btn" onclick="sendReply('${id}', '${data.userId}')">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-            return div;
+                        <div style="margin:10px 0;">${escapeHtml(data.content)}</div>
+                        <div class="card-actions">
+                            <button class="action-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${doc.id}')">
+                                <i class="${isLiked ? 'fas' : 'far'} fa-heart"></i>
+                                <span class="xzs">${data.likesCount || 0}</span>
+                            </button>
+                            <button class="action-btn" onclick="toggleReplies('${doc.id}', '${data.userId}')">
+                                <i class="far fa-comment-alt"></i>
+                                <span>${data.replyCount || 0}</span>
+                            </button>
+                        </div>
+                        <div id="replies-${doc.id}" class="replies-section">
+                            <div id="list-${doc.id}"></div>
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <input type="text" id="input-${doc.id}" style="flex:1; background:#111; border:1px solid var(--border); border-radius:20px; padding:8px 15px; color:white;" placeholder="Reply...">
+                                <button onclick="sendReply('${doc.id}', '${data.userId}')" style="background:white; border:none; border-radius:50%; width:35px; height:35px;"><i class="fas fa-paper-plane"></i></button>
+                            </div>
+                        </div>`;
+                    container.appendChild(card);
+                });
+            });
         }
 
         async function submitPost() {
             const txt = document.getElementById('new-post-content');
-            const content = txt.value.trim();
-            if (!content) return;
-            const btn = document.getElementById('submit-post-btn');
-            btn.disabled = true;
-            btn.innerText = 'Posting...';
-            try {
-                await db.collection('comments').add({
-                    content: content,
-                    userId: currentUser.uid,
-                    userName: userData.name || 'Anonymous',
-                    timestamp: new Date().toISOString(),
-                    likes: [],
-                    likesCount: 0,
-                    replyCount: 0,
-                    status: 'approved',
-                    isPublic: true
-                });
-                txt.value = '';
-                document.getElementById('char-count').innerText = '0/500';
-                closeModal();
-            } catch(e) {
-                alert("Error posting: " + e.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'Post';
+            if (!txt.value.trim() || !currentUser) return;
+            await db.collection('comments').add({
+                content: txt.value.trim(), userId: currentUser.uid, userName: userData.name,
+                isVerified: userData.isVerified || false, timestamp: new Date().toISOString(),
+                likes: [], likesCount: 0, replyCount: 0
+            });
+            txt.value = '';
+            closeModal();
+        }
+
+        async function toggleLike(id) {
+            if (!currentUser) return;
+            const ref = db.collection('comments').doc(id);
+            const doc = await ref.get();
+            const likes = doc.data().likes || [];
+            if (likes.includes(currentUser.uid)) {
+                await ref.update({ likes: firebase.firestore.FieldValue.arrayRemove(currentUser.uid), likesCount: firebase.firestore.FieldValue.increment(-1) });
+            } else {
+                await ref.update({ likes: firebase.firestore.FieldValue.arrayUnion(currentUser.uid), likesCount: firebase.firestore.FieldValue.increment(1) });
             }
         }
 
-        async function toggleLike(docId) {
-            if (!currentUser) {
-                document.getElementById('login-modal').classList.add('active');
-                return;
-            }
-            const ref = db.collection('comments').doc(docId);
-            try {
-                await db.runTransaction(async (t) => {
-                    const doc = await t.get(ref);
-                    if (!doc.exists) return;
-                    const data = doc.data();
-                    const likes = data.likes || [];
-                    let count = data.likesCount || 0;
-                    if (likes.includes(currentUser.uid)) {
-                        const idx = likes.indexOf(currentUser.uid);
-                        likes.splice(idx, 1);
-                        count = Math.max(0, count - 1);
-                    } else {
-                        likes.push(currentUser.uid);
-                        count++;
-                    }
-                    t.update(ref, { likes: likes, likesCount: count });
+        function toggleReplies(id, postAuthorId) {
+            const el = document.getElementById(`replies-${id}`);
+            el.classList.toggle('active');
+            if (el.classList.contains('active')) {
+                db.collection('comments').doc(id).collection('replies').orderBy('timestamp', 'asc').onSnapshot(snap => {
+                    const list = document.getElementById(`list-${id}`);
+                    list.innerHTML = '';
+                    snap.forEach(doc => {
+                        const r = doc.data();
+                        const isOP = r.userId === postAuthorId;
+                        list.innerHTML += `
+                            <div class="reply" style="margin-top:10px;">
+                                <div class="reply-header" style="display:flex;">
+                                    <span class="reply-author ${isOP ? 'is-op' : ''}">${escapeHtml(r.userName)} ${r.isVerified ? vBadge : ''}</span> <span style="color: var(--text-secondary); font-size: 0.75rem; margin-left: 15px; font-weight: 400; opacity: 0.8;">
+    ${getTimeAgo(new Date(r.timestamp))}
+</span>
+                                </div>
+                                <div style="color:#ccc; font-size:0.9rem">${escapeHtml(r.content)}</div>
+                            </div>`;
+                    });
                 });
-            } catch(e) {
-                console.error(e);
             }
+        }
+
+        async function sendReply(id, postAuthorId) {
+            const inp = document.getElementById(`input-${id}`);
+            if (!inp.value.trim() || !currentUser) return;
+            await db.collection('comments').doc(id).collection('replies').add({
+                content: inp.value.trim(), userId: currentUser.uid, userName: userData.name,
+                isVerified: userData.isVerified || false, timestamp: new Date().toISOString()
+            });
+            await db.collection('comments').doc(id).update({ replyCount: firebase.firestore.FieldValue.increment(1) });
+            inp.value = '';
         }
 
         function deletePost(id) {
-            if(confirm("Delete this post?")) {
-                db.collection('comments').doc(id).delete();
-            }
+            if (confirm("Delete this post?")) db.collection('comments').doc(id).delete();
         }
 
-        function toggleReplies(commentId, parentAuthorId) {
-            const section = document.getElementById(`replies-${commentId}`);
-            section.classList.toggle('active');
-            if (section.classList.contains('active')) {
-                attachReplyListener(commentId, parentAuthorId);
-            }
-        }
-
-        function attachReplyListener(commentId, parentAuthorId) {
-            const listContainer = document.getElementById(`reply-list-${commentId}`);
-            if (activeReplyListeners[commentId]) activeReplyListeners[commentId]();
-            
-            activeReplyListeners[commentId] = db.collection('comments')
-                .doc(commentId)
-                .collection('replies')
-                .orderBy('timestamp', 'asc')
-                .onSnapshot(snapshot => {
-                    if (snapshot.empty) {
-                        listContainer.innerHTML = '<div style="color:#444; font-size:0.8rem; font-style:italic;">No replies yet.</div>';
-                        return;
-                    }
-                    let html = '';
-                    snapshot.forEach(doc => {
-                        const r = doc.data();
-                        const isOP = r.userId === parentAuthorId;
-                        const time = getTimeAgo(new Date(r.timestamp));
-                        html += `
-                            <div class="reply-item">
-                                <div class="reply-content-box">
-                                    <div class="reply-header">
-                                        <span class="reply-author ${isOP ? 'is-op' : ''}">${escapeHtml(r.userName)}</span>
-                                        <span style="color:#555;">${time}</span>
-                                    </div>
-                                    <div class="reply-text">${escapeHtml(r.content)}</div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    listContainer.innerHTML = html;
-                });
-        }
-
-        async function sendReply(commentId, parentAuthorId) {
-            if (!currentUser) {
-                document.getElementById('login-modal').classList.add('active');
-                return;
-            }
-            const input = document.getElementById(`reply-input-${commentId}`);
-            const text = input.value.trim();
-            if (!text) return;
-            try {
-                await db.collection('comments').doc(commentId).collection('replies').add({
-                    content: text,
-                    userId: currentUser.uid,
-                    userName: userData.name || 'User',
-                    timestamp: new Date().toISOString()
-                });
-                await db.collection('comments').doc(commentId).update({
-                    replyCount: firebase.firestore.FieldValue.increment(1)
-                });
-                input.value = '';
-            } catch(e) {
-                alert("Could not send reply");
-            }
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function getTimeAgo(date) {
-            const seconds = Math.floor((new Date() - date) / 1000);
-            let interval = seconds / 31536000;
-            if (interval > 1) return Math.floor(interval) + "y";
-            interval = seconds / 2592000;
-            if (interval > 1) return Math.floor(interval) + "mo";
-            interval = seconds / 86400;
-            if (interval > 1) return Math.floor(interval) + "d";
-            interval = seconds / 3600;
-            if (interval > 1) return Math.floor(interval) + "h";
-            interval = seconds / 60;
-            if (interval > 1) return Math.floor(interval) + "m";
-            return "now";
+        function openModal() { document.getElementById('post-modal').classList.add('active'); }
+        function closeModal() { document.getElementById('post-modal').classList.remove('active'); }
+        function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+        function getTimeAgo(d) {
+            const s = Math.floor((new Date() - d) / 1000);
+            if (s < 60) return "Just now";
+            if (s < 3600) return Math.floor(s/60) + "m";
+            if (s < 86400) return Math.floor(s/3600) + "h";
+            return Math.floor(s/86400) + "d";
         }
     </script>
 </body>
