@@ -2,429 +2,134 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>Community Hub</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://iciiwhite.github.io/web-assets/icons/icons.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Alert | System Compromised</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
-        /* ALL YOUR ORIGINAL STYLES PRESERVED */
-        :root {
-            --bg-color: #050505;
-            --surface: #121212;
-            --surface-hover: #1e1e1e;
-            --border: #2a2a2a;
-            --accent-red: #ff0033;
-            --accent-red-dim: rgba(255, 0, 51, 0.1);
-            --text-primary: #ffffff;
-            --text-secondary: #a0a0a0;
-            --glass: rgba(18, 18, 18, 0.8);
-            --shadow: 0 8px 30px rgba(0,0,0,0.5);
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+            overflow-y: auto;
+            overflow-x: hidden;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-color); color: var(--text-primary); min-height: 100vh; padding-bottom: 80px; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-color); }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-        header { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: var(--glass); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 1000; }
-        .brand { font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
-        .brand i, .brand span { color: var(--accent-red); }
-        .user-profile { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
-        .user-avatar-small { width: 30px; height: 30px; border-radius: 50%; background: var(--surface-hover); display: flex; align-items: center; justify-content: center; color: var(--text-primary); font-weight: 600; border: 1px solid var(--border); }
-        main { max-width: 700px; margin: 80px auto 0; padding: 0 15px; }
-        .fab-container { position: fixed; bottom: 30px; right: 30px; z-index: 900; }
-        .fab-btn { background: var(--accent-red); color: white; border: none; border-radius: 50px; padding: 15px 25px; font-weight: 600; box-shadow: 0 4px 20px rgba(255, 0, 51, 0.4); cursor: pointer; display: flex; align-items: center; gap: 10px; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0); backdrop-filter: blur(2px); z-index: 2000; display: none; align-items: center; justify-content: center; }
-        .modal-overlay.active { display: flex; }
-        .modal-card { background: var(--background); border: 1px solid white; border-radius: 16px; width: 90%; max-width: 500px; padding: 25px; }
-        .post-textarea { width: 100%; background: transparent; border: 1px solid white; border-radius: 10px; padding: 15px; color: white; min-height: 150px; resize: none; margin-bottom: 10px; }
-        .post-textarea:focus{
-            outline: none;
-            border-color: white;
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
-        .post-textarea::placeholder{}
-        .submit-btn { background: var(--text-primary); color: black; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
-        .author-name { font-weight: 600; font-size: 1rem; color: var(--text-primary); display: flex; align-items: center; }
-        .author-name.is-me { color: var(--accent-red); }
-        .card-actions { border-top: 1px solid var(--border); padding-top: 12px; display: flex; gap: 20px; }
-        .action-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .action-btn.liked { color: var(--accent-red); }
-        .replies-section { margin-top: 1px; padding-top: 1px; border-top: 1px solid var(--border); display: none; gap: 2px; background: transparent; border-radius:0: padding: 0; }
-        .replies-section.active { display: flex !important; flex-direction : column; gao: 2px;}
-        .reply-author { font-weight: 600; color: var(--text-primary); }
-        .reply-author.is-op { color: var(--accent-red); display: flex; align-items: center; gap: 5px; }
-        .reply-author.is-op::after { content: 'Author'; font-size: 0.6rem; background: var(--accent-red); color: white; padding: 1px 4px; border-radius: 4px; font-weight: normal; }
-
-        /* ADDED FILTER TABS AND BADGE UI */
-        .filter-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .filter-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 10px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; }
-        .filter-btn.active { display: none; }
-        .v-badge { width: 14px; height: 14px; margin-left: 5px; fill: #1d9bf0; display: inline-block; vertical-align: middle; }
-        .card-header{
-            display: flex;
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
         }
-        .xzs{
-            color: white;
+        .glitch-text {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-        .reply{
-            background: black;
-            padding: 10px;
-            border-radius: 5px;
-            border: 0.0001px solid rgba(225, 225, 225, 0.3);
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .7; }
         }
-        input:focus{
-            outline: none;
-            border: 1px solid var(--accent-red);
-        }
-        .exit{
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: transparent;
-            backdrop-filter: blur(5px);
-            font-size: 2em;
-            font-weight: 900;
-            color: white;
-            padding: 1px 10px;
-            border-radius: 100%;
-            border: 1px solid white;
+        video {
+            filter: grayscale(1) contrast(1.2) brightness(0.8);
+            object-fit: cover;
         }
     </style>
 </head>
-<body>
+<body class="flex items-center justify-center min-h-screen p-4">
 
-    <header>
-        <div class="brand"><i class="fas fa-cubes"></i> <div>Community <span>Hub</span></div></div>
-            <button id="btn-all" class="filter-btn active" onclick="setFilter('all')"><i class="fas fa-globe"></i></button>
-            <button id="btn-mine" class="filter-btn" onclick="setFilter('mine')"><i class="fas fa-user"></i></button>
-        <div class="user-profile" id="header-user"><span>Guest</span><div class="user-avatar-small"><i class="fas fa-user"></i></div></div>
-    </header>
+    <!-- Main Container -->
+    <div class="glass-panel w-full max-w-md rounded-3xl overflow-hidden flex flex-col animate-in fade-in zoom-in duration-700">
+        
+        <!-- Header Section -->
+        <div class="p-6 bg-red-500/10 border-b border-red-500/20 flex items-center gap-4">
+            <div class="bg-red-500 p-3 rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.4)]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m14.5 9-5 5"/><path d="m9.5 9 5 5"/></svg>
+            </div>
+            <div>
+                <h1 class="text-white font-extrabold text-xl tracking-tight">Access Denied</h1>
+                <p class="text-red-400 text-xs font-semibold uppercase tracking-widest mono">System Integrity Compromised</p>
+            </div>
+        </div>
 
-    <main>
-        <div id="feed-container"></div>
-    </main>
+        <!-- Camera Feed Section -->
+        <div class="px-6 pt-6">
+            <div class="relative group">
+                <div class="absolute inset-0 bg-red-500/5 rounded-2xl pointer-events-none border border-white/5"></div>
+                <video id="videoFeed" autoplay playsinline class="w-full h-48 rounded-2xl bg-black border border-white/10 shadow-inner"></video>
+                <div class="absolute top-3 left-3 flex items-center gap-2">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                    </span>
+                    <span class="text-[10px] text-white/50 mono font-bold">LIVE_FEED_01</span>
+                </div>
+                <div class="absolute bottom-3 right-3">
+                    <span class="text-[10px] text-white/30 mono" id="timestamp"></span>
+                </div>
+            </div>
+        </div>
 
-    <div class="fab-container"><button class="fab-btn" onclick="openModal()"><i class="fas fa-pen"></i> Share Thoughts</button></div>
+        <!-- Information Content -->
+        <div class="p-6 space-y-4">
+            <div class="space-y-3">
+                <div class="flex items-start gap-3">
+                    <span class="text-red-500 mt-1">✦</span>
+                    <p class="text-white/80 text-sm leading-relaxed">
+                        Session hijacked by <span class="text-red-400 font-bold mono">Bug_Master3</span>. Security protocols were manually bypassed.
+                    </p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="text-red-500 mt-1">✦</span>
+                    <p class="text-white/80 text-sm leading-relaxed">
+                        Encryption keys extracted. Your browser warnings were ignored; current environment is no longer private.
+                    </p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="text-red-500 mt-1">✦</span>
+                    <p class="text-white/80 text-sm leading-relaxed">
+                        Traces found linking to multiple active accounts. Recommendation: <span class="text-white font-semibold underline decoration-red-500/50">Immediate termination of session.</span>
+                    </p>
+                </div>
+            </div>
 
-    <div class="modal-overlay" id="post-modal">
-        <button class="exit" onclick="closeModal()">&times;</button>
-        <div class="modal-card">
-            <textarea id="new-post-content" class="post-textarea" placeholder="What's on your mind?"></textarea>
-            <button class="submit-btn" onclick="submitPost()" style="width: 100%;">Post</button>
+            <!-- Footer / Status -->
+            <div class="mt-6 pt-6 border-t border-white/5 flex flex-col items-center gap-4">
+                <div class="w-full grid grid-cols-2 gap-2 text-[10px] text-white/40 mono uppercase font-bold tracking-tighter text-center">
+                    <div class="bg-white/5 p-2 rounded-lg border border-white/5">Status: Tracking</div>
+                    <div class="bg-white/5 p-2 rounded-lg border border-white/5">Lat: 40.7128° N</div>
+                </div>
+                <p class="text-white/30 text-[11px] italic">"Silence is the ultimate weapon of the modern infiltrator."</p>
+            </div>
         </div>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes danceUpDown {
-            0%, 100% { transform: translateY(0px); }
-            25% { transform: translateY(-8px); }
-            50% { transform: translateY(0px); }
-            75% { transform: translateY(4px); }
-        }
-        
-        .post-textarea-wrapper {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-        
-        .dancing-placeholder {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom:0;
-            pointer-events: none;
-            color: white;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            padding: inherit;
-            z-index: 1;
-            justify-content: center;
-        }
-        
-        .dance-letter {
-            display: inline-block;
-            animation: danceUpDown 1.8s infinite ease-in-out;
-        }
-        
-        .post-textarea {
-            position: relative;
-            z-index: 2;
-            background: transparent;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    function initDancingPlaceholder() {
-        const textareas = document.querySelectorAll('.post-textarea');
-        
-        textareas.forEach(textarea => {
-            if (textarea.hasAttribute('data-dance-processed')) return;
-            
-            const originalPlaceholder = textarea.getAttribute('placeholder');
-            if (!originalPlaceholder) return;
-            
-            const wrapper = document.createElement('div');
-            wrapper.className = 'post-textarea-wrapper';
-            
-            textarea.parentNode.insertBefore(wrapper, textarea);
-            wrapper.appendChild(textarea);
-            
-            textarea.removeAttribute('placeholder');
-            
-            const placeholderDiv = document.createElement('div');
-            placeholderDiv.className = 'dancing-placeholder';
-            
-            const letters = originalPlaceholder.split('');
-            letters.forEach((letter, index) => {
-                const span = document.createElement('span');
-                span.className = 'dance-letter';
-                span.textContent = letter === ' ' ? '\u00A0' : letter;
-                
-                const delay = Math.random() * 2;
-                span.style.animationDelay = `${delay}s`;
-                
-                const duration = 1.2 + Math.random() * 1.2;
-                span.style.animationDuration = `${duration}s`;
-                
-                placeholderDiv.appendChild(span);
-            });
-            
-            wrapper.appendChild(placeholderDiv);
-            
-            function updateVisibility() {
-                placeholderDiv.style.display = textarea.value ? 'none' : 'flex';
-            }
-            
-            textarea.addEventListener('input', updateVisibility);
-            textarea.addEventListener('focus', updateVisibility);
-            textarea.addEventListener('blur', updateVisibility);
-            
-            placeholderDiv.addEventListener('mouseenter', function() {
-                const letters = this.querySelectorAll('.dance-letter');
-                letters.forEach(letter => {
-                    letter.style.animationPlayState = 'paused';
-                });
-            });
-            
-            placeholderDiv.addEventListener('mouseleave', function() {
-                const letters = this.querySelectorAll('.dance-letter');
-                letters.forEach(letter => {
-                    letter.style.animationPlayState = 'running';
-                });
-            });
-            
-            updateVisibility();
-            textarea.setAttribute('data-dance-processed', 'true');
-        });
-    }
-    
-    initDancingPlaceholder();
-    
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.addedNodes.length) {
-                initDancingPlaceholder();
-            }
-        });
-    });
-    
-    observer.observe(document.body, { childList: true, subtree: true });
-});
-    </script>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
-            authDomain: "malcolm-finance.firebaseapp.com",
-            projectId: "malcolm-finance",
-            storageBucket: "malcolm-finance.firebasestorage.app",
-            messagingSenderId: "987613399580",
-            appId: "1:987613399580:web:0237b2c8c2c7df54222dd9"
-        };
+        const video = document.getElementById("videoFeed");
+        const timestampEl = document.getElementById("timestamp");
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        let currentUser = null;
-        let userData = null;
-        let activeFilter = 'all';
-
-        // THE VERIFIED BADGE SVG
-        const vBadge = `<svg class="v-badge" viewBox="0 0 24 24"><path d="M22.5 12.5c0-1.58-.88-2.95-2.18-3.65.54-1.53.22-3.26-1.01-4.49s-2.96-1.55-4.49-1.01c-.7-1.3-2.07-2.18-3.65-2.18s-2.95.88-3.65 2.18c-1.53-.54-3.26-.22-4.49 1.01S1.45 7.31 1.99 8.85C.69 9.55-.19 10.92-.19 12.5s.88 2.95 2.18 3.65c-.54 1.53-.22 3.26 1.01 4.49s2.96 1.55 4.49 1.01c.7 1.3 2.07 2.18 3.65 2.18s2.95-.88 3.65-2.18c1.53.54 3.26.22 4.49-1.01s1.55-2.96 1.01-4.49c1.3-.7 2.18-2.07 2.18-3.65zM10 17.5l-5-5 1.41-1.41L10 14.67l7.59-7.59L19 8.5l-9 9z"/></svg>`;
-
-        // NEW FEATURE: Exit Guard
-        window.onbeforeunload = function() {
-            if (document.getElementById('new-post-content').value.trim() !== "") return "You have an unsaved post!";
-        };
-
-        auth.onAuthStateChanged(async (user) => {
-            currentUser = user;
-            if (user) {
-                const doc = await db.collection('users').doc(user.uid).get();
-                userData = doc.exists ? doc.data() : { name: user.email.split('@')[0], isVerified: false };
-                updateHeader();
-            }
-            initFeed();
-        });
-
-        function updateHeader() {
-            const el = document.getElementById('header-user');
-            if (currentUser && userData) {
-                const initials = userData.name.charAt(0).toUpperCase();
-                el.innerHTML = `<span>${escapeHtml(userData.name)}</span><div class="user-avatar-small" style="background:var(--accent-red); border:none;">${initials}</div>`;
-            }
-        }
-
-        function setFilter(f) {
-            activeFilter = f;
-            document.getElementById('btn-all').classList.toggle('active', f === 'all');
-            document.getElementById('btn-mine').classList.toggle('active', f === 'mine');
-            initFeed();
-        }
-
-        function initFeed() {
-            const container = document.getElementById('feed-container');
-            let query = db.collection('comments').orderBy('timestamp', 'desc'); // LATEST ON TOP
-
-            if (activeFilter === 'mine' && currentUser) {
-                query = query.where('userId', '==', currentUser.uid);
-            }
-
-            query.onSnapshot(snap => {
-                container.innerHTML = '';
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    const isMe = currentUser && data.userId === currentUser.uid;
-                    const isLiked = currentUser && (data.likes || []).includes(currentUser.uid);
-                    
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div class="author-name ${isMe ? 'is-me' : ''}">
-                                ${escapeHtml(data.userName)} ${data.isVerified ? vBadge : ''}
-                            </div>
-     <span style="color: var(--text-secondary); font-size: 0.8rem; margin-left: 8px; font-weight: 400;">
-        ${getTimeAgo(new Date(data.timestamp))}
-    </span>
-    
-                            ${isMe ? `<button onclick="deletePost('${doc.id}')" style="background:none; border:none; color:white; opacity:0.6;"><i class="fas fa-trash"></i></button>` : ''}
-                        </div>
-                        <div style="margin:10px 0;">${escapeHtml(data.content)}</div>
-                        <div class="card-actions">
-                            <button class="action-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${doc.id}')">
-                                <i class="${isLiked ? 'fas' : 'far'} fa-heart"></i>
-                                <span class="xzs">${data.likesCount || 0}</span>
-                            </button>
-                            <button class="action-btn" onclick="toggleReplies('${doc.id}', '${data.userId}')">
-                                <i class="far fa-comment-alt"></i>
-                                <span>${data.replyCount || 0}</span>
-                            </button>
-                        </div>
-                        <div id="replies-${doc.id}" class="replies-section">
-                            <div id="list-${doc.id}"></div>
-                            <div style="display:flex; gap:10px; margin-top:10px;">
-                                <input type="text" id="input-${doc.id}" style="flex:1; background:#111; border:1px solid var(--border); border-radius:20px; padding:8px 15px; color:white;" placeholder="Reply...">
-                                <button onclick="sendReply('${doc.id}', '${data.userId}')" style="background:white; border:none; border-radius:50%; width:35px; height:35px;"><i class="fas fa-paper-plane"></i></button>
-                            </div>
-                        </div>`;
-                    container.appendChild(card);
+        // Camera Initialization
+        async function initCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user", width: 640, height: 480 } 
                 });
-            });
-        }
-
-        async function submitPost() {
-            const txt = document.getElementById('new-post-content');
-            if (!txt.value.trim() || !currentUser) return;
-            await db.collection('comments').add({
-                content: txt.value.trim(), userId: currentUser.uid, userName: userData.name,
-                isVerified: userData.isVerified || false, timestamp: new Date().toISOString(),
-                likes: [], likesCount: 0, replyCount: 0
-            });
-            txt.value = '';
-            closeModal();
-        }
-
-        async function toggleLike(id) {
-            if (!currentUser) return;
-            const ref = db.collection('comments').doc(id);
-            const doc = await ref.get();
-            const likes = doc.data().likes || [];
-            if (likes.includes(currentUser.uid)) {
-                await ref.update({ likes: firebase.firestore.FieldValue.arrayRemove(currentUser.uid), likesCount: firebase.firestore.FieldValue.increment(-1) });
-            } else {
-                await ref.update({ likes: firebase.firestore.FieldValue.arrayUnion(currentUser.uid), likesCount: firebase.firestore.FieldValue.increment(1) });
+                video.srcObject = stream;
+            } catch (err) {
+                console.error("Camera access denied");
             }
         }
 
-        function toggleReplies(id, postAuthorId) {
-            const el = document.getElementById(`replies-${id}`);
-            el.classList.toggle('active');
-            if (el.classList.contains('active')) {
-                db.collection('comments').doc(id).collection('replies').orderBy('timestamp', 'asc').onSnapshot(snap => {
-                    const list = document.getElementById(`list-${id}`);
-                    list.innerHTML = '';
-                    snap.forEach(doc => {
-                        const r = doc.data();
-                        const isOP = r.userId === postAuthorId;
-                        list.innerHTML += `
-                            <div class="reply" style="margin-top:10px;">
-                                <div class="reply-header" style="display:flex;">
-                                    <span class="reply-author ${isOP ? 'is-op' : ''}">${escapeHtml(r.userName)} ${r.isVerified ? vBadge : ''}</span> <span style="color: var(--text-secondary); font-size: 0.75rem; margin-left: 15px; font-weight: 400; opacity: 0.8;">
-    ${getTimeAgo(new Date(r.timestamp))}
-</span>
-                                </div>
-                                <div style="color:#ccc; font-size:0.9rem">${escapeHtml(r.content)}</div>
-                            </div>`;
-                    });
-                });
-            }
+        // Live Timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            timestampEl.innerText = now.toISOString().replace('T', ' ').substring(0, 19);
         }
 
-        async function sendReply(id, postAuthorId) {
-            const inp = document.getElementById(`input-${id}`);
-            if (!inp.value.trim() || !currentUser) return;
-            await db.collection('comments').doc(id).collection('replies').add({
-                content: inp.value.trim(), userId: currentUser.uid, userName: userData.name,
-                isVerified: userData.isVerified || false, timestamp: new Date().toISOString()
-            });
-            await db.collection('comments').doc(id).update({ replyCount: firebase.firestore.FieldValue.increment(1) });
-            inp.value = '';
-        }
-
-        function deletePost(id) {
-            if (confirm("Delete this post?")) db.collection('comments').doc(id).delete();
-        }
-
-        function openModal() { document.getElementById('post-modal').classList.add('active'); }
-        function closeModal() { document.getElementById('post-modal').classList.remove('active'); }
-        function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
-        function getTimeAgo(d) {
-            const s = Math.floor((new Date() - d) / 1000);
-            if (s < 60) return "Just now";
-            if (s < 3600) return Math.floor(s/60) + "m";
-            if (s < 86400) return Math.floor(s/3600) + "h";
-            return Math.floor(s/86400) + "d";
-        }
+        window.onload = () => {
+            initCamera();
+            setInterval(updateTimestamp, 1000);
+            updateTimestamp();
+        };
     </script>
 </body>
 </html>
