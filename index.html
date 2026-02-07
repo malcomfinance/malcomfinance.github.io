@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Alert | System Compromised</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .glitch-text {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .7; }
+        }
+        video {
+            filter: grayscale(1) contrast(1.2) brightness(0.8);
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main Container -->
+    <div class="glass-panel w-full max-w-md rounded-3xl overflow-hidden flex flex-col animate-in fade-in zoom-in duration-700">
+        
+        <!-- Header Section -->
+        <div class="p-6 bg-red-500/10 border-b border-red-500/20 flex items-center gap-4">
+            <div class="bg-red-500 p-3 rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.4)]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m14.5 9-5 5"/><path d="m9.5 9 5 5"/></svg>
+            </div>
+            <div>
+                <h1 class="text-white font-extrabold text-xl tracking-tight">Access Denied</h1>
+                <p class="text-red-400 text-xs font-semibold uppercase tracking-widest mono">System Integrity Compromised</p>
+            </div>
+        </div>
+
+        <!-- Camera Feed Section -->
+        <div class="px-6 pt-6">
+            <div class="relative group">
+                <div class="absolute inset-0 bg-red-500/5 rounded-2xl pointer-events-none border border-white/5"></div>
+                <video id="videoFeed" autoplay playsinline class="w-full h-48 rounded-2xl bg-black border border-white/10 shadow-inner"></video>
+                <div class="absolute top-3 left-3 flex items-center gap-2">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                    </span>
+                    <span class="text-[10px] text-white/50 mono font-bold">LIVE_FEED_01</span>
+                </div>
+                <div class="absolute bottom-3 right-3">
+                    <span class="text-[10px] text-white/30 mono" id="timestamp"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Content -->
+        <div class="p-6 space-y-4">
+            <div class="space-y-3">
+                <div class="flex items-start gap-3">
+                    <span class="text-red-500 mt-1">✦</span>
+                    <p class="text-white/80 text-sm leading-relaxed">
+                        Session hijacked by <span class="text-red-400 font-bold mono">Bug_Master3</span>. Security protocols were manually bypassed.
+                    </p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="text-red-500 mt-1">✦</span>
+                    <p class="text-white/80 text-sm leading-relaxed">
+                        Encryption keys extracted. Your browser warnings were ignored; current environment is no longer private.
+                    </p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="text-red-500 mt-1">✦</span>
+                    <p class="text-white/80 text-sm leading-relaxed">
+                        Traces found linking to multiple active accounts. Recommendation: <span class="text-white font-semibold underline decoration-red-500/50">Immediate termination of session.</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer / Status -->
+            <div class="mt-6 pt-6 border-t border-white/5 flex flex-col items-center gap-4">
+                <div class="w-full grid grid-cols-2 gap-2 text-[10px] text-white/40 mono uppercase font-bold tracking-tighter text-center">
+                    <div class="bg-white/5 p-2 rounded-lg border border-white/5">Status: Tracking</div>
+                    <div class="bg-white/5 p-2 rounded-lg border border-white/5">Lat: 40.7128° N</div>
+                </div>
+                <p class="text-white/30 text-[11px] italic">"Silence is the ultimate weapon of the modern infiltrator."</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById("videoFeed");
+        const timestampEl = document.getElementById("timestamp");
+
+        // Camera Initialization
+        async function initCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user", width: 640, height: 480 } 
+                });
+                video.srcObject = stream;
+            } catch (err) {
+                console.error("Camera access denied");
+            }
+        }
+
+        // Live Timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            timestampEl.innerText = now.toISOString().replace('T', ' ').substring(0, 19);
+        }
+
+        window.onload = () => {
+            initCamera();
+            setInterval(updateTimestamp, 1000);
+            updateTimestamp();
+        };
+    </script>
+</body>
+</html>
