@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Malcom Finance · Transactions</title>
+  <link href="tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="fontawesome-free-6.6.0-web/css/all.min.css">
+<script src="firebase-app-compat.js"></script>
+  <script src="firebase-auth-compat.js"></script>
+  <script src="firebase-firestore-compat.js"></script>
+  <script src="firebase-storage-compat.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg-main: #f9fafb;
+      --bg-card: #ffffff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --accent-green: #059669;
+      --accent-soft: #ecfdf5;
+    }
+
+    body.dark {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --accent-green: #10b981;
+      --accent-soft: #064e3b;
+    }
+
+    body { 
+      background-color: var(--bg-main); 
+      color: var(--text-main); 
+      transition: background-color 0.3s ease, color 0.3s ease; 
+      font-family: 'Inter', sans-serif; 
+    }
+
+    .card { 
+      background-color: var(--bg-card); 
+      border: 1px solid var(--border-color); 
+      border-radius: 1.5rem; 
+      transition: all 0.3s ease;
+    }
+
+    .text-muted { color: var(--text-muted); }
+    .accent-bg { background-color: var(--accent-green); }
+    .accent-text { color: var(--accent-green); }
+    .soft-accent-bg { background-color: var(--accent-soft); }
+
+    .status-badge {
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+  </style>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
+      authDomain: "malcolm-finance.firebaseapp.com",
+      projectId: "malcolm-finance",
+      storageBucket: "malcolm-finance.firebasestorage.app",
+      messagingSenderId: "987613399580",
+      appId: "1:987613399580:web:0237b2c8c2c7df54222dd9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
+    }
+  </script>
+</head>
+<body class="antialiased pb-24">
+  <script>
+    let currentUser, userData, allTransactions = [];
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) { window.location.href = 'auth.html'; return; }
+      currentUser = user;
+      window.currentUser = currentUser;
+      await loadUserData();
+      loadTransactions();
+    });
+
+    async function loadUserData() {
+      try {
+        const doc = await db.collection('users').doc(currentUser.uid).get();
+        if (doc.exists) {
+          userData = doc.data(); userData.id = currentUser.uid;
+          window.userData = userData;
+          if (typeof updateSidebar === 'function') updateSidebar();
+        }
+      } catch (e) {}
+    }
+
+    function loadTransactions() {
+      db.collection('transactions')
+        .where('userId', '==', currentUser.uid)
+        .orderBy('date', 'desc')
+        .onSnapshot(snap => {
+          allTransactions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          renderTransactions();
+        }, err => {
+            // Fallback for missing index during development
+            db.collection('transactions')
+              .where('userId', '==', currentUser.uid)
+              .get()
+              .then(snap => {
+                allTransactions = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                  .sort((a,b) => new Date(b.date) - new Date(a.date));
+                renderTransactions();
+              });
+        });
+    }
+
+    function getIcon(type) {
+      switch(type) {
+        case 'deposit': return 'fa-arrow-down';
+        case 'withdrawal': return 'fa-arrow-up';
+        case 'earning': return 'fa-tasks';
+        case 'referral_bonus': return 'fa-users';
+        case 'bonus': return 'fa-gift';
+        default: return 'fa-exchange-alt';
+      }
+    }
+
+    function getIconColor(type) {
+      if (['deposit','earning','referral_bonus','bonus'].includes(type)) return '#10b981';
+      return '#ef4444';
+    }
+
+    function renderTransactions() {
+      const container = document.getElementById('transactions-container');
+      if (!allTransactions || allTransactions.length === 0) {
+        container.innerHTML = `
+          <div class="card p-12 text-center">
+            <div class="w-16 h-16 soft-accent-bg rounded-full flex items-center justify-center mx-auto mb-4">
+               <i class="fas fa-history text-2xl accent-text"></i>
+            </div>
+            <p class="text-muted font-medium">No transactions found</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = allTransactions.map(t => {
+        const isPositive = ['deposit','earning','referral_bonus','bonus'].includes(t.type);
+        const statusClass = t.status === 'completed' ? 'bg-green-500/10 text-green-500' : 
+                          t.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500' : 'bg-red-500/10 text-red-500';
+
+        return `
+          <div class="card p-5 mb-4 hover:shadow-md transition cursor-default">
+            <div class="flex justify-between items-start mb-3">
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-2xl flex items-center justify-center mr-3" style="background-color: ${getIconColor(t.type)}15">
+                  <i class="fas ${getIcon(t.type)} text-sm" style="color:${getIconColor(t.type)}"></i>
+                </div>
+                <div>
+                  <span class="block font-bold text-sm capitalize">${t.type.replace('_',' ')}</span>
+                  <span class="status-badge ${statusClass}">${t.status || 'completed'}</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="block font-bold text-base ${isPositive ? 'text-green-500' : 'text-red-500'}">
+                  ${isPositive ? '+' : '-'}$${Math.abs(parseFloat(t.amount)||0).toFixed(2)}
+                </span>
+                <span class="text-[10px] text-muted font-medium">
+                   ${new Date(t.date).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                </span>
+              </div>
+            </div>
+            ${t.description ? `<p class="text-xs text-muted leading-relaxed border-t border-[var(--border-color)] pt-3 mt-1">${t.description}</p>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+  </script>
+
+  <main id="page-root" class="max-w-xl mx-auto px-6 pt-10">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold">Activity</h1>
+      <p class="text-sm text-muted">Tracking your financial history</p>
+    </div>
+
+    <div id="transactions-container">
+      <div class="flex justify-center p-12">
+        <i class="fas fa-circle-notch fa-spin accent-text text-2xl"></i>
+      </div>
+    </div>
+  </main>
+
+  <script src="sidebar.js"></script>
+</body>
+</html>
