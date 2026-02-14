@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Malcom Finance</title>
+  <link href="tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="fontawesome-free-6.6.0-web/css/all.min.css">  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    
+    .slider-container {
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .slider-container::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .slide-enter {
+      animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(220, 252, 231, 0.5);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-slate-800 antialiased overflow-hidden h-screen flex flex-col">
+  <script>
+    if (localStorage.getItem('mf_onboarding_seen') === 'true') {
+      window.location.replace('home.html');
+    }
+  </script>
+
+  <div class="flex-1 flex flex-col relative h-full">
+    <div class="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-green-50 to-transparent -z-10"></div>
+    
+    <div id="skip-btn" class="absolute top-6 right-6 z-20 transition-opacity duration-300">
+      <button onclick="finishOnboarding()" class="group flex items-center gap-2 text-slate-500 hover:text-green-700 font-semibold text-sm transition-colors py-2 px-4 rounded-full hover:bg-green-50">
+        Skip
+        <i class="fas fa-chevron-right text-xs transition-transform group-hover:translate-x-1"></i>
+      </button>
+    </div>
+
+    <div class="flex-1 flex items-center justify-center w-full relative overflow-hidden">
+      <div id="slider-track" class="flex transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] w-full h-full">
+        
+        <div class="w-full flex-shrink-0 flex flex-col items-center justify-center px-8 text-center h-full">
+          <div class="w-24 h-24 bg-gradient-to-br from-green-100 to-green-50 rounded-3xl flex items-center justify-center mb-8 shadow-lg shadow-green-100/50 ring-1 ring-green-100 slide-enter" style="animation-delay: 0.1s">
+            <i class="fas fa-chart-pie text-4xl text-green-600"></i>
+          </div>
+          <h1 class="text-3xl font-extrabold text-slate-900 mb-4 slide-enter" style="animation-delay: 0.2s">
+            Welcome to <span class="text-green-600">Malcom Finance</span>
+          </h1>
+          <p class="text-slate-500 text-lg leading-relaxed max-w-xs mx-auto slide-enter" style="animation-delay: 0.3s">
+            Your ultimate online gateway to financial independence. Experience a smarter way to grow your wealth today.
+          </p>
+        </div>
+
+        <div class="w-full flex-shrink-0 flex flex-col items-center justify-center px-8 text-center h-full">
+          <div class="w-24 h-24 bg-gradient-to-br from-green-100 to-green-50 rounded-3xl flex items-center justify-center mb-8 shadow-lg shadow-green-100/50 ring-1 ring-green-100">
+            <i class="fas fa-rocket text-4xl text-green-600"></i>
+          </div>
+          <h1 class="text-3xl font-extrabold text-slate-900 mb-4">
+            Create an Account
+          </h1>
+          <p class="text-slate-500 text-lg leading-relaxed max-w-xs mx-auto mb-6">
+            Start your journey to becoming a billionaire. A small activation fee of <span class="text-green-700 font-bold bg-green-50 px-2 py-0.5 rounded">UGX 18,500</span> unlocks premium earnings.
+          </p>
+          <div class="w-full max-w-xs glass-card rounded-2xl p-4 shadow-sm text-left space-y-3">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-700"><i class="fas fa-mobile-alt"></i></div>
+              <div><p class="text-xs text-slate-400 font-medium uppercase">MTN Money</p><p class="font-bold text-slate-800 tracking-wide">0787 591 025</p></div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-700"><i class="fas fa-mobile-alt"></i></div>
+              <div><p class="text-xs text-slate-400 font-medium uppercase">Airtel Money</p><p class="font-bold text-slate-800 tracking-wide">0730 101 447</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full flex-shrink-0 flex flex-col items-center justify-center px-8 text-center h-full">
+          <div class="w-24 h-24 bg-gradient-to-br from-green-100 to-green-50 rounded-3xl flex items-center justify-center mb-8 shadow-lg shadow-green-100/50 ring-1 ring-green-100">
+            <i class="fas fa-sack-dollar text-4xl text-green-600"></i>
+          </div>
+          <h1 class="text-3xl font-extrabold text-slate-900 mb-4">
+            Daily Activities
+          </h1>
+          <p class="text-slate-500 text-lg leading-relaxed max-w-xs mx-auto">
+            Turn your spare time into profit. Complete simple daily tasks and earn between <span class="text-green-700 font-bold">$0.50</span> and <span class="text-green-700 font-bold">$5.00</span> instantly.
+          </p>
+          <div class="grid grid-cols-2 gap-4 mt-8 w-full max-w-xs">
+            <div class="bg-white border border-slate-100 p-4 rounded-2xl shadow-sm">
+              <i class="fas fa-mouse-pointer text-green-500 mb-2"></i>
+              <div class="font-bold text-slate-800">Easy Tasks</div>
+              <div class="text-xs text-slate-400">Click & Earn</div>
+            </div>
+            <div class="bg-white border border-slate-100 p-4 rounded-2xl shadow-sm">
+              <i class="fas fa-clock text-green-500 mb-2"></i>
+              <div class="font-bold text-slate-800">24/7 Access</div>
+              <div class="text-xs text-slate-400">Work Anytime</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full flex-shrink-0 flex flex-col items-center justify-center px-8 text-center h-full">
+          <div class="w-24 h-24 bg-gradient-to-br from-green-100 to-green-50 rounded-3xl flex items-center justify-center mb-8 shadow-lg shadow-green-100/50 ring-1 ring-green-100">
+            <i class="fas fa-users-rays text-4xl text-green-600"></i>
+          </div>
+          <h1 class="text-3xl font-extrabold text-slate-900 mb-4">
+            Massive Rewards
+          </h1>
+          <p class="text-slate-500 text-lg leading-relaxed max-w-xs mx-auto">
+            Build your empire by inviting friends. Secure a massive <span class="text-green-700 font-bold">30% commission</span> for every direct referral.
+          </p>
+          <div class="mt-8 relative w-full max-w-xs">
+            <div class="absolute inset-0 bg-green-200 blur-xl opacity-20 rounded-full"></div>
+            <div class="relative bg-white border border-green-100 p-5 rounded-2xl shadow-sm flex items-center justify-between">
+              <div class="text-left">
+                <div class="text-xs text-slate-400 font-bold uppercase tracking-wider">Your Bonus</div>
+                <div class="text-2xl font-black text-green-600">30%</div>
+              </div>
+              <div class="h-10 w-px bg-slate-100"></div>
+              <div class="text-right">
+                <div class="text-xs text-slate-400 font-bold uppercase tracking-wider">Network</div>
+                <div class="text-2xl font-black text-slate-800">Unlimited</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full flex-shrink-0 flex flex-col items-center justify-center px-8 text-center h-full">
+          <div class="w-24 h-24 bg-gradient-to-br from-green-100 to-green-50 rounded-3xl flex items-center justify-center mb-8 shadow-lg shadow-green-100/50 ring-1 ring-green-100">
+            <i class="fas fa-wallet text-4xl text-green-600"></i>
+          </div>
+          <h1 class="text-3xl font-extrabold text-slate-900 mb-4">
+            Instant Withdrawals
+          </h1>
+          <p class="text-slate-500 text-lg leading-relaxed max-w-xs mx-auto mb-8">
+            Your money, your control. Withdraw your earnings securely starting from just <span class="text-green-700 font-bold">$6.00</span> via Mobile Money or Crypto.
+          </p>
+          <button onclick="finishOnboarding()" class="w-full max-w-xs bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-xl shadow-green-200 transform transition active:scale-95 flex items-center justify-center gap-2">
+            Get Started Now <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="w-full px-8 pb-12 pt-4">
+      <div class="flex items-center relative max-w-md mx-auto min-h-[60px]">
+        <div class="absolute left-1/2 transform -translate-x-1/2 flex gap-2" id="pagination-dots">
+          <div class="h-2 rounded-full transition-all duration-300 bg-green-600 w-8" data-index="0"></div>
+          <div class="h-2 rounded-full transition-all duration-300 bg-green-200 w-2" data-index="1"></div>
+          <div class="h-2 rounded-full transition-all duration-300 bg-green-200 w-2" data-index="2"></div>
+          <div class="h-2 rounded-full transition-all duration-300 bg-green-200 w-2" data-index="3"></div>
+          <div class="h-2 rounded-full transition-all duration-300 bg-green-200 w-2" data-index="4"></div>
+        </div>
+
+        <div class="ml-auto">
+          <button id="next-btn" class="w-14 h-14 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-lg shadow-slate-200 hover:bg-slate-800 transition-colors active:scale-90 z-10 relative">
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const track = document.getElementById('slider-track');
+      const nextBtn = document.getElementById('next-btn');
+      const dots = document.querySelectorAll('#pagination-dots div');
+      const skipBtn = document.getElementById('skip-btn');
+      const totalSlides = 5;
+      let currentIndex = 0;
+      let touchStartX = 0;
+      let touchEndX = 0;
+      let autoPlayInterval;
+
+      function updateUI() {
+        track.style.transform = `translateX(-${currentIndex * 100}%)`;
+        
+        dots.forEach((dot, idx) => {
+          if(idx === currentIndex) {
+            dot.classList.remove('bg-slate-200', 'w-2');
+            dot.classList.add('bg-green-600', 'w-8');
+          } else {
+            dot.classList.remove('bg-green-600', 'w-8');
+            dot.classList.add('bg-slate-200', 'w-2');
+          }
+        });
+
+        if (currentIndex === totalSlides - 1) {
+          nextBtn.innerHTML = '<i class="fas fa-check"></i>';
+          nextBtn.classList.add('bg-green-600');
+          nextBtn.classList.remove('bg-slate-900');
+          skipBtn.classList.add('opacity-0', 'pointer-events-none');
+        } else {
+          nextBtn.innerHTML = '<i class="fas fa-arrow-right"></i>';
+          nextBtn.classList.remove('bg-green-600');
+          nextBtn.classList.add('bg-slate-900');
+          skipBtn.classList.remove('opacity-0', 'pointer-events-none');
+        }
+      }
+
+      function nextSlide() {
+        if (currentIndex < totalSlides - 1) {
+          currentIndex++;
+        } else {
+          finishOnboarding();
+          return;
+        }
+        updateUI();
+      }
+
+      function prevSlide() {
+        if (currentIndex > 0) {
+          currentIndex--;
+          updateUI();
+        }
+      }
+
+      function startAutoPlay() {
+        stopAutoPlay();
+        autoPlayInterval = setInterval(() => {
+          if(currentIndex < totalSlides - 1) {
+            nextSlide();
+          } else {
+            stopAutoPlay();
+          }
+        }, 5000);
+      }
+
+      function stopAutoPlay() {
+        clearInterval(autoPlayInterval);
+      }
+
+      nextBtn.addEventListener('click', () => {
+        stopAutoPlay();
+        nextSlide();
+        startAutoPlay();
+      });
+
+      track.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+        stopAutoPlay();
+      }, {passive: true});
+
+      track.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        if (touchStartX - touchEndX > 50) nextSlide();
+        if (touchEndX - touchStartX > 50) prevSlide();
+        startAutoPlay();
+      }, {passive: true});
+
+      updateUI();
+      startAutoPlay();
+    })();
+
+    window.finishOnboarding = function() {
+      localStorage.setItem('mf_onboarding_seen', 'true');
+      window.location.href = 'home.html';
+    };
+  </script>
+</body>
+</html>
