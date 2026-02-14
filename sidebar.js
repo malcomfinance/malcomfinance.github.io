@@ -37,6 +37,26 @@
     document.body.style.overflow = 'auto';
   }
 
+  window.toggleFullScreen = function() {
+    if (!document.fullscreenElement) {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+      } else if (document.documentElement.webkitRequestFullscreen) {
+        document.documentElement.webkitRequestFullscreen();
+      } else if (document.documentElement.msRequestFullscreen) {
+        document.documentElement.msRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    }
+  };
+
   const style = document.createElement('style');
   style.textContent = `
     #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); background-color: var(--bg-card); border-right: 1px solid var(--border-color); }
@@ -46,6 +66,7 @@
     .nav-link.active { background-color: var(--accent-green); color: white !important; }
     header { background-color: var(--bg-card) !important; border-bottom: 1px solid var(--border-color) !important; color: var(--text-main) !important; }
     main#page-root { padding-top: 5rem; }
+    #header-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
   `;
   document.head.appendChild(style);
 
@@ -57,32 +78,7 @@
         </button>
         <h1 id="header-title" class="text-lg font-bold tracking-tight"></h1>
       </div>
-      
-              <button class="p-2 hover:bg-white/5 rounded-lg transition-colors text-zinc-500 hover:text-red-400" onclick="toggleFullScreen()"><i class="fas fa-arrows-alt w-4 h-4"></i></button>
-              
-<script>
-  function toggleFullScreen() {
-    if (!document.fullscreenElement) {
-      // Enter full screen mode
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen();
-      } else if (document.documentElement.webkitRequestFullscreen) { // Safari
-        document.documentElement.webkitRequestFullscreen();
-      } else if (document.documentElement.msRequestFullscreen) { // IE11
-        document.documentElement.msRequestFullscreen();
-      }
-    } else {
-      // Exit full screen mode
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) { // Safari
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) { // IE11
-        document.msExitFullscreen();
-      }
-    }
-  }
-</script>
+      <button class="p-2 hover:bg-white/5 rounded-lg transition-colors text-zinc-500 hover:text-red-400" onclick="toggleFullScreen()"><i class="fas fa-arrows-alt w-4 h-4"></i></button>
       <button id="theme-toggle" class="w-10 h-10 flex items-center justify-center rounded-xl soft-accent-bg accent-text transition-transform active:scale-90">
         <i class="fas fa-moon" id="theme-icon"></i>
       </button>
