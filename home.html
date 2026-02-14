@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Malcom Finance · Dashboard</title>
+  <link href="tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <script src="firebase-app-compat.js"></script>
+  <script src="firebase-auth-compat.js"></script>
+  <script src="firebase-firestore-compat.js"></script>
+  <script src="firebase-storage-compat.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    :root { --bg-main: #f9fafb; --bg-card: #ffffff; --text-main: #111827; --text-muted: #6b7280; --border-color: #e5e7eb; --accent-green: #059669; --accent-soft: #ecfdf5; --input-bg: #f3f4f6; }
+    body.dark { --bg-main: #0f172a; --bg-card: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --border-color: #334155; --accent-green: #10b981; --accent-soft: #064e3b; --input-bg: #0f172a; }
+    body { background-color: var(--bg-main); color: var(--text-main); transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; font-family: 'Inter', sans-serif; }
+    .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 1.5rem; transition: all 0.3s ease; }
+    .text-muted { color: var(--text-muted); }
+    .accent-bg { background-color: var(--accent-green); }
+    .accent-text { color: var(--accent-green); }
+    .accent-border { border-color: var(--accent-green); }
+    .soft-accent-bg { background-color: var(--accent-soft); }
+    input, select { background-color: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color); }
+    input:focus, select:focus { border-color: var(--accent-green); outline: none; }
+    .modal-backdrop { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+  </style>
+  <script>
+    const firebaseConfig = { apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4", authDomain: "malcolm-finance.firebaseapp.com", projectId: "malcolm-finance", storageBucket: "malcolm-finance.firebasestorage.app", messagingSenderId: "987613399580", appId: "1:987613399580:web:0237b2c8c2c7df54222dd9" };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    if (localStorage.getItem('theme') === 'dark') { document.documentElement.classList.add('dark'); document.body.classList.add('dark'); }
+  </script>
+</head>
+<body class="antialiased pb-20">
+  <main class="max-w-xl mx-auto px-6 pt-10">
+    <div class="flex items-center justify-between mb-8">
+      <div><h1 class="text-2xl font-bold">Malcom Finance</h1><p class="text-sm text-muted">Financial Growth Dashboard</p></div>
+      <div id="theme-toggle-container"></div>
+    </div>
+    <div class="card p-8 mb-8 shadow-sm">
+      <div class="flex justify-between items-center mb-4"><span class="text-muted font-medium">Available Balance</span><span class="soft-accent-bg accent-text px-3 py-1 rounded-full text-xs font-bold uppercase">USD</span></div>
+      <div class="text-5xl font-bold accent-text tracking-tight" id="accbal">0.00</div>
+      <div class="flex gap-4 mt-8">
+        <button onclick="showDepositModal()" class="flex-1 accent-bg text-white font-bold py-4 rounded-2xl shadow-lg">Deposit</button>
+        <button onclick="showWithdrawModal()" class="flex-1 border-2 accent-border accent-text font-bold py-4 rounded-2xl">Withdraw</button>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 gap-4 mb-8">
+      <div onclick="location.href='balances.html'" class="card p-5 text-center cursor-pointer"><i class="fas fa-wallet text-2xl accent-text mb-2"></i></div>
+      <div onclick="location.href='transactions.html'" class="card p-5 text-center cursor-pointer"><i class="fas fa-history text-2xl accent-text mb-2"></i></div>
+      <div onclick="showReferralModal()" class="card p-5 text-center cursor-pointer"><i class="fas fa-user-friends text-2xl accent-text mb-2"></i></div>
+    </div>
+    <div class="card p-6 border-l-4 accent-border">
+      <h3 class="text-lg font-bold mb-3"><i class="fas fa-bolt accent-text mr-2"></i> Daily Insight</h3>
+      <div class="text-muted italic text-sm" id="quote-text">"The best time to start was yesterday."</div>
+      <div class="accent-text font-bold mt-2 text-sm" id="quote-author">Icii White</div>
+      <button onclick="location.href='daily-activities.html'" class="mt-6 w-full soft-accent-bg accent-text font-bold py-4 rounded-2xl">Launch Activities</button>
+    </div>
+  </main>
+
+  <div id="deposit-modal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-6">
+    <div class="card max-w-sm w-full p-8 shadow-2xl">
+      <h3 class="text-xl font-bold accent-text mb-6">Activate Account</h3>
+      <p class="text-muted text-sm mb-4">Send <span class="accent-text font-bold">UGX 18,500</span> to:</p>
+      <div class="soft-accent-bg rounded-2xl p-5 space-y-4 border accent-border">
+        <div class="flex justify-between items-center"><span class="text-xs font-bold uppercase text-muted">MTN</span><span class="text-sm font-mono">+256 787591025</span><button class="mt-1 accent-bg text-white font-bold py-1 rounded-2xl shadow-lg" style="padding: 3px 7px" onclick="window.location.href='tel:*185*1*1#'">Go</button></div>
+        <div class="flex justify-between items-center"><span class="text-xs font-bold uppercase text-muted">Airtel</span><span class="text-sm font-mono">+256 730101447</span><button class="mt-1 accent-bg text-white font-bold py-1 rounded-2xl shadow-lg" style="padding: 3px 7px" onclick="window.location.href='tel:*185*1#'">Go</button></div>
+      </div>
+      <br>
+      <div class="soft-accent-bg rounded-2xl p-5 space-y-4 border accent-border">
+        <div class="flex justify-between items-center"><span class="text-xs font-bold uppercase text-muted">MTN</span><span class="text-sm font-mono">GLORIA NAKIDDE</span></div>
+        <div class="flex justify-between items-center"><span class="text-xs font-bold uppercase text-muted">Airtel</span><span class="text-sm font-mono">ALLAN ELVIS LUTAAYA</span></div>
+      </div>
+      <button onclick="closeModal('deposit-modal')" class="mt-8 w-full accent-bg text-white font-bold py-4 rounded-2xl shadow-lg">I've made payment</button>
+    </div>
+  </div>
+
+  <div id="withdraw-modal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-6">
+    <div class="card max-w-sm w-full p-8 shadow-2xl">
+      <h3 class="text-xl font-bold accent-text mb-6">Request Withdrawal</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-bold uppercase text-muted">Amount (USD)</label>
+          <input type="number" id="withdraw-amount" placeholder="Min $6" class="w-full p-4 rounded-2xl mt-1">
+        </div>
+        <div>
+          <label class="text-xs font-bold uppercase text-muted">Method</label>
+          <select id="withdraw-method" class="w-full p-4 rounded-2xl mt-1">
+            <option value="mtn">MTN Mobile Money</option>
+            <option value="airtel">Airtel Money</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-bold uppercase text-muted">Wallet Number</label>
+          <input type="text" id="withdraw-wallet" placeholder="07XXXXXXXX" class="w-full p-4 rounded-2xl mt-1">
+        </div>
+        <div>
+          <label class="text-xs font-bold uppercase text-muted">Password</label>
+          <input type="password" id="withdraw-password" placeholder="••••••••" class="w-full p-4 rounded-2xl mt-1">
+        </div>
+      </div>
+      <div class="flex gap-3 mt-8">
+        <button onclick="confirmWithdrawal()" class="flex-1 accent-bg text-white font-bold py-4 rounded-2xl shadow-lg">Continue</button>
+        <button onclick="closeModal('withdraw-modal')" class="flex-1 bg-black/5 font-bold py-4 rounded-2xl text-muted">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="withdraw-confirm-modal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-6">
+    <div class="card max-w-sm w-full p-8 shadow-2xl">
+      <h3 class="text-xl font-bold accent-text mb-6 text-center">Confirm Withdrawal</h3>
+      <div id="withdraw-confirm-details" class="mb-6"></div>
+      <div class="flex gap-3">
+        <button onclick="submitWithdrawal()" class="flex-1 accent-bg text-white font-bold py-4 rounded-2xl shadow-lg">Submit</button>
+        <button onclick="closeModal('withdraw-confirm-modal')" class="flex-1 bg-black/5 font-bold py-4 rounded-2xl text-muted">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="referral-modal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-6">
+    <div class="card max-w-sm w-full p-8 shadow-2xl">
+      <h3 class="text-xl font-bold accent-text mb-2 text-center">Refer & Earn</h3>
+      <div class="soft-accent-bg p-4 rounded-2xl border border-dashed accent-border mb-6">
+        <div class="text-[11px] break-all font-mono accent-text" id="referral-link-display">...</div>
+      </div>
+      <button onclick="shareReferral()" class="w-full accent-bg text-white font-bold py-4 rounded-2xl flex items-center justify-center shadow-lg"><i class="fas fa-share-nodes mr-2"></i> Share Invitation</button>
+      <button onclick="closeModal('referral-modal')" class="w-full text-muted text-sm font-bold py-2">Close</button>
+    </div>
+  </div>
+
+  <div id="alert-modal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-6">
+    <div class="card max-w-sm w-full p-8 shadow-2xl">
+      <h3 class="text-xl font-bold accent-text mb-4 text-center">Alert</h3>
+      <p id="alert-message" class="text-center text-muted mb-6">Message</p>
+      <button onclick="closeModal('alert-modal')" class="w-full accent-bg text-white font-bold py-4 rounded-2xl shadow-lg">OK</button>
+    </div>
+  </div>
+
+  <script src="sidebar.js"></script>
+
+  <script>
+    let currentUser, userData, pendingWithdrawalData;
+
+    window.showAlert = function(message) {
+      document.getElementById('alert-message').innerText = message;
+      document.getElementById('alert-modal').classList.replace('hidden', 'flex');
+    };
+
+    window.showDepositModal = function() {
+      document.getElementById('deposit-modal').classList.replace('hidden', 'flex');
+    };
+
+    window.closeModal = function(id) {
+      document.getElementById(id).classList.replace('flex', 'hidden');
+    };
+
+    window.showWithdrawModal = function() {
+      if (!userData || !userData.isActive) { showAlert('Activate account first'); return; }
+      ['withdraw-amount', 'withdraw-wallet', 'withdraw-password'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('withdraw-modal').classList.replace('hidden', 'flex');
+    };
+
+    window.confirmWithdrawal = async function() {
+      const amount = parseFloat(document.getElementById('withdraw-amount').value);
+      const method = document.getElementById('withdraw-method').value;
+      const wallet = document.getElementById('withdraw-wallet').value;
+      const password = document.getElementById('withdraw-password').value;
+      if (!amount || amount < 6 || !wallet || !password || amount > userData.balance) { showAlert('Check inputs or balance'); return; }
+      try {
+        await currentUser.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(currentUser.email, password));
+        const fee = amount * 0.05;
+        pendingWithdrawalData = { amount, method, wallet, fee, netAmount: amount - fee };
+        document.getElementById('withdraw-confirm-details').innerHTML = `<div class="p-4 soft-accent-bg rounded-xl border accent-border"><p><strong>Amount:</strong> $${amount.toFixed(2)}</p><p><strong>Fee (5%):</strong> $${fee.toFixed(2)}</p><p class="text-lg accent-text"><strong>Net: $${(amount - fee).toFixed(2)}</strong></p></div>`;
+        closeModal('withdraw-modal');
+        document.getElementById('withdraw-confirm-modal').classList.replace('hidden', 'flex');
+      } catch { showAlert('Incorrect password'); }
+    };
+
+    window.submitWithdrawal = async function() {
+      if (!pendingWithdrawalData) return;
+      try {
+        await db.collection('transactions').add({ ...pendingWithdrawalData, userId: currentUser.uid, type: 'withdrawal', status: 'pending', date: new Date().toISOString() });
+        showAlert('Submitted'); closeModal('withdraw-confirm-modal'); pendingWithdrawalData = null;
+      } catch { showAlert('Error'); }
+    };
+
+    window.showReferralModal = function() {
+      if (!userData?.referralCode) return;
+      document.getElementById('referral-link-display').innerHTML = `https://malcomfinance.github.io/auth.html?ref=${userData.referralCode}`;
+      document.getElementById('referral-modal').classList.replace('hidden', 'flex');
+    };
+
+    window.shareReferral = async function() {
+      if (!userData?.referralCode) return;
+      const link = `https://malcomfinance.github.io/auth.html?ref=${userData.referralCode}`;
+      const text = `Join Malcom Finance and start earning. Use my referral link: ${link}`;
+      if (navigator.share) {
+        try { await navigator.share({ title: 'Malcom Finance', text: text, url: link }); } catch (e) { console.log('Share cancelled'); }
+      } else {
+        try { await navigator.clipboard.writeText(link); showAlert('Referral link copied to clipboard!'); } catch { showAlert('Sharing not supported'); }
+      }
+    };
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) { window.location.href = 'auth.html'; return; }
+      currentUser = user;
+      await loadUserData();
+      await loadTodaysActivities();
+      renderUI();
+    });
+
+    async function loadUserData() {
+      const cached = localStorage.getItem(`user_${currentUser.uid}`);
+      if (cached) { try { userData = JSON.parse(cached); } catch {} }
+      try {
+        const doc = await db.collection('users').doc(currentUser.uid).get();
+        if (doc.exists) { userData = doc.data(); userData.id = currentUser.uid; localStorage.setItem(`user_${currentUser.uid}`, JSON.stringify(userData)); renderUI(); }
+      } catch {}
+    }
+
+    async function loadTodaysActivities() {
+      const today = new Date().toISOString().split('T')[0];
+      try {
+        const doc = await db.collection('daily_activities').doc(today).get();
+        if (doc.exists) {
+          const data = doc.data();
+          const quote = data.quote || { text: 'The best time to start was yesterday.', author: 'Icii White' };
+          document.getElementById('quote-text').innerHTML = `"${quote.text}"`;
+          document.getElementById('quote-author').innerHTML = quote.author;
+        }
+      } catch {}
+    }
+
+    function renderUI() {
+      if (!userData) return;
+      document.getElementById('accbal').innerHTML = (userData.balance || 0).toFixed(2);
+    }
+  </script>
+</body>
+</html>
