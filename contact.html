@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Malcom Finance · Support</title>
+  <link href="tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="fontawesome-free-6.6.0-web/css/all.min.css">
+<script src="firebase-app-compat.js"></script>
+  <script src="firebase-auth-compat.js"></script>
+  <script src="firebase-firestore-compat.js"></script>
+  <script src="firebase-storage-compat.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg-main: #f9fafb;
+      --bg-card: #ffffff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --accent-green: #059669;
+      --accent-soft: #ecfdf5;
+    }
+
+    body.dark {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --accent-green: #10b981;
+      --accent-soft: #064e3b;
+    }
+
+    body { 
+      background-color: var(--bg-main); 
+      color: var(--text-main); 
+      transition: background-color 0.3s ease, color 0.3s ease; 
+      font-family: 'Inter', sans-serif; 
+    }
+
+    .card { 
+      background-color: var(--bg-card); 
+      border: 1px solid var(--border-color); 
+      border-radius: 1.5rem; 
+      transition: all 0.3s ease;
+    }
+
+    .text-muted { color: var(--text-muted); }
+    .accent-bg { background-color: var(--accent-green); }
+    .accent-text { color: var(--accent-green); }
+    .soft-accent-bg { background-color: var(--accent-soft); }
+
+    .support-btn {
+      display: flex;
+      align-items: center;
+      padding: 1.25rem;
+      border-radius: 1.25rem;
+      transition: all 0.2s;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-card);
+      margin-bottom: 1rem;
+    }
+
+    .support-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-color: var(--accent-green);
+    }
+    
+    .status-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+      border-radius: 1rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+      margin-right: 8px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    details summary::-webkit-details-marker { display:none; }
+  </style>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
+      authDomain: "malcolm-finance.firebaseapp.com",
+      projectId: "malcolm-finance",
+      storageBucket: "malcolm-finance.firebasestorage.app",
+      messagingSenderId: "987613399580",
+      appId: "1:987613399580:web:0237b2c8c2c7df54222dd9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
+    }
+  </script>
+</head>
+<body class="antialiased pb-24">
+  <script>
+    let currentUser;
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) { window.location.href = 'auth.html'; return; }
+      currentUser = user;
+      window.currentUser = currentUser;
+      await loadUserData();
+    });
+
+    async function loadUserData() {
+      try {
+        const doc = await db.collection('users').doc(currentUser.uid).get();
+        if (doc.exists) {
+          window.userData = doc.data();
+          window.userData.id = currentUser.uid;
+          if (typeof updateSidebar === 'function') updateSidebar();
+        }
+      } catch (e) { console.error(e); }
+    }
+  </script>
+
+  <main id="page-root" class="max-w-xl mx-auto px-6 pt-10">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold">Customer Care</h1>
+      <p class="text-sm text-muted">How can we help you today?</p>
+    </div>
+
+    <!-- Live Support Status -->
+    <div class="card p-4 mb-8 bg-opacity-50 flex items-center justify-center">
+      <div class="status-badge accent-text">
+        <span class="status-dot"></span>
+        Support agents online
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <!-- WhatsApp Support -->
+      <a href="https://wa.me/256709264094" target="_blank" class="support-btn group">
+        <div class="w-12 h-12 rounded-2xl soft-accent-bg flex items-center justify-center mr-4 transition-transform group-hover:scale-110">
+          <i class="fab fa-whatsapp text-2xl accent-text"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="font-bold text-sm">WhatsApp Chat</h3>
+          <p class="text-[11px] text-muted">Instant response (Recommended)</p>
+        </div>
+        <i class="fas fa-external-link-alt text-[10px] text-muted"></i>
+      </a>
+
+      <!-- Telegram Support -->
+      <a href="https://wa.me/256759832339" target="_blank" class="support-btn group">
+        <div class="w-12 h-12 rounded-2xl bg-green-500/10 flex items-center justify-center mr-4 transition-transform group-hover:scale-110">
+          <i class="fab fa-whatsapp text-2xl text-green-500"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="font-bold text-sm">WhatsApp Support</h3>
+          <p class="text-[11px] text-muted">Help & Official updates</p>
+        </div>
+        <i class="fas fa-external-link-alt text-[10px] text-muted"></i>
+      </a>
+
+      <!-- Email Support -->
+      <a href="mailto:enockmalcom972@gmail.com" class="support-btn group">
+        <div class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center mr-4 transition-transform group-hover:scale-110">
+          <i class="fas fa-envelope text-2xl text-purple-500"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="font-bold text-sm">Email Support</h3>
+          <p class="text-[11px] text-muted">For formal inquiries</p>
+        </div>
+        <i class="fas fa-chevron-right text-[10px] text-muted group-hover:translate-x-1 transition-transform"></i>
+      </a>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-10 mb-6">
+        <h2 class="text-lg font-bold mb-4">Common Questions</h2>
+        <div class="space-y-3">
+            <details class="card p-5 group">
+                <summary class="flex items-center justify-between cursor-pointer list-none">
+                    <span class="text-sm font-semibold">How do I verify my account?</span>
+                    <i class="fas fa-chevron-down text-xs text-muted group-open:rotate-180 transition-transform"></i>
+                </summary>
+                <div class="mt-4 text-xs text-muted leading-relaxed">
+                    Account verification is automatic once you perform your first activation. Our system validates your details during the process to ensure security.
+                </div>
+            </details>
+
+            <details class="card p-5 group">
+                <summary class="flex items-center justify-between cursor-pointer list-none">
+                    <span class="text-sm font-semibold">Withdrawal processing time?</span>
+                    <i class="fas fa-chevron-down text-xs text-muted group-open:rotate-180 transition-transform"></i>
+                </summary>
+                <div class="mt-4 text-xs text-muted leading-relaxed">
+                    Most withdrawals are processed within 2-24 hours. For large amounts, it may take up to 48 hours for security compliance checks.
+                </div>
+            </details>
+
+            <details class="card p-5 group">
+                <summary class="flex items-center justify-between cursor-pointer list-none">
+                    <span class="text-sm font-semibold">Referral system commission?</span>
+                    <i class="fas fa-chevron-down text-xs text-muted group-open:rotate-180 transition-transform"></i>
+                </summary>
+                <div class="mt-4 text-xs text-muted leading-relaxed">
+                    We offer a competitive 30% commission on all account activations made through your unique referral link. Commissions are credited instantly.
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <div class="text-center p-8 mt-4">
+        <p class="text-[10px] text-muted uppercase font-bold tracking-widest">Malcom Finance Support</p>
+        <p class="text-[9px] text-muted mt-1 italic">Providing reliable financial assistance since 2024</p>
+    </div>
+  </main>
+
+  <script src="sidebar.js"></script>
+</body>
+</html>
