@@ -12,7 +12,15 @@
   <script src="firebase-storage-compat.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
     :root { --bg-main: #f9fafb; --bg-card: #ffffff; --text-main: #111827; --text-muted: #6b7280; --border-color: #e5e7eb; --accent-green: #059669; --accent-soft: #ecfdf5; --input-bg: #f3f4f6; }
+    *{
+
+cursor:none!important;
+
+}
+
+html,body{overflow:hidden}html{overflow:scroll;scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar{display:none}
     body.dark { --bg-main: #0f172a; --bg-card: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --border-color: #334155; --accent-green: #10b981; --accent-soft: #064e3b; --input-bg: #0f172a; }
     body { background-color: var(--bg-main); color: var(--text-main); transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; font-family: 'Inter', sans-serif; }
     .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 1.5rem; transition: all 0.3s ease; }
