@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Malcom Finance · My Wallet</title>
+  <link href="tailwind.min.css" rel="stylesheet">
+ <link rel="stylesheet" href="fontawesome-free-6.6.0-web/css/all.min.css">
+<script src="firebase-app-compat.js"></script>
+  <script src="firebase-auth-compat.js"></script>
+  <script src="firebase-firestore-compat.js"></script>
+  <script src="firebase-storage-compat.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg-main: #f9fafb;
+      --bg-card: #ffffff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --accent-green: #059669;
+      --accent-soft: #ecfdf5;
+      --input-bg: #f3f4f6;
+    }
+
+    body.dark {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --accent-green: #10b981;
+      --accent-soft: #064e3b;
+      --input-bg: #0f172a;
+    }
+
+    body { 
+      background-color: var(--bg-main); 
+      color: var(--text-main); 
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; 
+      font-family: 'Inter', sans-serif; 
+    }
+
+    .card { 
+      background-color: var(--bg-card); 
+      border: 1px solid var(--border-color); 
+      border-radius: 1.5rem; 
+      transition: all 0.3s ease;
+    }
+
+    .text-muted { color: var(--text-muted); }
+    .accent-bg { background-color: var(--accent-green); }
+    .accent-text { color: var(--accent-green); }
+    .accent-border { border-color: var(--accent-green); }
+    .soft-accent-bg { background-color: var(--accent-soft); }
+  </style>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
+      authDomain: "malcolm-finance.firebaseapp.com",
+      projectId: "malcolm-finance",
+      storageBucket: "malcolm-finance.firebasestorage.app",
+      messagingSenderId: "987613399580",
+      appId: "1:987613399580:web:0237b2c8c2c7df54222dd9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // Immediate theme application
+    if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+    }
+  </script>
+</head>
+<body class="antialiased pb-20">
+  <script>
+    let currentUser, userData, allTransactions = [];
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) { window.location.href = 'auth.html'; return; }
+      currentUser = user;
+      window.currentUser = currentUser;
+      await loadUserData();
+      await loadTransactions();
+      updateBalancesUI();
+    });
+
+    async function loadUserData() {
+      const cached = localStorage.getItem(`user_${currentUser.uid}`);
+      if (cached) {
+        try { userData = JSON.parse(cached); window.userData = userData; updateSidebar?.(); } catch {}
+      }
+      try {
+        const doc = await db.collection('users').doc(currentUser.uid).get();
+        if (doc.exists) {
+          userData = doc.data(); userData.id = currentUser.uid;
+          window.userData = userData;
+          localStorage.setItem(`user_${currentUser.uid}`, JSON.stringify(userData));
+          updateSidebar?.();
+        }
+      } catch {}
+    }
+
+    async function loadTransactions() {
+      const cached = localStorage.getItem(`transactions_${currentUser.uid}`);
+      if (cached) {
+        try { allTransactions = JSON.parse(cached); } catch {}
+      }
+      try {
+        const snap = await db.collection('transactions').where('userId', '==', currentUser.uid).get();
+        allTransactions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        localStorage.setItem(`transactions_${currentUser.uid}`, JSON.stringify(allTransactions));
+      } catch {}
+    }
+
+    function updateBalancesUI() {
+      if (!userData) return;
+      let main = parseFloat(userData.balance) || 0;
+      let earnings = 0, referral = 0, bonuses = 0, withdrawn = 0;
+      allTransactions.filter(t => t.status === 'completed').forEach(t => {
+        const amt = parseFloat(t.amount) || 0;
+        if (t.type === 'earning') earnings += amt;
+        if (t.type === 'referral_bonus') referral += amt;
+        if (t.type === 'bonus') bonuses += amt;
+        if (t.type === 'withdrawal') withdrawn += amt;
+      });
+      const total = earnings + referral + bonuses;
+      document.getElementById('main-balance').innerHTML = `$${main.toFixed(2)}`;
+      document.getElementById('earnings-balance').innerHTML = `$${earnings.toFixed(2)}`;
+      document.getElementById('referral-balance').innerHTML = `$${referral.toFixed(2)}`;
+      document.getElementById('bonuses-balance').innerHTML = `$${bonuses.toFixed(2)}`;
+      document.getElementById('withdrawn-balance').innerHTML = `$${withdrawn.toFixed(2)}`;
+      document.getElementById('total-earnings-balance').innerHTML = `$${total.toFixed(2)}`;
+    }
+  </script>
+
+  <main id="page-root" class="max-w-xl mx-auto px-6 pt-10">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-bold">My Wallet</h1>
+        <p class="text-sm text-muted">Overview of your assets</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <!-- Main Balance -->
+      <div class="card p-6 shadow-sm hover:shadow-md transition">
+        <div class="flex items-center mb-3">
+            <div class="w-8 h-8 rounded-full soft-accent-bg flex items-center justify-center mr-3">
+                <i class="fas fa-wallet accent-text text-sm"></i>
+            </div>
+            <h4 class="text-[10px] font-bold uppercase tracking-widest text-muted">Main Balance</h4>
+        </div>
+        <div class="text-3xl font-bold accent-text tracking-tight" id="main-balance">$0.00</div>
+      </div>
+
+      <!-- Total Earnings -->
+      <div class="card p-6 shadow-sm hover:shadow-md transition">
+         <div class="flex items-center mb-3">
+            <div class="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mr-3">
+                <i class="fas fa-chart-line text-blue-500 text-sm"></i>
+            </div>
+            <h4 class="text-[10px] font-bold uppercase tracking-widest text-muted">Total Earnings</h4>
+        </div>
+        <div class="text-3xl font-bold text-blue-500 tracking-tight" id="total-earnings-balance">$0.00</div>
+      </div>
+
+      <!-- Breakdown Grid -->
+      <div class="card p-6 shadow-sm hover:shadow-md transition md:col-span-2 grid grid-cols-2 gap-6">
+          
+          <div>
+            <h4 class="text-[10px] font-bold uppercase tracking-widest text-muted mb-1">Task Earnings</h4>
+            <div class="text-xl font-bold" id="earnings-balance">$0.00</div>
+          </div>
+
+          <div>
+            <h4 class="text-[10px] font-bold uppercase tracking-widest text-muted mb-1">Referrals</h4>
+            <div class="text-xl font-bold" id="referral-balance">$0.00</div>
+          </div>
+
+          <div>
+            <h4 class="text-[10px] font-bold uppercase tracking-widest text-muted mb-1">Bonuses</h4>
+            <div class="text-xl font-bold" id="bonuses-balance">$0.00</div>
+          </div>
+
+          <div>
+            <h4 class="text-[10px] font-bold uppercase tracking-widest text-muted mb-1">Withdrawn</h4>
+            <div class="text-xl font-bold text-red-400" id="withdrawn-balance">$0.00</div>
+          </div>
+
+      </div>
+    </div>
+  </main>
+  
+  <script src="sidebar.js"></script>
+</body>
+</html>
