@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Malcom Finance · Settings</title>
+  <link href="tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="fontawesome-free-6.6.0-web/css/all.min.css">
+  <link rel="stylesheet" href="cropper.min.css">
+  <script src="firebase-app-compat.js"></script>
+  <script src="firebase-auth-compat.js"></script>
+  <script src="firebase-firestore-compat.js"></script>
+  <script src="firebase-storage-compat.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg-main: #f9fafb;
+      --bg-card: #ffffff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --accent-green: #059669;
+      --accent-soft: #ecfdf5;
+      --input-bg: #f3f4f6;
+    }
+
+    body.dark {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --accent-green: #10b981;
+      --accent-soft: #064e3b;
+      --input-bg: #0f172a;
+    }
+
+    body { 
+      background-color: var(--bg-main); 
+      color: var(--text-main); 
+      transition: background-color 0.3s ease, color 0.3s ease; 
+      font-family: 'Inter', sans-serif; 
+    }
+
+    .card { 
+      background-color: var(--bg-card); 
+      border: 1px solid var(--border-color); 
+      border-radius: 1.5rem; 
+      overflow: hidden;
+    }
+
+    .text-muted { color: var(--text-muted); }
+    .accent-bg { background-color: var(--accent-green); }
+    .accent-text { color: var(--accent-green); }
+    .accent-border { border-color: var(--accent-green); }
+    .soft-accent-bg { background-color: var(--accent-soft); }
+    .modal-backdrop { background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+  </style>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
+      authDomain: "malcolm-finance.firebaseapp.com",
+      projectId: "malcolm-finance",
+      storageBucket: "malcolm-finance.firebasestorage.app",
+      messagingSenderId: "987613399580",
+      appId: "1:987613399580:web:0237b2c8c2c7df54222dd9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
+    }
+  </script>
+</head>
+<body class="antialiased pb-24">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  <script>
+    let currentUser, userData, cropper;
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) { window.location.href = 'auth.html'; return; }
+      currentUser = user;
+      window.currentUser = currentUser;
+      await loadUserData();
+    });
+
+    async function loadUserData() {
+      try {
+        const doc = await db.collection('users').doc(currentUser.uid).get();
+        if (doc.exists) {
+          userData = doc.data();
+          userData.id = currentUser.uid;
+          window.userData = userData;
+          if (typeof updateSidebar === 'function') updateSidebar();
+          renderSettings();
+        }
+      } catch (e) { console.error("Error loading user data:", e); }
+    }
+
+    function renderSettings() {
+      if (!userData) return;
+      document.getElementById('profile-img').src = userData.profilePictureUrl || 'https://via.placeholder.com/150';
+      document.getElementById('name-display').textContent = userData.name || 'User';
+      document.getElementById('email-display').textContent = userData.email || '';
+      
+      document.getElementById('display-name').textContent = userData.name || 'N/A';
+      document.getElementById('display-email').textContent = userData.email || 'N/A';
+      document.getElementById('display-phone').textContent = userData.phone || 'N/A';
+      document.getElementById('display-referral').textContent = userData.referralCode || 'N/A';
+      document.getElementById('display-joined').textContent = userData.createdAt ? new Date(userData.createdAt).toLocaleDateString() : 'N/A';
+    }
+
+    function openProfileModal() { document.getElementById('profile-picture-modal').classList.replace('hidden', 'flex'); }
+    function closeProfileModal() { 
+      document.getElementById('profile-picture-modal').classList.replace('flex', 'hidden');
+      if (cropper) { cropper.destroy(); cropper = null; }
+      document.getElementById('image-preview').classList.add('hidden');
+      document.getElementById('upload-placeholder').classList.remove('hidden');
+    }
+
+    function loadImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.getElementById('image-preview');
+        img.src = e.target.result;
+        img.classList.remove('hidden');
+        document.getElementById('upload-placeholder').classList.add('hidden');
+        if (cropper) cropper.destroy();
+        cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1 });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function saveProfilePicture() {
+      if (!cropper) return;
+      const btn = document.getElementById('save-profile-btn');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Uploading...';
+      
+      cropper.getCroppedCanvas().toBlob(async (blob) => {
+        try {
+          const ref = storage.ref(`profile_pictures/${currentUser.uid}.png`);
+          await ref.put(blob);
+          const url = await ref.getDownloadURL();
+          await db.collection('users').doc(currentUser.uid).update({ profilePictureUrl: url });
+          
+          userData.profilePictureUrl = url;
+          window.userData = userData;
+          document.getElementById('profile-img').src = url;
+          if (typeof updateSidebar === 'function') updateSidebar();
+          closeProfileModal();
+        } catch (e) {
+          console.error("Upload error:", e);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = originalText;
+        }
+      });
+    }
+
+    async function logout() {
+      await auth.signOut();
+      window.location.href = 'auth.html';
+    }
+  </script>
+
+  <main id="page-root" class="max-w-xl mx-auto px-6 pt-10">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold">Account</h1>
+      <p class="text-sm text-muted">Your personal profile and details</p>
+    </div>
+
+    <div class="card p-6 mb-6 flex flex-col items-center text-center">
+      <div class="relative group cursor-pointer mb-4" onclick="openProfileModal()">
+        <img id="profile-img" class="w-24 h-24 rounded-full object-cover border-4 accent-border shadow-lg" src="https://via.placeholder.com/150">
+        <div class="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+          <i class="fas fa-camera text-white"></i>
+        </div>
+      </div>
+      <h2 id="name-display" class="text-xl font-bold">...</h2>
+      <p id="email-display" class="text-sm text-muted">...</p>
+    </div>
+
+    <div class="card mb-6 divide-y divide-[var(--border-color)]">
+      <div class="p-5 flex justify-between items-center">
+        <span class="text-xs font-bold uppercase tracking-wider text-muted">Full Name</span>
+        <span id="display-name" class="font-medium text-right ml-4">...</span>
+      </div>
+      <div class="p-5 flex justify-between items-center">
+        <span class="text-xs font-bold uppercase tracking-wider text-muted">Email</span>
+        <span id="display-email" class="font-medium text-right ml-4">...</span>
+      </div>
+      <div class="p-5 flex justify-between items-center">
+        <span class="text-xs font-bold uppercase tracking-wider text-muted">Phone</span>
+        <span id="display-phone" class="font-medium text-right ml-4">...</span>
+      </div>
+      <div class="p-5 flex justify-between items-center">
+        <span class="text-xs font-bold uppercase tracking-wider text-muted">Referral Code</span>
+        <span id="display-referral" class="font-mono accent-text font-bold">...</span>
+      </div>
+      <div class="p-5 flex justify-between items-center">
+        <span class="text-xs font-bold uppercase tracking-wider text-muted">Joined</span>
+        <span id="display-joined" class="font-medium text-right ml-4">...</span>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <button onclick="logout()" class="w-full border-2 border-red-500/20 text-red-500 font-bold py-4 rounded-2xl flex items-center justify-center hover:bg-red-500/5 transition active:scale-95">
+        <i class="fas fa-sign-out-alt mr-2"></i> Sign Out
+      </button>
+    </div>
+  </main>
+
+  <div id="profile-picture-modal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-6">
+    <div class="card max-w-sm w-full p-8 shadow-2xl">
+      <h3 class="text-xl font-bold mb-6 text-center">Change Photo</h3>
+      
+      <div class="mb-6 rounded-2xl overflow-hidden bg-black/5 flex items-center justify-center min-h-[200px]">
+        <img id="image-preview" class="hidden max-w-full">
+        <div id="upload-placeholder" class="text-center text-muted p-4">
+            <i class="fas fa-image text-3xl mb-2 block"></i>
+            <span class="text-xs">Select an image</span>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <input type="file" id="image-input" accept="image/*" class="hidden" onchange="loadImage(event)">
+        <button onclick="document.getElementById('image-input').click()" class="w-full border-2 accent-border accent-text font-bold py-3 rounded-2xl flex items-center justify-center transition hover:bg-[var(--accent-soft)]">
+          <i class="fas fa-folder-open mr-2"></i> Choose File
+        </button>
+        
+        <div class="flex gap-3">
+            <button id="save-profile-btn" onclick="saveProfilePicture()" class="flex-1 accent-bg text-white font-bold py-3 rounded-2xl shadow-lg transition active:scale-95">
+                Update
+            </button>
+            <button onclick="closeProfileModal()" class="flex-1 bg-black/5 font-bold py-3 rounded-2xl text-muted transition hover:bg-black/10">
+                Cancel
+            </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="sidebar.js"></script>
+</body>
+</html>
