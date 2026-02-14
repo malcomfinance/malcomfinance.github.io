@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Malcom Finance · Daily Activities</title>
+  <link href="tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="fontawesome-free-6.6.0-web/css/all.min.css">
+  <script src="firebase-app-compat.js"></script>
+  <script src="firebase-auth-compat.js"></script>
+  <script src="firebase-firestore-compat.js"></script>
+  <script src="firebase-storage-compat.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    :root {
+      --bg-main: #f9fafb;
+      --bg-card: #ffffff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --accent-green: #059669;
+      --accent-soft: #ecfdf5;
+      --input-bg: #f3f4f6;
+    }
+    body.dark {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --accent-green: #10b981;
+      --accent-soft: #064e3b;
+      --input-bg: #0f172a;
+    }
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1.5rem;
+    }
+    .text-muted { color: var(--text-muted); }
+    .accent-bg { background-color: var(--accent-green); }
+    .accent-text { color: var(--accent-green); }
+    .accent-border { border-color: var(--accent-green); }
+    .soft-accent-bg { background-color: var(--accent-soft); }
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+    .glass-effect {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+    }
+    .activity-card {
+      border-radius: 18px;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      min-height: 200px;
+    }
+    .activity-card.completed { opacity: 0.9; transform: translateY(-5px); }
+    .activity-card.locked { opacity: 0.6; filter: grayscale(0.5); pointer-events: none; }
+    .activity-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.2em;
+    }
+    .video-icon { background: rgba(255,87,87,0.2); color: #ff5757; }
+    .text-icon { background: rgba(76,175,80,0.2); color: #4CAF50; }
+    .link-icon { background: rgba(33,150,243,0.2); color: #2196F3; }
+    .share-icon { background: rgba(255,193,7,0.2); color: #ffc107; }
+    .survey-icon { background: rgba(156,39,176,0.2); color: #9C27B0; }
+    .blog-icon { background: rgba(255,152,0,0.2); color: #FF9800; }
+    .custom-icon { background: rgba(0,188,212,0.2); color: #00BCD4; }
+    .activity-status {
+      position: absolute; top: 15px; right: 15px; width: 30px; height: 30px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9em;
+    }
+    .status-completed { background: rgba(76,175,80,0.2); color: #4CAF50; border: 2px solid #4CAF50; }
+    .status-pending { background: rgba(255,193,7,0.2); color: #ffc107; border: 2px solid #ffc107; }
+    .custom-control-btn, .youtube-controls .custom-control-btn {
+      background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2);
+      color: white; width: 50px; height: 50px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      font-size: 1.2em; transition: all 0.3s ease;
+    }
+    .custom-control-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
+    .custom-control-btn.play-pause { background: rgba(106,184,255,0.3); border-color: rgba(106,184,255,0.5); }
+    .youtube-iframe { width: 100%; height: 400px; border: none; border-radius: 12px; background: #000; }
+    @media (max-width: 768px) { .youtube-iframe { height: 250px; } }
+    .text-content::-webkit-scrollbar { width: 8px; }
+    .text-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+    .text-content::-webkit-scrollbar-thumb { background: rgba(106,184,255,0.5); border-radius: 4px; }
+    .progress-bar { height: 4px; background: white; border-radius: 5px; overflow: hidden; position: relative; }
+    .progress-bar::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #404040; }
+    .progress-fill { height: 100%; border-radius: 5px; transition: width 0.5s ease; width: 0%; position: relative; overflow: hidden; }
+    .progress-fill::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(90deg, #ff4d4d 0%, #ff4d4d 25%, #ff944d 25%, #ff944d 50%, #ffd24d 50%, #ffd24d 75%, #a3ff4d 75%, #a3ff4d 100%);
+    }
+    .progress-fill::after {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: repeating-linear-gradient(90deg, transparent 0, transparent 4.5%, rgba(255,255,255,0.3) 4.5%, rgba(255,255,255,0.3) 5%);
+      mask: linear-gradient(90deg, transparent 0, transparent 4.5%, #fff 4.5%, #fff 5%);
+      mask-repeat: repeat; mask-size: 5% 100%;
+    }
+    .submitted-overlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; z-index: 10; border-radius: 18px;
+    }
+    .submitted-icon { font-size: 4em; color: #28a745; margin-bottom: 20px; animation: bounce 2s infinite; }
+    @keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+    .countdown-timer { padding: 7px 15px; border-radius: 12px; border: 1px solid white; width: 80%; display: flex; flex-direction: column; background: black; }
+    .timer-text { display: flex; gap: 10px; margin-left: 10px; }
+    .timer-title { color: #6ab8ff; font-size: 0.8em; font-weight: 600; }
+    .timer-display, #total-reward { font-size: 0.8em; font-weight: 700; color: white; font-family: 'Orbitron', sans-serif; }
+  </style>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
+      authDomain: "malcolm-finance.firebaseapp.com",
+      projectId: "malcolm-finance",
+      storageBucket: "malcolm-finance.firebasestorage.app",
+      messagingSenderId: "987613399580",
+      appId: "1:987613399580:web:0237b2c8c2c7df54222dd9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
+    }
+  </script>
+</head>
+<body class="antialiased pb-20">
+  <div id="header" class="fixed top-0 left-0 w-full z-10 px-4 pt-4">
+    <div class="countdown-timer glass-effect max-w-xl mx-auto">
+      <div class="current-date text-yellow-400 text-sm font-bold orbitron mb-1 text-left ml-2" id="current-date">Loading...</div>
+      <div class="timer-text flex items-center justify-between px-2">
+        <div class="timer-title">TIME LEFT</div>
+        <div class="timer-display" id="countdown-timer">00:00:00</div>
+        <div id="total-reward" class="accent-text font-bold">$0.00</div>
+      </div>
+      <div class="progress-container w-full mt-2">
+        <div class="progress-card w-full">
+          <div class="progress-header hidden justify-between items-center mb-2">
+            <div class="progress-title">Completion Progress</div>
+            <div class="progress-count" id="progress-count">0/0</div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-xl mx-auto px-4 pt-32">
+    <h1 class="day-title hidden" id="day-title"></h1>
+    <div class="card p-5 mb-6 border-l-4 accent-border">
+      <div class="quote-text italic text-muted text-sm" id="quote-text">"The best time to start was yesterday. The next best time is now."</div>
+      <div class="quote-author accent-text font-bold mt-2 text-sm" id="quote-author">Icii White</div>
+    </div>
+    <div class="activities-container space-y-4" id="activities-container">
+      <div class="loader text-center py-12">
+        <div class="inline-block w-12 h-12 border-4 border-[var(--accent-green)] border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-muted mt-4">Loading today's activities...</p>
+      </div>
+    </div>
+    <div class="submit-section text-center my-8">
+      <button class="submit-btn accent-bg text-white font-bold py-4 px-8 rounded-2xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-3" id="submit-btn" disabled onclick="submitActivities()">
+        <i class="fas fa-paper-plane"></i> Submit Activities
+      </button>
+    </div>
+  </main>
+
+  <div id="alert-modal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-6">
+    <div class="card max-w-sm w-full p-8 shadow-2xl">
+      <h3 class="text-xl font-bold accent-text mb-4 text-center">Alert</h3>
+      <p id="alert-message" class="text-center text-muted mb-6"></p>
+      <button onclick="closeAlertModal()" class="w-full accent-bg text-white font-bold py-4 rounded-2xl shadow-lg">OK</button>
+    </div>
+  </div>
+
+  <div id="confirm-modal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-6">
+    <div class="card max-w-sm w-full p-8 shadow-2xl">
+      <h3 class="text-xl font-bold accent-text mb-4 text-center">Confirm</h3>
+      <p id="confirm-message" class="text-center text-muted mb-6"></p>
+      <div class="flex gap-3">
+        <button onclick="confirmContinue()" class="flex-1 accent-bg text-white font-bold py-4 rounded-2xl shadow-lg">Continue</button>
+        <button onclick="confirmCancel()" class="flex-1 bg-black/5 font-bold py-4 rounded-2xl text-muted">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="sidebar.js"></script>
+
+  <script>
+    let currentUser = null;
+    let userData = null;
+    let todayActivities = [];
+    let userSubmission = null;
+    let completionStatus = {};
+    let activityObservers = {};
+    let videoPlayers = {};
+    let youtubePlayers = {};
+
+    const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const YTPlayerState = { UNSTARTED: -1, ENDED: 0, PLAYING: 1, PAUSED: 2, BUFFERING: 3, CUED: 5 };
+
+    let alertResolve = null;
+    let confirmResolve = null;
+
+    window.showAlert = function(message) {
+      return new Promise((resolve) => {
+        alertResolve = resolve;
+        document.getElementById('alert-message').innerText = message;
+        document.getElementById('alert-modal').classList.replace('hidden', 'flex');
+      });
+    };
+
+    window.closeAlertModal = function() {
+      document.getElementById('alert-modal').classList.replace('flex', 'hidden');
+      if (alertResolve) {
+        alertResolve();
+        alertResolve = null;
+      }
+    };
+
+    window.showConfirm = function(message) {
+      return new Promise((resolve) => {
+        confirmResolve = resolve;
+        document.getElementById('confirm-message').innerText = message;
+        document.getElementById('confirm-modal').classList.replace('hidden', 'flex');
+      });
+    };
+
+    window.confirmContinue = function() {
+      document.getElementById('confirm-modal').classList.replace('flex', 'hidden');
+      if (confirmResolve) {
+        confirmResolve(true);
+        confirmResolve = null;
+      }
+    };
+
+    window.confirmCancel = function() {
+      document.getElementById('confirm-modal').classList.replace('flex', 'hidden');
+      if (confirmResolve) {
+        confirmResolve(false);
+        confirmResolve = null;
+      }
+    };
+
+    async function requestNotificationPermission() {
+      if ('Notification' in window && Notification.permission !== 'granted') {
+        try {
+          await Notification.requestPermission();
+        } catch (error) { console.error(error); }
+      }
+    }
+
+    function showNotification(title, body) {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, { body: body, icon: 'logo.png' });
+      }
+    }
+
+    function createAppFolder() {
+      if (window.AndroidInterface && typeof window.AndroidInterface.createFolder === 'function') {
+        try { window.AndroidInterface.createFolder('Malcom Finance'); } catch (error) { console.error(error); }
+      } else if (window.cordova && window.cordova.file) {
+        window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory,
+          function(fileSystem) { fileSystem.getDirectory('Malcom Finance', { create: true, exclusive: false }, function(directory) {}, function(error) {}); },
+          function(error) {}
+        );
+      } else if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
+        window.Capacitor.Plugins.Filesystem.mkdir({ path: 'Malcom Finance', directory: 'EXTERNAL_STORAGE', recursive: true }).catch(() => {});
+      } else if ('showDirectoryPicker' in window) {
+        window.showDirectoryPicker().catch(() => {});
+      }
+    }
+
+    function initializeDeviceFeatures() {
+      setTimeout(requestNotificationPermission, 2000);
+      setTimeout(createAppFolder, 3000);
+    }
+
+    function getTodayStorageKey() {
+      const today = getTodayDateString();
+      return `malcom_finance_${today}_${currentUser?.uid || 'guest'}`;
+    }
+
+    function saveToLocalStorage() {
+      if (!currentUser) return;
+      const storageKey = getTodayStorageKey();
+      const data = { completionStatus, activities: todayActivities, timestamp: new Date().toISOString(), userSubmitted: !!userSubmission };
+      try { localStorage.setItem(storageKey, JSON.stringify(data)); } catch (error) { console.error(error); }
+    }
+
+    function loadFromLocalStorage() {
+      if (!currentUser) return null;
+      const storageKey = getTodayStorageKey();
+      try { const savedData = localStorage.getItem(storageKey); return savedData ? JSON.parse(savedData) : null; } catch { return null; }
+    }
+
+    function clearLocalStorage() {
+      if (!currentUser) return;
+      const storageKey = getTodayStorageKey();
+      try { localStorage.removeItem(storageKey); } catch (error) { console.error(error); }
+    }
+
+    function getTodayDateString() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function getDayOfWeek() { return DAYS[new Date().getDay()]; }
+
+    function formatDate() {
+      const now = new Date();
+      return now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function updateCountdownTimer() {
+      const now = new Date();
+      const midnight = new Date(); midnight.setHours(24, 0, 0, 0);
+      const diff = midnight - now;
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      document.getElementById('countdown-timer').textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      const timerElement = document.querySelector('.countdown-timer');
+      if (diff < 5 * 60 * 1000) {
+        timerElement.style.borderColor = 'rgba(255, 87, 87, 0.5)';
+        timerElement.querySelector('.timer-title').style.color = '#ff5757';
+      } else if (diff < 30 * 60 * 1000) {
+        timerElement.style.borderColor = 'rgba(255, 193, 7, 0.5)';
+        timerElement.querySelector('.timer-title').style.color = '#ffc107';
+      }
+    }
+
+    function isYouTubeUrl(url) {
+      if (!url) return false;
+      const cleanUrl = url.toLowerCase().trim();
+      const youtubePatterns = ['youtube.com', 'youtu.be', 'youtube-nocookie.com', 'youtube.googleapis.com', 'y2u.be'];
+      return youtubePatterns.some(pattern => cleanUrl.includes(pattern));
+    }
+
+    function extractYouTubeId(url) {
+      if (!url) return null;
+      try {
+        const cleanUrl = url.split('&')[0].split('#')[0];
+        if (cleanUrl.includes('youtu.be/')) {
+          const match = cleanUrl.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+          if (match && match[1]) return match[1];
+        }
+        if (cleanUrl.includes('youtube.com/watch')) {
+          const match = cleanUrl.match(/v=([a-zA-Z0-9_-]+)/);
+          if (match && match[1]) return match[1];
+        }
+        if (cleanUrl.includes('youtube.com/embed/')) {
+          const match = cleanUrl.match(/embed\/([a-zA-Z0-9_-]+)/);
+          if (match && match[1]) return match[1];
+        }
+        const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+        const match = cleanUrl.match(regExp);
+        if (match && match[6]) {
+          const videoId = match[6].split('?')[0].split('&')[0];
+          if (videoId && videoId.length >= 10 && videoId.length <= 12) return videoId;
+        }
+        return null;
+      } catch { return null; }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('day-title').textContent = `${getDayOfWeek()} Activities`;
+      document.getElementById('current-date').textContent = formatDate();
+      updateCountdownTimer();
+      setInterval(updateCountdownTimer, 1000);
+      auth.onAuthStateChanged(async (user) => {
+        if (!user) {
+          await showAlert('Please login to access activities');
+          window.location.href = 'index.html';
+          return;
+        }
+        currentUser = user;
+        await loadUserData();
+        if (!userData || !userData.isActive) {
+          await showAlert('Your account is not activated. Please activate your account to access daily activities.');
+          window.location.href = 'home.html';
+          return;
+        }
+        await loadTodayActivities();
+        await checkUserSubmission();
+        initializeDeviceFeatures();
+      });
+    });
+
+    async function loadUserData() {
+      try {
+        const doc = await db.collection('users').doc(currentUser.uid).get();
+        if (doc.exists) userData = doc.data();
+      } catch (error) { console.error(error); }
+    }
+
+    async function loadTodayActivities() {
+      try {
+        const todayDate = getTodayDateString();
+        const doc = await db.collection('daily_activities').doc(todayDate).get();
+        if (doc.exists) {
+          const data = doc.data();
+          todayActivities = data.activities || [];
+          if (data.quote) {
+            document.getElementById('quote-text').textContent = data.quote.text || '';
+            document.getElementById('quote-author').textContent = data.quote.author ? `${data.quote.author}` : 'Anonymous';
+          }
+          const savedData = loadFromLocalStorage();
+          if (savedData && !userSubmission) {
+            completionStatus = savedData.completionStatus || {};
+          } else {
+            todayActivities.forEach((_, index) => { completionStatus[index] = false; });
+          }
+          renderActivities();
+          updateProgress();
+          setTimeout(() => { setupActivityObservers(); }, 500);
+        } else {
+          showNoActivitiesMessage();
+        }
+      } catch (error) {
+        console.error(error);
+        showNoActivitiesMessage();
+      }
+    }
+
+    async function checkUserSubmission() {
+      try {
+        const todayDate = getTodayDateString();
+        const snapshot = await db.collection('activity_submissions').where('userId', '==', currentUser.uid).where('date', '==', todayDate).get();
+        if (!snapshot.empty) {
+          userSubmission = snapshot.docs[0].data();
+          userSubmission.id = snapshot.docs[0].id;
+          lockActivities();
+        } else {
+          const savedData = loadFromLocalStorage();
+          if (savedData && savedData.userSubmitted) {
+            lockActivities();
+          }
+        }
+      } catch (error) { console.error(error); }
+    }
+
+    function showNoActivitiesMessage() {
+      const container = document.getElementById('activities-container');
+      container.innerHTML = `
+        <div class="card p-8 text-center">
+          <i class="fas fa-calendar-plus text-5xl accent-text mb-4"></i>
+          <h3 class="text-xl font-bold mb-2">No Activities Available Today</h3>
+          <p class="text-muted">Check back tomorrow for new activities! Activities are updated daily at midnight.</p>
+        </div>
+      `;
+    }
+
+    function renderActivities() {
+      const container = document.getElementById('activities-container');
+      if (todayActivities.length === 0) { showNoActivitiesMessage(); return; }
+      let html = '';
+      todayActivities.forEach((activity, index) => {
+        const isCompleted = completionStatus[index] || false;
+        const activityClass = isCompleted ? 'completed' : '';
+        html += `
+          <div class="activity-card card p-0 ${activityClass}" id="activity-${index}">
+            <div class="activity-header flex justify-between items-center p-5 border-b border-[var(--border-color)]">
+              <div class="activity-type flex items-center gap-3">
+                <div class="activity-icon ${activity.type}-icon"><i class="${getActivityIcon(activity.type)}"></i></div>
+                <div class="activity-title font-semibold">${activity.title || 'Activity'}</div>
+              </div>
+              <div class="activity-reward accent-bg text-white px-4 py-2 rounded-full font-bold">$${(activity.reward || 0).toFixed(2)}</div>
+            </div>
+            <div class="activity-content p-5">${renderActivityContent(activity, index)}</div>
+            ${isCompleted ? '<div class="activity-status status-completed"><i class="fas fa-check"></i></div>' : '<div class="activity-status status-pending"><i class="fas fa-clock"></i></div>'}
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function getActivityIcon(type) {
+      switch(type) {
+        case 'video': return 'fas fa-video';
+        case 'text': return 'fas fa-file-alt';
+        case 'link': return 'fas fa-link';
+        case 'share': return 'fas fa-share-alt';
+        case 'survey': return 'fas fa-poll';
+        case 'blog': return 'fas fa-pen-fancy';
+        case 'custom': return 'fas fa-code';
+        default: return 'fas fa-tasks';
+      }
+    }
+
+    function renderActivityContent(activity, index) {
+      switch(activity.type) {
+        case 'video':
+          const videoUrl = activity.videoUrl || activity.content || '';
+          if (isYouTubeUrl(videoUrl)) {
+            const videoId = extractYouTubeId(videoUrl);
+            if (videoId) {
+              return `
+                <div class="video-wrapper">
+                  <div class="video-container relative bg-black rounded-t-xl overflow-hidden">
+                    <div id="youtube-player-${index}" class="youtube-iframe"></div>
+                    <div class="video-loading absolute inset-0 flex items-center justify-center bg-black z-10" id="youtube-loading-${index}">
+                      <div class="loader-spinner w-10 h-10 border-3 border-white/30 border-t-[#ff5757] rounded-full animate-spin"></div>
+                      <p class="text-white mt-2">Loading YouTube video...</p>
+                    </div>
+                  </div>
+                  <div class="youtube-controls flex justify-center gap-4 p-4 bg-black/70 rounded-b-xl">
+                    <button class="custom-control-btn play-pause" id="youtube-play-pause-${index}"><i class="fas fa-play"></i></button>
+                  </div>
+                </div>
+                <p class="text-muted text-sm text-center mt-2">Watch the video completely to complete this activity</p>
+                <div class="text-yellow-500 text-xs text-center mt-1"><i class="fas fa-info-circle"></i> Progress: <span id="video-progress-${index}">0%</span></div>
+              `;
+            } else {
+              return `<div class="p-5 text-center bg-black/30 rounded-xl"><i class="fas fa-exclamation-triangle text-yellow-500 text-2xl mb-2"></i><p class="text-yellow-500">Unable to load YouTube video.</p><p class="text-muted text-xs mt-2">URL: ${videoUrl.substring(0, 50)}...</p></div>`;
+            }
+          } else {
+            return `
+              <div class="video-wrapper">
+                <div class="video-container relative bg-black rounded-t-xl overflow-hidden">
+                  <video class="activity-video w-full" id="video-${index}" ${activity.videoThumbnail ? `poster="${activity.videoThumbnail}"` : ''} playsinline><source src="${videoUrl}" type="video/mp4"></video>
+                  <div class="video-loading absolute inset-0 flex items-center justify-center bg-black z-10 hidden" id="video-loading-${index}"><div class="loader-spinner w-10 h-10 border-3 border-white/30 border-t-[#ff5757] rounded-full animate-spin"></div><p class="text-white mt-2">Loading video...</p></div>
+                </div>
+                <div class="custom-video-controls flex justify-center gap-4 p-4 bg-black/70 rounded-b-xl"><button class="custom-control-btn play-pause" id="play-pause-${index}"><i class="fas fa-play"></i></button></div>
+              </div>
+              <p class="text-muted text-sm text-center mt-2">Watch the video completely to complete this activity</p>
+              <div class="text-yellow-500 text-xs text-center mt-1"><i class="fas fa-info-circle"></i> Progress: <span id="video-progress-${index}">0%</span></div>
+            `;
+          }
+        case 'text':
+          return `<div class="text-content max-h-60 overflow-y-auto p-4 bg-black/30 rounded-xl leading-relaxed text-muted" id="text-${index}">${activity.textContent || activity.content || 'No content provided.'}</div><p class="text-muted text-sm text-center mt-2">Scroll to the bottom of the text to complete this activity</p>`;
+        case 'link':
+          return `<div class="link-container p-5 bg-black/30 rounded-xl"><p class="text-muted mb-3">${activity.description || 'Click the link below to visit:'}</p><a href="${activity.linkUrl || activity.content || '#'}" target="_blank" class="link-button inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition transform hover:-translate-y-1 shadow-lg" id="link-${index}"><i class="fas fa-external-link-alt"></i> ${activity.linkText || 'Visit Link'}</a></div>`;
+        case 'share':
+          return `
+            <div class="share-container p-5 bg-black/30 rounded-xl">
+              <p class="text-muted w-full mb-3">${activity.description || 'Share this content on social media:'}</p>
+              <div class="flex flex-wrap gap-3">
+                <button class="share-button facebook flex-1 min-w-[120px] p-4 rounded-xl border border-[#3b5998]/50 bg-white/5 hover:bg-white/10 transition" onclick="shareToPlatform('facebook', ${index})"><i class="fab fa-facebook-f text-[#3b5998] mr-2"></i> Facebook</button>
+                <button class="share-button twitter flex-1 min-w-[120px] p-4 rounded-xl border border-[#1da1f2]/50 bg-white/5 hover:bg-white/10 transition" onclick="shareToPlatform('twitter', ${index})"><i class="fab fa-twitter text-[#1da1f2] mr-2"></i> Twitter</button>
+                <button class="share-button whatsapp flex-1 min-w-[120px] p-4 rounded-xl border border-[#25d366]/50 bg-white/5 hover:bg-white/10 transition" onclick="shareToPlatform('whatsapp', ${index})"><i class="fab fa-whatsapp text-[#25d366] mr-2"></i> WhatsApp</button>
+                <button class="share-button telegram flex-1 min-w-[120px] p-4 rounded-xl border border-[#0088cc]/50 bg-white/5 hover:bg-white/10 transition" onclick="shareToPlatform('telegram', ${index})"><i class="fab fa-telegram text-[#0088cc] mr-2"></i> Telegram</button>
+              </div>
+            </div>
+            <div class="mt-3 text-yellow-500 text-sm text-center"><i class="fas fa-info-circle"></i> Shares needed: <span id="share-count-${index}">0</span>/3</div>
+          `;
+        case 'survey':
+          const surveyQuestion = activity.surveyQuestion || activity.question || 'Select the correct answer:';
+          const surveyOptions = activity.surveyOptions || activity.options || [];
+          return `<div class="survey-container p-5 bg-black/30 rounded-xl"><div class="survey-question text-white font-semibold mb-4">${surveyQuestion}</div>${surveyOptions.map((opt, optIndex) => `<div class="survey-option p-4 mb-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 cursor-pointer transition" id="survey-${index}-option-${optIndex}" onclick="selectSurveyOption(${index}, ${optIndex})">${opt}</div>`).join('')}</div>`;
+        case 'blog':
+          return `<div class="p-5 bg-black/30 rounded-xl"><h4 class="text-white font-bold mb-2">Write a blog post on: ${activity.blogTopic || activity.topic || ''}</h4><p class="text-muted">Minimum words required: ${activity.blogMinWords || activity.minWords || 200}</p><p class="text-accent mt-3"><i class="fas fa-info-circle"></i> ${activity.instructions || 'Write a blog post on the given topic.'}</p></div>`;
+        case 'custom':
+          return `<div class="p-5 bg-black/30 rounded-xl">${activity.customContent || activity.content || 'Custom activity content will appear here.'}<p class="text-accent mt-3"><i class="fas fa-info-circle"></i> ${activity.customInstructions || activity.instructions || 'Complete the activity as instructed.'}</p></div>`;
+        default:
+          return `<p class="text-muted text-center">Unknown activity type</p>`;
+      }
+    }
+
+    function setupActivityObservers() {
+      todayActivities.forEach((activity, index) => {
+        if (completionStatus[index]) return;
+        switch(activity.type) {
+          case 'video':
+            const videoUrl = activity.videoUrl || activity.content || '';
+            if (isYouTubeUrl(videoUrl)) setTimeout(() => { setupYouTubeObserver(index, videoUrl); }, 1000);
+            else setTimeout(() => { setupRegularVideoObserver(index); }, 500);
+            break;
+          case 'text': setTimeout(() => { setupTextObserver(index); }, 500); break;
+          case 'link': setTimeout(() => { setupLinkObserver(index); }, 500); break;
+          case 'share': setTimeout(() => { setupShareObserver(index); }, 500); break;
+        }
+      });
+    }
+
+    function setupRegularVideoObserver(index) {
+      const video = document.getElementById(`video-${index}`);
+      if (!video) return;
+      videoPlayers[index] = { element: video, isPlaying: false, progress: 0, completed: false };
+      const playPauseBtn = document.getElementById(`play-pause-${index}`);
+      if (playPauseBtn) playPauseBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleRegularVideoPlay(index); });
+      video.controls = false;
+      video.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; });
+      video.addEventListener('timeupdate', () => {
+        if (video.duration && video.currentTime) {
+          const progress = (video.currentTime / video.duration) * 100;
+          videoPlayers[index].progress = progress;
+          const progressElement = document.getElementById(`video-progress-${index}`);
+          if (progressElement) progressElement.textContent = `${Math.round(progress)}%`;
+          if (progress >= 95 && !videoPlayers[index].completed) {
+            videoPlayers[index].completed = true;
+            markActivityAsCompleted(index);
+            video.pause();
+            if (playPauseBtn) playPauseBtn.innerHTML = '<i class="fas fa-check"></i>';
+          }
+        }
+      });
+      video.addEventListener('ended', () => {
+        videoPlayers[index].completed = true;
+        videoPlayers[index].isPlaying = false;
+        markActivityAsCompleted(index);
+        if (playPauseBtn) playPauseBtn.innerHTML = '<i class="fas fa-check"></i>';
+        const progressElement = document.getElementById(`video-progress-${index}`);
+        if (progressElement) progressElement.textContent = "100%";
+      });
+      video.addEventListener('pause', () => {
+        videoPlayers[index].isPlaying = false;
+        if (playPauseBtn && !videoPlayers[index].completed) playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+      });
+      video.addEventListener('play', () => {
+        videoPlayers[index].isPlaying = true;
+        if (playPauseBtn && !videoPlayers[index].completed) playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+      });
+      video.addEventListener('waiting', () => { const loading = document.getElementById(`video-loading-${index}`); if (loading) loading.style.display = 'flex'; });
+      video.addEventListener('canplay', () => { const loading = document.getElementById(`video-loading-${index}`); if (loading) loading.style.display = 'none'; });
+      video.addEventListener('keydown', (e) => e.preventDefault());
+      video.load();
+    }
+
+    function toggleRegularVideoPlay(index) {
+      const video = videoPlayers[index]?.element;
+      if (!video) return;
+      if (video.paused) video.play(); else video.pause();
+    }
+
+    function setupYouTubeObserver(index, videoUrl) {
+      const videoId = extractYouTubeId(videoUrl);
+      if (!videoId) { console.error('Could not extract YouTube ID'); return; }
+      setTimeout(() => { const loading = document.getElementById(`youtube-loading-${index}`); if (loading) loading.style.display = 'none'; }, 2000);
+      youtubePlayers[index] = { player: null, isPlaying: false, progress: 0, completed: false, duration: 0, currentTime: 0 };
+      youtubePlayers[index].player = new YT.Player(`youtube-player-${index}`, {
+        videoId: videoId,
+        playerVars: { controls: 0, modestbranding: 1, rel: 0, showinfo: 0, iv_load_policy: 3, disablekb: 1, playsinline: 1 },
+        events: {
+          onReady: (event) => { onYouTubePlayerReady(index, event); },
+          onStateChange: (event) => { onYouTubePlayerStateChange(index, event); },
+          onError: () => { const loading = document.getElementById(`youtube-loading-${index}`); if (loading) loading.innerHTML = '<div><i class="fas fa-exclamation-triangle text-[#ff5757] text-2xl mb-2"></i><p class="text-[#ff5757]">Error loading video.</p></div>'; }
+        }
+      });
+    }
+
+    function onYouTubePlayerReady(index, event) {
+      const loading = document.getElementById(`youtube-loading-${index}`); if (loading) loading.style.display = 'none';
+      const playPauseBtn = document.getElementById(`youtube-play-pause-${index}`);
+      if (playPauseBtn) playPauseBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleYouTubePlay(index); });
+      youtubePlayers[index].duration = event.target.getDuration();
+      startYouTubeProgressTracking(index);
+    }
+
+    function onYouTubePlayerStateChange(index, event) {
+      const player = youtubePlayers[index];
+      if (!player) return;
+      const playPauseBtn = document.getElementById(`youtube-play-pause-${index}`);
+      switch(event.data) {
+        case YTPlayerState.PLAYING:
+          player.isPlaying = true;
+          if (playPauseBtn) playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+          startYouTubeProgressTracking(index);
+          break;
+        case YTPlayerState.PAUSED:
+          player.isPlaying = false;
+          if (playPauseBtn) playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+          break;
+        case YTPlayerState.ENDED:
+          player.isPlaying = false;
+          player.completed = true;
+          player.progress = 100;
+          markActivityAsCompleted(index);
+          if (playPauseBtn) playPauseBtn.innerHTML = '<i class="fas fa-check"></i>';
+          const progressElement = document.getElementById(`video-progress-${index}`);
+          if (progressElement) progressElement.textContent = "100%";
+          break;
+      }
+    }
+
+    function toggleYouTubePlay(index) {
+      const player = youtubePlayers[index];
+      if (!player || !player.player) return;
+      if (player.isPlaying) player.player.pauseVideo(); else player.player.playVideo();
+    }
+
+    function startYouTubeProgressTracking(index) {
+      if (youtubePlayers[index].progressInterval) clearInterval(youtubePlayers[index].progressInterval);
+      youtubePlayers[index].progressInterval = setInterval(() => {
+        const player = youtubePlayers[index];
+        if (!player || !player.player || !player.isPlaying) return;
+        try {
+          const currentTime = player.player.getCurrentTime();
+          const duration = player.duration || player.player.getDuration();
+          if (duration > 0) {
+            const progress = (currentTime / duration) * 100;
+            player.progress = progress;
+            player.currentTime = currentTime;
+            const progressElement = document.getElementById(`video-progress-${index}`);
+            if (progressElement) progressElement.textContent = `${Math.round(progress)}%`;
+            if (progress >= 95 && !player.completed) {
+              player.completed = true;
+              markActivityAsCompleted(index);
+              player.player.pauseVideo();
+              const playPauseBtn = document.getElementById(`youtube-play-pause-${index}`);
+              if (playPauseBtn) playPauseBtn.innerHTML = '<i class="fas fa-check"></i>';
+              clearInterval(player.progressInterval);
+            }
+          }
+        } catch (e) { console.warn(e); }
+      }, 1000);
+    }
+
+    function setupTextObserver(index) {
+      const textElement = document.getElementById(`text-${index}`);
+      if (!textElement) return;
+      textElement.addEventListener('scroll', () => {
+        const scrollPercentage = (textElement.scrollTop / (textElement.scrollHeight - textElement.clientHeight)) * 100;
+        if (scrollPercentage >= 90) markActivityAsCompleted(index);
+      });
+    }
+
+    function setupLinkObserver(index) {
+      const link = document.getElementById(`link-${index}`);
+      if (!link) return;
+      link.addEventListener('click', () => setTimeout(() => markActivityAsCompleted(index), 1000));
+    }
+
+    function setupShareObserver(index) {
+      if (!activityObservers[index]) activityObservers[index] = { shareCount: 0 };
+      const shareElement = document.getElementById(`share-count-${index}`);
+      if (shareElement) shareElement.textContent = '0';
+    }
+
+    function markActivityAsCompleted(index) {
+      if (completionStatus[index]) return;
+      completionStatus[index] = true;
+      const activityElement = document.getElementById(`activity-${index}`);
+      if (activityElement) {
+        activityElement.classList.add('completed');
+        const statusElement = activityElement.querySelector('.activity-status');
+        if (statusElement) { statusElement.className = 'activity-status status-completed'; statusElement.innerHTML = '<i class="fas fa-check"></i>'; }
+      }
+      updateProgress();
+      saveToLocalStorage();
+      if ('Notification' in window && Notification.permission === 'granted') {
+        const activity = todayActivities[index];
+        showNotification('Activity Completed', `You completed: ${activity.title || 'Activity'}!`);
+      }
+    }
+
+    function updateProgress() {
+      const totalActivities = todayActivities.length;
+      const completedCount = Object.values(completionStatus).filter(v => v).length;
+      const progressCountElement = document.getElementById('progress-count');
+      if (progressCountElement) progressCountElement.textContent = `${completedCount}/${totalActivities}`;
+      const progressPercentage = totalActivities > 0 ? (completedCount / totalActivities) * 100 : 0;
+      const progressFill = document.getElementById('progress-fill');
+      if (progressFill) progressFill.style.width = `${progressPercentage}%`;
+      let totalReward = 0;
+      todayActivities.forEach((activity, index) => { if (completionStatus[index]) totalReward += parseFloat(activity.reward) || 0; });
+      const totalRewardElement = document.getElementById('total-reward');
+      if (totalRewardElement) totalRewardElement.textContent = `$${totalReward.toFixed(2)}`;
+      const submitBtn = document.getElementById('submit-btn');
+      if (completedCount > 0 && !userSubmission) submitBtn.disabled = false; else submitBtn.disabled = true;
+    }
+
+    function shareToPlatform(platform, index) {
+      const activity = todayActivities[index];
+      const shareUrl = activity.shareUrl || window.location.href;
+      const shareText = activity.shareText || 'Check out this amazing opportunity!';
+      let shareLink = '';
+      switch(platform) {
+        case 'facebook': shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`; break;
+        case 'twitter': shareLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`; break;
+        case 'whatsapp': shareLink = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`; break;
+        case 'telegram': shareLink = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`; break;
+      }
+      window.open(shareLink, '_blank', 'width=600,height=400');
+      if (!activityObservers[index]) activityObservers[index] = { shareCount: 0 };
+      activityObservers[index].shareCount++;
+      const shareElement = document.getElementById(`share-count-${index}`);
+      if (shareElement) shareElement.textContent = activityObservers[index].shareCount;
+      if (activityObservers[index].shareCount >= 3) markActivityAsCompleted(index);
+    }
+
+    function selectSurveyOption(activityIndex, optionIndex) {
+      const activity = todayActivities[activityIndex];
+      const correctAnswer = activity.surveyCorrect !== undefined ? activity.surveyCorrect : activity.correctAnswer;
+      const optionsCount = activity.surveyOptions ? activity.surveyOptions.length : (activity.options ? activity.options.length : 0);
+      for (let i = 0; i < optionsCount; i++) {
+        const optionElement = document.getElementById(`survey-${activityIndex}-option-${i}`);
+        if (optionElement) optionElement.classList.remove('selected');
+      }
+      const selectedOption = document.getElementById(`survey-${activityIndex}-option-${optionIndex}`);
+      if (selectedOption) {
+        selectedOption.classList.add('selected');
+        setTimeout(() => { markActivityAsCompleted(activityIndex); }, 500);
+      }
+    }
+
+    async function submitActivities() {
+      const completedCount = Object.values(completionStatus).filter(v => v).length;
+      if (completedCount === 0) {
+        await showAlert('Please complete at least one activity before submitting.');
+        return;
+      }
+      const confirmed = await showConfirm('Are you sure you want to submit today\'s activities? You will receive rewards only for completed activities.');
+      if (!confirmed) return;
+      try {
+        const todayDate = getTodayDateString();
+        const totalReward = todayActivities.reduce((sum, activity, index) => sum + (completionStatus[index] ? parseFloat(activity.reward) || 0 : 0), 0);
+        const submissionData = {
+          userId: currentUser.uid,
+          userName: userData ? userData.name : currentUser.displayName || 'User',
+          userEmail: currentUser.email,
+          date: todayDate,
+          day: getDayOfWeek(),
+          activities: todayActivities,
+          completionStatus: completionStatus,
+          totalReward: totalReward,
+          submittedAt: new Date().toISOString(),
+          status: 'pending',
+          completedCount: completedCount,
+          totalCount: todayActivities.length
+        };
+        await db.collection('activity_submissions').add(submissionData);
+        const savedData = loadFromLocalStorage();
+        if (savedData) { savedData.userSubmitted = true; localStorage.setItem(getTodayStorageKey(), JSON.stringify(savedData)); }
+        lockActivities();
+        if ('Notification' in window && Notification.permission === 'granted') showNotification('Activities Submitted', `You submitted ${completedCount} activities for review!`);
+        await showAlert(`Successfully submitted ${completedCount} activities! They will be reviewed by admin and rewards will be added to your account within 24 hours.`);
+      } catch (error) {
+        console.error(error);
+        await showAlert('Error submitting activities. Please try again.');
+      }
+    }
+
+    function lockActivities() {
+      userSubmission = { submitted: true };
+      document.querySelectorAll('.activity-card').forEach(card => card.classList.add('locked'));
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-lock"></i> Already Submitted';
+      document.querySelectorAll('.activity-card').forEach(card => {
+        if (!card.querySelector('.submitted-overlay')) {
+          const overlay = document.createElement('div');
+          overlay.className = 'submitted-overlay';
+          overlay.innerHTML = '<div class="submitted-icon"><i class="fas fa-check-circle"></i></div><div class="submitted-text text-2xl font-bold text-white mb-2">Submitted</div><div class="submitted-message text-muted text-center max-w-xs">Your activities have been submitted for review. You will receive your rewards once approved by admin.</div>';
+          card.appendChild(overlay);
+        }
+      });
+    }
+
+    window.simulateCompletion = function() { todayActivities.forEach((_, index) => markActivityAsCompleted(index)); };
+    window.resetCompletion = function() {
+      todayActivities.forEach((_, index) => {
+        completionStatus[index] = false;
+        const activityElement = document.getElementById(`activity-${index}`);
+        if (activityElement) {
+          activityElement.classList.remove('completed');
+          const statusElement = activityElement.querySelector('.activity-status');
+          if (statusElement) { statusElement.className = 'activity-status status-pending'; statusElement.innerHTML = '<i class="fas fa-clock"></i>'; }
+        }
+      });
+      updateProgress();
+      setupActivityObservers();
+      clearLocalStorage();
+    };
+  </script>
+  <script>
+    (function() {
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const today = new Date();
+      document.title = `Activities for ${today.getDate()} ${months[today.getMonth()]}, ${today.getFullYear()}`;
+    })();
+  </script>
+</body>
+</html>
