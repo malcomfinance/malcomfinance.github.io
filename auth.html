@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Malcom Finance · Access</title>
+  <link href="tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="fontawesome-free-6.6.0-web/css/all.min.css">
+<script src="firebase-app-compat.js"></script>
+  <script src="firebase-auth-compat.js"></script>
+  <script src="firebase-firestore-compat.js"></script>
+  <script src="firebase-storage-compat.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    :root {
+      --bg-main: #f9fafb; --bg-card: #ffffff; --text-main: #111827; --text-muted: #6b7280;
+      --border-color: #e5e7eb; --accent-green: #059669; --accent-soft: #ecfdf5; --input-bg: #f3f4f6;
+    }
+    html.dark {
+      --bg-main: #0f172a; --bg-card: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8;
+      --border-color: #334155; --accent-green: #10b981; --accent-soft: #064e3b; --input-bg: #0f172a;
+    }
+    body { background-color: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; transition: background-color 0.3s ease; }
+    .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 2rem; }
+    .accent-bg { background-color: var(--accent-green); }
+    .accent-text { color: var(--accent-green); }
+    .input-group { background-color: var(--input-bg); border: 1px solid var(--border-color); transition: border-color 0.2s; }
+    .input-group:focus-within { border-color: var(--accent-green); }
+    input { background: transparent; color: var(--text-main); outline: none; }
+  </style>
+  <script>
+    // Immediate theme application to prevent flicker
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
+      authDomain: "malcolm-finance.firebaseapp.com",
+      projectId: "malcolm-finance",
+      storageBucket: "malcolm-finance.firebasestorage.app",
+      messagingSenderId: "987613399580",
+      appId: "1:987613399580:web:0237b2c8c2c7df54222dd9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    function togglePassword(id, iconId) {
+      const input = document.getElementById(id);
+      const icon = document.getElementById(iconId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+  </script>
+
+  <div class="max-w-md w-full">
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 accent-bg rounded-2xl flex items-center justify-center text-white text-2xl mx-auto mb-4 shadow-lg shadow-green-200 dark:shadow-none">
+        <i class="fas fa-leaf"></i>
+      </div>
+      <h1 class="text-3xl font-extrabold tracking-tight">Malcom Finance</h1>
+      <p class="text-muted text-sm mt-2 font-medium">Secure Wealth Management</p>
+    </div>
+
+    <div class="card p-8 shadow-xl">
+      <!-- Login View -->
+      <div id="login-view">
+        <h2 class="text-xl font-bold mb-6">Welcome Back</h2>
+        <div class="space-y-4">
+          <div class="input-group flex items-center p-4 rounded-2xl">
+            <i class="fas fa-envelope text-muted mr-3"></i>
+            <input type="email" id="login-email" class="w-full text-sm" placeholder="Email Address">
+          </div>
+          <div class="input-group flex items-center p-4 rounded-2xl">
+            <i class="fas fa-lock text-muted mr-3"></i>
+            <input type="password" id="login-pwd" class="w-full text-sm" placeholder="Password">
+            <i class="fas fa-eye text-muted cursor-pointer hover:accent-text" id="eye-login" onclick="togglePassword('login-pwd', 'eye-login')"></i>
+          </div>
+          <button onclick="login()" id="login-btn" class="w-full accent-bg text-white font-bold py-4 rounded-2xl shadow-lg transition transform active:scale-95">Sign In</button>
+        </div>
+        <p class="text-center text-sm text-muted mt-6">New here? <button onclick="toggleView()" class="accent-text font-bold">Create account</button></p>
+      </div>
+
+      <!-- Signup View -->
+      <div id="signup-view" class="hidden">
+        <h2 class="text-xl font-bold mb-6">Join Malcom</h2>
+        <div class="space-y-4">
+          <div class="input-group flex items-center p-4 rounded-2xl">
+            <i class="fas fa-user text-muted mr-3"></i>
+            <input type="text" id="name" class="w-full text-sm" placeholder="Full Name">
+          </div>
+          <div class="input-group flex items-center p-4 rounded-2xl">
+            <i class="fas fa-envelope text-muted mr-3"></i>
+            <input type="email" id="email" class="w-full text-sm" placeholder="Email Address">
+          </div>
+          <div class="input-group flex items-center p-4 rounded-2xl">
+            <i class="fas fa-phone text-muted mr-3"></i>
+            <input type="text" id="phone" class="w-full text-sm" placeholder="Phone Number">
+          </div>
+          <div class="input-group flex items-center p-4 rounded-2xl">
+            <i class="fas fa-lock text-muted mr-3"></i>
+            <input type="password" id="pwd" class="w-full text-sm" placeholder="Password">
+            <i class="fas fa-eye text-muted cursor-pointer hover:accent-text" id="eye-signup" onclick="togglePassword('pwd', 'eye-signup')"></i>
+          </div>
+          <div class="input-group flex items-center p-4 rounded-2xl">
+            <i class="fas fa-user-friends text-muted mr-3"></i>
+            <input type="text" id="referral-code" class="w-full text-sm" placeholder="Referral Code (Optional)">
+          </div>
+          <button onclick="signup()" id="signup-btn" class="w-full accent-bg text-white font-bold py-4 rounded-2xl shadow-lg transition transform active:scale-95">Get Started</button>
+        </div>
+        <p class="text-center text-sm text-muted mt-6">Have an account? <button onclick="toggleView()" class="accent-text font-bold">Sign in</button></p>
+      </div>
+
+      <!-- Messages -->
+      <div id="err" class="mt-4 p-3 bg-red-50 text-red-500 text-xs rounded-xl hidden text-center font-bold"></div>
+      <div id="success" class="mt-4 p-3 bg-green-50 text-green-600 text-xs rounded-xl hidden text-center font-bold"></div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const refFromUrl = urlParams.get('ref');
+    if (refFromUrl) {
+      document.getElementById('referral-code').value = refFromUrl;
+    }
+
+    function toggleView() {
+      document.getElementById('login-view').classList.toggle('hidden');
+      document.getElementById('signup-view').classList.toggle('hidden');
+      document.getElementById('err').classList.add('hidden');
+    }
+
+    async function login() {
+      const email = document.getElementById('login-email').value;
+      const pwd = document.getElementById('login-pwd').value;
+      const btn = document.getElementById('login-btn');
+      const err = document.getElementById('err');
+      
+      if(!email || !pwd) { err.textContent = 'Please enter email and password'; err.classList.remove('hidden'); return; }
+      btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      
+      try {
+        await auth.signInWithEmailAndPassword(email, pwd);
+        window.location.href = 'home.html';
+      } catch (e) {
+        err.textContent = e.message; err.classList.remove('hidden');
+        btn.disabled = false; btn.textContent = 'Sign In';
+      }
+    }
+
+    async function signup() {
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+      const pwd = document.getElementById('pwd').value;
+      const refInput = document.getElementById('referral-code').value;
+      
+      const btn = document.getElementById('signup-btn');
+      const err = document.getElementById('err');
+      const success = document.getElementById('success');
+
+      if(!name || !email || !phone || !pwd) { err.textContent = 'Fill all required fields'; err.classList.remove('hidden'); return; }
+      btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+      try {
+        const emailCheck = await db.collection('users').where('email', '==', email).get();
+        if (!emailCheck.empty) { throw new Error('Email already registered'); }
+
+        const cred = await auth.createUserWithEmailAndPassword(email, pwd);
+        const code = (name.substring(0,3).toUpperCase() + Math.random().toString(36).substring(2,7).toUpperCase()).replace(/[^A-Z0-9]/g,'A');
+
+        await db.collection('users').doc(cred.user.uid).set({
+          name, email, phone, referralCode: code, referredBy: refInput || null,
+          balance: 0, isActive: false, referrals: 0, earningsBalance: 0, referralBalance: 0,
+          bonusesBalance: 0, totalWithdrawn: 0, totalEarnings: 0,
+          createdAt: new Date().toISOString(), lastLogin: new Date().toISOString(), profilePictureUrl: ''
+        });
+
+        if (refInput) {
+          const refSnap = await db.collection('users').where('referralCode', '==', refInput).get();
+          if (!refSnap.empty) {
+            await db.collection('users').doc(refSnap.docs[0].id).update({
+              referrals: firebase.firestore.FieldValue.increment(1)
+            });
+          }
+        }
+
+        success.textContent = 'Account created! Redirecting...'; success.classList.remove('hidden');
+        setTimeout(() => window.location.href = 'index.html', 2000);
+      } catch (e) {
+        err.textContent = e.message; err.classList.remove('hidden');
+        btn.disabled = false; btn.textContent = 'Get Started';
+      }
+    }
+  </script>
+</body>
+</html>
