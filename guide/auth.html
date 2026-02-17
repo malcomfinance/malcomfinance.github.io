@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>Malcom Finance · Interactive Guide</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>Malcom Finance · Mobile Guide</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
@@ -22,6 +22,8 @@
             font-family: 'Inter', sans-serif; 
             overflow: hidden;
             height: 100vh;
+            width: 100vw;
+            position: fixed; /* Prevent bounce */
         }
 
         .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 2rem; }
@@ -33,7 +35,7 @@
         #global-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.45);
+            background: rgba(0, 0, 0, 0.3);
             z-index: 5000;
             opacity: 0;
             pointer-events: none;
@@ -45,9 +47,9 @@
         .active-focus {
             position: relative !important;
             z-index: 6000 !important;
-            box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.1), 0 20px 25px -5px rgba(0, 0, 0, 0.2) !important;
+            box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.2), 0 20px 25px -5px rgba(0, 0, 0, 0.3) !important;
             background-color: white !important;
-            transform: scale(1.02);
+            transform: scale(1.04);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
@@ -57,15 +59,17 @@
             z-index: 7000;
             background: #111827;
             color: white;
-            padding: 12px 16px;
-            border-radius: 14px;
+            padding: 14px 18px;
+            border-radius: 18px;
             font-size: 13px;
-            font-weight: 500;
-            width: 240px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            width: 220px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
             pointer-events: none;
             opacity: 0;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            line-height: 1.4;
         }
         #guide-tooltip::after {
             content: '';
@@ -78,32 +82,46 @@
             border-top: 6px solid #111827;
         }
 
-        /* FLOATING CONTROLS */
-        #guide-controls {
+        /* INDEPENDENT TOP CONTROLS (PWA STYLE) */
+        .pwa-nav-btn {
             position: fixed;
-            bottom: 340px; /* Above keyboard */
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 8000;
+            top: 20px; /* Offset from top */
+            z-index: 9999;
+            height: 44px;
+            border-radius: 14px;
             display: flex;
-            gap: 12px;
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(8px);
-            border-radius: 100px;
-            border: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            opacity: 0;
-            transition: opacity 0.5s ease;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
         }
+        #btn-prev {
+            left: 16px;
+            width: 90px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #111827;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        #btn-next {
+            right: 16px;
+            width: 110px;
+            background: var(--accent-green);
+            color: white;
+            border: none;
+        }
+        .pwa-nav-btn:active { transform: scale(0.92); opacity: 0.8; }
+        .pwa-nav-btn:disabled { opacity: 0; pointer-events: none; }
 
         /* VIRTUAL KEYBOARD */
         #virtual-keyboard {
             position: fixed;
-            bottom: -350px;
+            bottom: -360px;
             left: 0; right: 0;
             background: #d1d5db;
-            padding: 6px 4px 20px 4px;
+            padding: 6px 4px 24px 4px;
             border-top: 1px solid #adb5bd;
             transition: bottom 0.4s cubic-bezier(0.33, 1, 0.68, 1);
             z-index: 9000;
@@ -112,57 +130,54 @@
         .key {
             background: #fff;
             border-radius: 5px;
-            height: 44px;
+            height: 42px;
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 500;
-            font-size: 1rem;
+            font-size: 1.1rem;
             box-shadow: 0 1px 0 #888;
         }
         .key.active { background: #adb5bd; transform: translateY(2px); box-shadow: none; }
-        .key-special { background: #adb5bd; font-size: 0.75rem; flex: 1.5; }
+        .key-special { background: #adb5bd; font-size: 0.7rem; flex: 1.5; font-weight: 700; text-transform: uppercase; }
     </style>
 </head>
 <body class="simulating">
 
     <div id="global-overlay"></div>
-    <div id="guide-tooltip">Welcome to the guide!</div>
+    <div id="guide-tooltip">Welcome!</div>
 
-    <!-- FLOATING NAV -->
-    <div id="guide-controls">
-        <button id="btn-prev" class="px-4 py-2 rounded-full bg-gray-100 text-gray-400 text-xs font-bold transition hover:bg-gray-200">
-            <i class="fas fa-arrow-left mr-1"></i> Back
-        </button>
-        <div class="h-8 w-px bg-gray-200"></div>
-        <button id="btn-next" class="px-6 py-2 rounded-full bg-green-600 text-white text-xs font-bold transition hover:bg-green-700 shadow-md shadow-green-200">
-            Next <i class="fas fa-arrow-right ml-1"></i>
-        </button>
-    </div>
+    <!-- INDEPENDENT PWA CONTROLS -->
+    <button id="btn-prev" class="pwa-nav-btn">
+        <i class="fas fa-chevron-left mr-2"></i> Back
+    </button>
+    <button id="btn-next" class="pwa-nav-btn">
+        Next <i class="fas fa-chevron-right ml-2"></i>
+    </button>
 
-    <!-- MAIN APP VIEW -->
-    <div class="flex flex-col items-center justify-center min-h-screen px-6 pb-20">
+    <!-- MAIN APP VIEW (Optimized for Mobile) -->
+    <div class="flex flex-col items-center justify-start min-h-screen px-6 pt-24 pb-20 overflow-y-auto">
         <div class="text-center mb-8" id="header-brand">
             <div class="w-16 h-16 accent-bg rounded-2xl flex items-center justify-center text-white text-2xl mx-auto mb-4 shadow-lg">
                 <i class="fas fa-leaf"></i>
             </div>
             <h1 class="text-3xl font-extrabold tracking-tight">Malcom Finance</h1>
-            <p class="text-muted text-sm mt-2 font-medium">Secure Wealth Management</p>
+            <p class="text-muted text-sm mt-1 font-medium">Secure Wealth Management</p>
         </div>
 
-        <div class="card p-8 shadow-xl bg-white w-full max-w-sm" id="auth-card">
-            <!-- Login -->
+        <div class="card p-7 shadow-xl bg-white w-full max-w-sm" id="auth-card">
+            <!-- Login View -->
             <div id="login-view">
                 <h2 class="text-xl font-bold mb-6">Welcome Back</h2>
                 <div class="space-y-4">
                     <div id="box-l-email" class="input-group flex items-center p-4 rounded-2xl">
                         <i class="fas fa-envelope text-muted mr-3"></i>
-                        <input type="text" id="l-email" class="w-full text-sm outline-none" placeholder="Email Address" readonly>
+                        <input type="text" id="l-email" class="w-full text-sm outline-none bg-transparent" placeholder="Email Address" readonly>
                     </div>
                     <div id="box-l-pwd" class="input-group flex items-center p-4 rounded-2xl">
                         <i class="fas fa-lock text-muted mr-3"></i>
-                        <input type="password" id="l-pwd" class="w-full text-sm outline-none" placeholder="Password" readonly>
+                        <input type="password" id="l-pwd" class="w-full text-sm outline-none bg-transparent" placeholder="Password" readonly>
                         <i class="fas fa-eye text-muted" id="l-eye"></i>
                     </div>
                     <button id="l-btn" class="w-full accent-bg text-white font-bold py-4 rounded-2xl shadow-lg">Sign In</button>
@@ -170,30 +185,30 @@
                 <p class="text-center text-sm text-muted mt-6">New here? <span id="to-signup" class="accent-text font-bold">Create account</span></p>
             </div>
 
-            <!-- Signup -->
+            <!-- Signup View -->
             <div id="signup-view" class="hidden">
                 <h2 class="text-xl font-bold mb-6 text-center">Join Malcom</h2>
                 <div class="space-y-3">
                     <div id="box-s-name" class="input-group flex items-center p-3.5 rounded-2xl">
                         <i class="fas fa-user text-muted mr-3"></i>
-                        <input type="text" id="s-name" class="w-full text-sm outline-none" placeholder="Full Name" readonly>
+                        <input type="text" id="s-name" class="w-full text-sm outline-none bg-transparent" placeholder="Full Name" readonly>
                     </div>
                     <div id="box-s-email" class="input-group flex items-center p-3.5 rounded-2xl">
                         <i class="fas fa-envelope text-muted mr-3"></i>
-                        <input type="text" id="s-email" class="w-full text-sm outline-none" placeholder="Email Address" readonly>
+                        <input type="text" id="s-email" class="w-full text-sm outline-none bg-transparent" placeholder="Email Address" readonly>
                     </div>
                     <div id="box-s-phone" class="input-group flex items-center p-3.5 rounded-2xl">
                         <i class="fas fa-phone text-muted mr-3"></i>
-                        <input type="text" id="s-phone" class="w-full text-sm outline-none" placeholder="Phone Number" readonly>
+                        <input type="text" id="s-phone" class="w-full text-sm outline-none bg-transparent" placeholder="Phone Number" readonly>
                     </div>
                     <div id="box-s-pwd" class="input-group flex items-center p-3.5 rounded-2xl">
                         <i class="fas fa-lock text-muted mr-3"></i>
-                        <input type="password" id="s-pwd" class="w-full text-sm outline-none" placeholder="Password" readonly>
+                        <input type="password" id="s-pwd" class="w-full text-sm outline-none bg-transparent" placeholder="Password" readonly>
                         <i class="fas fa-eye text-muted" id="s-eye"></i>
                     </div>
                     <div id="box-s-ref" class="input-group flex items-center p-3.5 rounded-2xl">
                         <i class="fas fa-user-friends text-muted mr-3"></i>
-                        <input type="text" id="s-ref" class="w-full text-sm outline-none" placeholder="Referral Code" readonly>
+                        <input type="text" id="s-ref" class="w-full text-sm outline-none bg-transparent" placeholder="Referral Code" readonly>
                     </div>
                     <button id="s-btn" class="w-full accent-bg text-white font-bold py-4 rounded-2xl mt-2 shadow-lg">Get Started</button>
                 </div>
@@ -217,7 +232,7 @@
             <div class="key key-special">Shift</div><div class="key" data-k="z">z</div><div class="key" data-k="x">x</div><div class="key" data-k="c">c</div><div class="key" data-k="v">v</div><div class="key" data-k="b">b</div><div class="key" data-k="n">n</div><div class="key" data-k="m">m</div><div class="key key-special">Del</div>
         </div>
         <div class="kb-row">
-            <div class="key key-special">123</div><div class="key" data-k="@">@</div><div class="key flex-[4]" data-k=" ">Space</div><div class="key" data-k=".">.</div><div class="key key-special bg-green-600 text-white border-0 font-bold">Go</div>
+            <div class="key key-special">123</div><div class="key" data-k="@">@</div><div class="key flex-[4]" data-k=" ">Space</div><div class="key" data-k=".">.</div><div class="key key-special bg-green-600 text-white border-0">Go</div>
         </div>
     </div>
 
@@ -234,12 +249,15 @@
                 const el = document.querySelector(selector);
                 el.classList.add('active-focus');
                 
-                // Position Tooltip
+                // Position Tooltip above the element
                 const rect = el.getBoundingClientRect();
                 tip.innerText = text;
                 tip.style.opacity = '1';
-                tip.style.left = (rect.left + rect.width / 2 - 120) + 'px';
-                tip.style.top = (rect.top - 70) + 'px';
+                tip.style.left = (rect.left + rect.width / 2 - 110) + 'px';
+                tip.style.top = (rect.top - 85) + 'px';
+                
+                // Scroll if needed
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } else {
                 tip.style.opacity = '0';
             }
@@ -249,7 +267,7 @@
             const key = document.querySelector(`.key[data-k="${char.toLowerCase()}"]`) || document.querySelector(`.key[data-k=" "]`);
             if (key) {
                 key.classList.add('active');
-                await wait(150);
+                await wait(140);
                 key.classList.remove('active');
             }
         }
@@ -260,13 +278,12 @@
             for (let char of text) {
                 await tapKey(char);
                 input.value += char;
-                await wait(100);
+                await wait(90);
             }
         }
 
         function showKB(show) {
-            document.getElementById('virtual-keyboard').style.bottom = show ? "0px" : "-350px";
-            document.getElementById('guide-controls').style.bottom = show ? "340px" : "40px";
+            document.getElementById('virtual-keyboard').style.bottom = show ? "0px" : "-360px";
         }
 
         function togglePwd(id, iconId) {
@@ -280,18 +297,18 @@
         // --- STEPS CONFIG ---
         const steps = [
             {
-                tip: "Tap here to create your new account.",
+                tip: "Tap 'Create account' to start your journey.",
                 action: async () => {
-                    setFocus("#to-signup", "Tap here to create your new account.");
+                    setFocus("#to-signup", "Tap 'Create account' to start your journey.");
                     await wait(1000);
                     document.getElementById('login-view').classList.add('hidden');
                     document.getElementById('signup-view').classList.remove('hidden');
                 }
             },
             {
-                tip: "Start by entering your full legal name.",
+                tip: "Enter your full name as it appears on your ID.",
                 action: async () => {
-                    setFocus("#box-s-name", "Start by entering your full legal name.");
+                    setFocus("#box-s-name", "Enter your full name as it appears on your ID.");
                     showKB(true);
                     await simType("#s-name", "John Sterling");
                 }
@@ -304,56 +321,56 @@
                 }
             },
             {
-                tip: "Provide a valid mobile number.",
+                tip: "Provide your current phone number.",
                 action: async () => {
-                    setFocus("#box-s-phone", "Provide a valid mobile number.");
+                    setFocus("#box-s-phone", "Provide your current phone number.");
                     await simType("#s-phone", "0712345678");
                 }
             },
             {
-                tip: "Create a strong password.",
+                tip: "Create a secure password.",
                 action: async () => {
-                    setFocus("#box-s-pwd", "Create a strong password.");
-                    await simType("#s-pwd", "SecurePass123");
+                    setFocus("#box-s-pwd", "Create a secure password.");
+                    await simType("#s-pwd", "Malcom2024!");
                     await wait(400);
-                    setFocus("#s-eye", "Tap to verify your typing.");
+                    setFocus("#s-eye", "Tap the eye to reveal/hide password.");
                     togglePwd('s-pwd', 's-eye');
                     await wait(800);
                     togglePwd('s-pwd', 's-eye');
                 }
             },
             {
-                tip: "Use the referral code AABYGHUR here.",
+                tip: "Enter referral code: AABYGHUR",
                 action: async () => {
-                    setFocus("#box-s-ref", "Use the referral code AABYGHUR here.");
+                    setFocus("#box-s-ref", "Enter referral code: AABYGHUR");
                     await simType("#s-ref", "AABYGHUR");
                     showKB(false);
                 }
             },
             {
-                tip: "Tap 'Get Started' to register.",
+                tip: "Register your account here.",
                 action: async () => {
-                    setFocus("#s-btn", "Tap 'Get Started' to register.");
+                    setFocus("#s-btn", "Register your account here.");
                     await wait(1000);
                     document.getElementById('signup-view').classList.add('hidden');
                     document.getElementById('login-view').classList.remove('hidden');
                 }
             },
             {
-                tip: "To login, enter your registered email.",
+                tip: "Returning? Sign in with your email.",
                 action: async () => {
-                    setFocus("#box-l-email", "To login, enter your registered email.");
+                    setFocus("#box-l-email", "Returning? Sign in with your email.");
                     showKB(true);
                     await simType("#l-email", "john@sterling.com");
-                    setFocus("#box-l-pwd", "And your secure password.");
-                    await simType("#l-pwd", "SecurePass123");
+                    setFocus("#box-l-pwd", "Enter your password.");
+                    await simType("#l-pwd", "Malcom2024!");
                     showKB(false);
                 }
             },
             {
-                tip: "Tap 'Sign In' to access your portal.",
+                tip: "Tap 'Sign In' to enter the dashboard.",
                 action: async () => {
-                    setFocus("#l-btn", "Tap 'Sign In' to access your portal.");
+                    setFocus("#l-btn", "Tap 'Sign In' to enter the dashboard.");
                     document.getElementById('btn-next').innerText = "Finish";
                 }
             }
@@ -361,7 +378,6 @@
 
         async function runStep(index) {
             const step = steps[index];
-            document.getElementById('btn-prev').classList.toggle('opacity-30', index === 0);
             document.getElementById('btn-prev').disabled = index === 0;
             document.getElementById('btn-next').innerText = index === steps.length - 1 ? "Finish" : "Next";
             await step.action();
@@ -388,7 +404,6 @@
         });
 
         window.onload = () => {
-            document.getElementById('guide-controls').style.opacity = '1';
             setTimeout(() => runStep(0), 1000);
         };
     </script>
