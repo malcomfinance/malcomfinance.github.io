@@ -1,206 +1,1691 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <title>Malcom Finance · My Wallet</title>
-  <link href="tailwind.min.css" rel="stylesheet">
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Malcom Finance · My Wallet</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0b0b0b">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" href="logo.png">
+<link href="tailwind.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
 <script src="firebase-app-compat.js"></script>
-  <script src="firebase-auth-compat.js"></script>
-  <script src="firebase-firestore-compat.js"></script>
-  <script src="firebase-storage-compat.js"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+<script src="firebase-auth-compat.js"></script>
+<script src="firebase-firestore-compat.js"></script>
+<script src="firebase-storage-compat.js"></script>
+<script>
+(function () {
+  try {
+    if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+  } catch (e) {}
+})();
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&display=swap');
 
-    :root {
-      --bg-main: #f9fafb;
-      --bg-card: #ffffff;
-      --text-main: #111827;
-      --text-muted: #6b7280;
-      --border-color: #e5e7eb;
-      --accent-green: #059669;
-      --accent-soft: #ecfdf5;
-      --input-bg: #f3f4f6;
-    }
-    
-    
-    
-    
-    
+*, *::before, *::after { box-sizing: border-box; }
 
-    body.dark {
-      --bg-main: #0f172a;
-      --bg-card: #1e293b;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --border-color: #334155;
-      --accent-green: #10b981;
-      --accent-soft: #064e3b;
-      --input-bg: #0f172a;
-    }
+:root {
+  --font: 'DM Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --sb-w: 290px;
+  --sb-rail: 86px;
+  --bg-1: #f5f5f3;
+  --bg-2: #e5e5e1;
+  --fg: #0b0b0b;
+  --fg-soft: #5f5f5c;
+  --line: rgba(11, 11, 11, 0.10);
+  --glass-tint: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.85);
+  --glass-shadow: 0 20px 45px rgba(20, 20, 20, 0.13);
+  --rim-1: rgba(255, 255, 255, 0.95);
+  --rim-2: rgba(255, 255, 255, 0.55);
+  --rim-inner: rgba(255, 255, 255, 0.08);
+  --btn-bg: rgba(255, 255, 255, 0.34);
+  --btn-hover: rgba(255, 255, 255, 0.62);
+  --tip-bg: #0b0b0b;
+  --tip-fg: #f6f6f4;
+  --solid: #0b0b0b;
+  --solid-fg: #f7f7f5;
+  --nav-active-bg: #0b0b0b;
+  --nav-active-fg: #ffffff;
+  --stripe: rgba(11, 11, 11, 0.045);
+  --scene-tint: rgba(245, 245, 243, 0.42);
+  --pos: #178a52;
+  --neg: #d64545;
+  --info: #3b6fd4;
+  --info-soft: rgba(59, 111, 212, 0.12);
+  --pos-soft: rgba(23, 138, 82, 0.12);
+  --neg-soft: rgba(214, 69, 69, 0.10);
+}
 
-    body { 
-      background-color: var(--bg-main); 
-      color: var(--text-main); 
-      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; 
-      font-family: 'Inter', sans-serif; 
-    }
+html.dark {
+  --bg-1: #070707;
+  --bg-2: #161616;
+  --fg: #f4f4f1;
+  --fg-soft: #9c9c98;
+  --line: rgba(255, 255, 255, 0.12);
+  --glass-tint: rgba(255, 255, 255, 0.055);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-shadow: 0 20px 45px rgba(0, 0, 0, 0.62);
+  --rim-1: rgba(255, 255, 255, 0.45);
+  --rim-2: rgba(255, 255, 255, 0.14);
+  --rim-inner: rgba(255, 255, 255, 0.05);
+  --btn-bg: rgba(255, 255, 255, 0.07);
+  --btn-hover: rgba(255, 255, 255, 0.15);
+  --tip-bg: #f4f4f1;
+  --tip-fg: #070707;
+  --solid: #f4f4f1;
+  --solid-fg: #0a0a0a;
+  --nav-active-bg: #f4f4f1;
+  --nav-active-fg: #0a0a0a;
+  --stripe: rgba(255, 255, 255, 0.05);
+  --scene-tint: rgba(7, 7, 7, 0.72);
+  --pos: #34d399;
+  --neg: #f87171;
+  --info: #7aa2f7;
+  --info-soft: rgba(122, 162, 247, 0.14);
+  --pos-soft: rgba(52, 211, 153, 0.14);
+  --neg-soft: rgba(248, 113, 113, 0.12);
+}
 
-    .card { 
-      background-color: var(--bg-card); 
-      border: 1px solid var(--border-color); 
-      border-radius: 1.5rem; 
-      transition: all 0.3s ease;
-    }
+html, body { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display: none; }
+html { scroll-behavior: smooth; }
 
-    .text-muted { color: var(--text-muted); }
-    .accent-bg { background-color: var(--accent-green); }
-    .accent-text { color: var(--accent-green); }
-    .accent-border { border-color: var(--accent-green); }
-    .soft-accent-bg { background-color: var(--accent-soft); }
-  </style>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
-      authDomain: "malcolm-finance.firebaseapp.com",
-      projectId: "malcolm-finance",
-      storageBucket: "malcolm-finance.firebasestorage.app",
-      messagingSenderId: "987613399580",
-      appId: "1:987613399580:web:0237b2c8c2c7df54222dd9"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg-1);
+  color: var(--fg);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color .35s ease, color .35s ease;
+}
 
-    // Immediate theme application
-    if (localStorage.getItem('theme') === 'dark') {
-        document.documentElement.classList.add('dark');
-        document.body.classList.add('dark');
-    }
-  </script>
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+}
+
+.scene-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: .88;
+}
+
+html:not(.dark) .scene-video { filter: brightness(1.22) contrast(.92) saturate(1.05); }
+html.dark .scene-video { filter: brightness(.62) contrast(1.05) saturate(1.12); }
+
+.scene-tint {
+  position: absolute;
+  inset: 0;
+  background: var(--scene-tint);
+  pointer-events: none;
+}
+
+.scene .stripes {
+  position: absolute;
+  inset: -20%;
+  background: repeating-linear-gradient(115deg, transparent 0 58px, var(--stripe) 58px 60px);
+  opacity: .55;
+}
+
+.glass {
+  position: relative;
+  isolation: isolate;
+  border-radius: 28px;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  box-shadow:
+    var(--glass-shadow),
+    inset 1.5px 1.5px 1px -1px var(--rim-1),
+    inset -1px -1px 1px -1px var(--rim-2),
+    inset 0 0 24px 4px var(--rim-inner);
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -3;
+  -webkit-backdrop-filter: url(#glass-distortion);
+  backdrop-filter: url(#glass-distortion);
+  pointer-events: none;
+}
+
+.glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -2;
+  background: var(--glass-tint);
+  -webkit-backdrop-filter: blur(3px) saturate(180%) brightness(1.06);
+  backdrop-filter: blur(3px) saturate(180%) brightness(1.06);
+  pointer-events: none;
+}
+
+@supports not (backdrop-filter: url(#glass-distortion)) {
+  .glass::before {
+    -webkit-backdrop-filter: blur(16px) saturate(185%);
+    backdrop-filter: blur(16px) saturate(185%);
+  }
+}
+
+.gbtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 14px 22px;
+  border-radius: 18px;
+  border: 1px solid var(--glass-border);
+  background: var(--btn-bg);
+  color: var(--fg);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: .875rem;
+  letter-spacing: .01em;
+  cursor: pointer;
+  text-decoration: none;
+  -webkit-backdrop-filter: blur(6px) saturate(180%);
+  backdrop-filter: blur(6px) saturate(180%);
+  box-shadow:
+    inset 1.5px 1.5px 1px -1px var(--rim-1),
+    inset -1px -1px 1px -1px var(--rim-2),
+    0 8px 18px rgba(0, 0, 0, .12);
+  transition: transform .25s ease, background .25s ease, box-shadow .25s ease;
+}
+
+.gbtn i { font-size: 1.15rem; }
+.gbtn:hover { background: var(--btn-hover); transform: translateY(-2px); }
+.gbtn:active { transform: translateY(0) scale(.98); }
+
+.gbtn.solid {
+  background: var(--solid);
+  color: var(--solid-fg);
+  border-color: transparent;
+  box-shadow:
+    inset 1.5px 1.5px 1px -1px rgba(255, 255, 255, .35),
+    0 12px 26px rgba(0, 0, 0, .28);
+}
+.gbtn.solid:hover { background: var(--solid); opacity: .92; }
+
+.icon-btn {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--fg);
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: background .22s ease, border-color .22s ease, transform .18s ease;
+}
+
+.icon-btn:hover { background: var(--btn-bg); border-color: var(--glass-border); }
+.icon-btn:active { transform: scale(.93); }
+
+.topbar {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  height: 62px;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border-radius: 22px;
+  transition: left .32s cubic-bezier(.22, 1, .36, 1);
+}
+
+.topbar-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.brand-mini { display: flex; align-items: center; gap: 9px; flex: 1; min-width: 0; }
+.brand-mini img { width: 28px; height: 28px; border-radius: 9px; object-fit: cover; }
+.brand-mini span {
+  font-size: .95rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar-actions { display: flex; align-items: center; gap: 4px; }
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100dvh;
+  width: min(84vw, 300px);
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 30px 30px 0;
+  border-left: none;
+  transform: translateX(-104%);
+  transition: transform .38s cubic-bezier(.22, 1, .36, 1), width .32s cubic-bezier(.22, 1, .36, 1);
+}
+
+body.nav-open .sidebar { transform: translateX(0); }
+
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 18px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 1; }
+.brand img { width: 40px; height: 40px; border-radius: 13px; object-fit: cover; flex: none; }
+.brand-text { min-width: 0; }
+.brand-text h2 {
+  margin: 0;
+  font-size: .875rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.brand-text p {
+  margin: 2px 0 0;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+  white-space: nowrap;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sidebar-nav::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+.nav-section-title {
+  margin: 16px 0 6px;
+  padding: 0 12px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  color: var(--fg-soft);
+  font-size: .875rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+  transition: background .22s ease, color .22s ease, border-color .22s ease, transform .18s ease;
+}
+
+.nav-item i { font-size: 1.35rem; flex: none; }
+.nav-item:hover { background: var(--btn-bg); border-color: var(--glass-border); color: var(--fg); }
+.nav-item:active { transform: scale(.985); }
+
+.nav-item.active {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-fg);
+  border-color: transparent;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, .22);
+}
+
+.nav-item.danger { color: var(--neg); }
+.nav-item.danger:hover { background: var(--neg-soft); border-color: rgba(214, 69, 69, .25); }
+
+.sidebar-foot { padding: 14px; }
+
+.support-card {
+  border-radius: 20px;
+  padding: 16px;
+  background: var(--btn-bg);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+  backdrop-filter: blur(10px) saturate(180%);
+}
+
+.support-card p:first-child {
+  margin: 0 0 4px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.support-card p:nth-child(2) {
+  margin: 0 0 12px;
+  font-size: .75rem;
+  line-height: 1.45;
+  color: var(--fg-soft);
+}
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(0, 0, 0, .45);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .3s ease, visibility .3s ease;
+}
+
+body.nav-open #overlay { opacity: 1; visibility: visible; }
+
+main {
+  padding: 88px 14px 118px;
+  transition: margin-left .32s cubic-bezier(.22, 1, .36, 1), padding .32s ease;
+}
+
+.wrap { max-width: 1240px; margin: 0 auto; }
+
+.page-head { margin-bottom: 18px; padding: 0 4px; }
+.page-head h1 {
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -.03em;
+}
+.page-head p {
+  margin: 5px 0 0;
+  font-size: .85rem;
+  font-weight: 500;
+  color: var(--fg-soft);
+}
+
+.wallet-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr;
+}
+
+.balance-hero {
+  padding: 26px 24px 24px;
+  border-radius: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hero-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.hero-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .01em;
+  color: var(--fg-soft);
+}
+
+.hero-label i {
+  font-size: 1.15rem;
+  color: var(--pos);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  border: 1px solid var(--glass-border);
+  background: var(--btn-bg);
+  color: var(--fg);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.hero-amount {
+  font-size: clamp(2.6rem, 9vw, 3.8rem);
+  font-weight: 800;
+  letter-spacing: -.04em;
+  line-height: 1.02;
+  font-variant-numeric: tabular-nums;
+  word-break: break-all;
+}
+
+.hero-amount .cur {
+  font-size: .42em;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--fg-soft);
+  margin-right: 4px;
+  vertical-align: .35em;
+}
+
+.hero-sub {
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--fg-soft);
+  margin-top: 6px;
+}
+
+.hero-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.stat-card {
+  padding: 22px;
+  border-radius: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.stat-label {
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .01em;
+  color: var(--fg-soft);
+}
+
+.stat-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  border: 1px solid var(--glass-border);
+  background: var(--btn-bg);
+}
+
+.stat-icon.pos { color: var(--pos); background: var(--pos-soft); border-color: transparent; }
+.stat-icon.info { color: var(--info); background: var(--info-soft); border-color: transparent; }
+
+.stat-value {
+  font-size: clamp(1.55rem, 4.2vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  word-break: break-all;
+}
+
+.stat-value .cur {
+  font-size: .62em;
+  font-weight: 700;
+  color: var(--fg-soft);
+  margin-right: 3px;
+}
+
+.stat-foot {
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--fg-soft);
+  margin-top: 2px;
+}
+
+.breakdown {
+  padding: 24px;
+  border-radius: 30px;
+}
+
+.breakdown-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.breakdown-head h3 {
+  margin: 0;
+  font-size: .95rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+}
+
+.breakdown-head span {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+}
+
+.breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.bd-item {
+  padding: 16px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  background: var(--btn-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
+  backdrop-filter: blur(8px) saturate(180%);
+}
+
+.bd-item .bd-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bd-item .bd-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex: none;
+}
+
+.bd-item.pos .bd-dot { background: var(--pos); }
+.bd-item.info .bd-dot { background: var(--info); }
+.bd-item.warn .bd-dot { background: #e09b2d; }
+.bd-item.neg .bd-dot { background: var(--neg); }
+
+.bd-item .bd-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+}
+
+.bd-item .bd-value {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+  word-break: break-all;
+}
+
+.bd-item.neg .bd-value { color: var(--neg); }
+.bd-item.pos .bd-value { color: var(--fg); }
+
+.bd-note {
+  font-size: .7rem;
+  font-weight: 500;
+  color: var(--fg-soft);
+  margin-top: 2px;
+}
+
+.bottomnav {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  height: 68px;
+  z-index: 75;
+  display: none;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 6px;
+  border-radius: 24px;
+}
+
+.bn-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex: 1;
+  height: 52px;
+  border-radius: 16px;
+  text-decoration: none;
+  color: var(--fg-soft);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  transition: color .22s ease, background .22s ease;
+}
+
+.bn-item i { font-size: 1.35rem; }
+.bn-item.active { color: var(--nav-active-fg); background: var(--nav-active-bg); }
+
+#ctx-menu {
+  position: fixed;
+  z-index: 350;
+  min-width: 210px;
+  padding: 8px;
+  border-radius: 22px;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0;
+  transform: scale(.96);
+  transform-origin: top left;
+  transition: opacity .18s ease, transform .18s ease;
+}
+
+#ctx-menu.open {
+  display: flex;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 13px;
+  border: none;
+  background: transparent;
+  color: var(--fg);
+  font-family: inherit;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background .16s ease, transform .12s ease;
+}
+
+.ctx-item i { font-size: 1.15rem; flex: none; }
+.ctx-item:hover { background: var(--btn-bg); }
+.ctx-item:active { transform: scale(.98); }
+
+.ctx-sep { height: 1px; margin: 6px 8px; background: var(--line); }
+
+#tip {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 500;
+  max-width: 78vw;
+  padding: 7px 11px;
+  border-radius: 10px;
+  font-family: var(--font);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--tip-fg);
+  background: var(--tip-bg);
+  border: 1px solid rgba(255, 255, 255, .14);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, .28);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, calc(-100% - 8px)) scale(.96);
+  transition: opacity .16s ease, transform .16s ease;
+}
+
+#tip.show { opacity: 1; transform: translate(-50%, calc(-100% - 8px)) scale(1); }
+#tip.below { transform: translate(-50%, 8px) scale(.96); }
+#tip.below.show { transform: translate(-50%, 8px) scale(1); }
+
+#scroll-pill {
+  position: fixed;
+  right: 9px;
+  top: 0;
+  width: 8px;
+  height: 60px;
+  border-radius: 999px;
+  z-index: 110;
+  opacity: 0;
+  cursor: grab;
+  touch-action: none;
+  background: var(--glass-tint);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    inset 1.5px 1.5px 1px -1px var(--rim-1),
+    inset -1px -1px 1px -1px var(--rim-2),
+    0 6px 18px rgba(0, 0, 0, .28);
+  -webkit-backdrop-filter: blur(4px) saturate(180%) brightness(1.06);
+  backdrop-filter: blur(4px) saturate(180%) brightness(1.06);
+  transition: opacity .35s ease, width .24s cubic-bezier(.22, 1, .36, 1), box-shadow .24s ease;
+  overflow: hidden;
+  will-change: transform, height;
+}
+
+#scroll-pill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -1;
+  -webkit-backdrop-filter: url(#glass-distortion);
+  backdrop-filter: url(#glass-distortion);
+  pointer-events: none;
+}
+
+#scroll-pill::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  bottom: 10%;
+  width: 1px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, .05));
+  opacity: .55;
+  pointer-events: none;
+}
+
+#scroll-pill.visible { opacity: .6; }
+#scroll-pill.hover,
+#scroll-pill.dragging { opacity: 1; width: 13px; }
+#scroll-pill.dragging { cursor: grabbing; }
+
+#dt-block {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 28px;
+  text-align: center;
+  background: #08080a;
+  color: #f4f4f1;
+  font-family: var(--font);
+}
+
+body.dt-open { overflow: hidden; }
+body.dt-open > *:not(#dt-block) { display: none !important; }
+body.dt-open #dt-block { display: flex; }
+
+#dt-block .dt-badge {
+  width: 84px;
+  height: 84px;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  background: rgba(255, 255, 255, .06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  margin-bottom: 10px;
+}
+
+#dt-block .dt-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  margin: 0;
+}
+
+#dt-block .dt-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  color: #e05252;
+  letter-spacing: .02em;
+  word-break: break-word;
+  max-width: 520px;
+  margin: 0;
+}
+
+#dt-block .dt-hint {
+  font-size: 13.5px;
+  color: #9c9c98;
+  max-width: 400px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+#dt-block .dt-foot {
+  font-size: 10px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #5f5f5c;
+  margin: 18px 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+@media (min-width: 768px) {
+  main { padding: 92px 26px 60px; }
+  .page-head h1 { font-size: 1.85rem; }
+  .wallet-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .balance-hero { grid-column: 1 / -1; padding: 32px 30px 28px; }
+  .breakdown { grid-column: 1 / -1; padding: 28px; }
+  .breakdown-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+}
+
+@media (max-width: 767px) {
+  .bottomnav { display: flex; }
+  .brand-mini { display: flex; }
+  .topbar-title { display: none; }
+}
+
+@media (min-width: 768px) {
+  .brand-mini { display: none; }
+}
+
+@media (min-width: 1024px) {
+  .sidebar { transform: none; width: var(--sb-w); }
+  main { margin-left: var(--sb-w); padding: 96px 30px 48px; }
+  .topbar { left: calc(var(--sb-w) + 12px); }
+  #overlay { display: none; }
+  body.nav-open .sidebar { transform: none; }
+  .bottomnav { display: none; }
+
+  body.sb-collapsed .sidebar { width: var(--sb-rail); }
+  body.sb-collapsed main { margin-left: var(--sb-rail); }
+  body.sb-collapsed .topbar { left: calc(var(--sb-rail) + 12px); }
+
+  body.sb-collapsed .brand-text,
+  body.sb-collapsed .nav-label,
+  body.sb-collapsed .nav-section-title,
+  body.sb-collapsed .support-card { display: none; }
+
+  body.sb-collapsed .sidebar-head { justify-content: center; padding: 22px 8px 18px; }
+  body.sb-collapsed .brand { flex: none; justify-content: center; }
+  body.sb-collapsed #collapseBtn { display: none; }
+  body.sb-collapsed .nav-item { justify-content: center; padding: 14px 0; }
+  body.sb-collapsed .sidebar-nav { overflow: visible; padding: 16px 10px; }
+}
+
+@media (min-width: 1280px) {
+  .wallet-grid { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; }
+  .balance-hero { grid-column: auto; }
+  .breakdown { grid-column: auto; }
+}
+
+@media (min-width: 1600px) {
+  .wrap { max-width: 1440px; }
+}
+</style>
 </head>
-<body class="antialiased pb-20">
-  <script>
-    let currentUser, userData, allTransactions = [];
 
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) { window.location.href = 'auth.html'; return; }
-      currentUser = user;
-      window.currentUser = currentUser;
-      await loadUserData();
-      await loadTransactions();
-      updateBalancesUI();
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="92" result="noise" />
+    <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+    <feDisplacementMap in="SourceGraphic" in2="blurred" scale="70" xChannelSelector="R" yChannelSelector="G" />
+  </filter>
+</svg>
+
+<div class="scene" aria-hidden="true">
+  <video class="scene-video" autoplay loop muted playsinline preload="auto" onerror="this.style.display='none'">
+    <source src="/money-c.mp4" type="video/mp4">
+  </video>
+  <div class="scene-tint"></div>
+  <div class="stripes"></div>
+</div>
+
+<header class="topbar glass">
+  <button class="icon-btn" id="menuBtn" data-tip="Open menu" aria-label="Open menu">
+    <i class="ph ph-list"></i>
+  </button>
+  <div class="brand-mini">
+    <img src="logo.png" alt="Malcom Finance logo">
+    <span>Malcom Finance</span>
+  </div>
+  <div class="topbar-title">My Wallet</div>
+  <div class="topbar-actions">
+    <button class="icon-btn" onclick="toggleFullScreen()" data-tip="Toggle fullscreen" aria-label="Toggle fullscreen">
+      <i class="ph ph-corners-out"></i>
+    </button>
+    <button class="icon-btn" id="themeBtn" data-tip="Switch theme" aria-label="Switch theme">
+      <i class="ph ph-moon" id="themeIcon"></i>
+    </button>
+  </div>
+</header>
+
+<aside id="sidebar" class="sidebar glass" aria-label="Main navigation">
+  <div class="sidebar-head">
+    <div class="brand">
+      <img src="logo.png" alt="Malcom Finance logo">
+      <div class="brand-text">
+        <h2>Malcom Finance</h2>
+        <p>Premium Account</p>
+      </div>
+    </div>
+    <button class="icon-btn" id="collapseBtn" data-tip="Close sidebar" aria-label="Close sidebar">
+      <i class="ph ph-x"></i>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="/" class="nav-item" data-tip="Dashboard overview">
+      <i class="ph-duotone ph-squares-four"></i>
+      <span class="nav-label">Dashboard</span>
+    </a>
+    <a href="balances" class="nav-item active" data-tip="View all your balances">
+      <i class="ph-duotone ph-wallet"></i>
+      <span class="nav-label">My Balances</span>
+    </a>
+    <a href="transactions" class="nav-item" data-tip="See your transaction history">
+      <i class="ph-duotone ph-arrows-left-right"></i>
+      <span class="nav-label">Transactions</span>
+    </a>
+    <a href="daily-activities" class="nav-item" data-tip="Complete today's tasks">
+      <i class="ph-duotone ph-list-checks"></i>
+      <span class="nav-label">Daily Tasks</span>
+    </a>
+    <a href="offers" class="nav-item" data-tip="Browse special offers">
+      <i class="ph-duotone ph-gift"></i>
+      <span class="nav-label">Special Offers</span>
+    </a>
+
+    <div class="nav-section-title">Account</div>
+
+    <a href="account-settings" class="nav-item" data-tip="Manage your account">
+      <i class="ph-duotone ph-gear-six"></i>
+      <span class="nav-label">Settings</span>
+    </a>
+    <a href="contact" class="nav-item" data-tip="Talk to a support agent">
+      <i class="ph-duotone ph-lifebuoy"></i>
+      <span class="nav-label">Support</span>
+    </a>
+    <button class="nav-item danger" onclick="firebase.auth().signOut()" data-tip="Sign out of your account">
+      <i class="ph-duotone ph-sign-out"></i>
+      <span class="nav-label">Logout</span>
+    </button>
+  </nav>
+
+  <div class="sidebar-foot">
+    <div class="support-card">
+      <p>Support Available</p>
+      <p>Need help with your investment?</p>
+      <a href="contact" class="gbtn solid" style="width:100%;padding:11px 14px;font-size:.78rem;border-radius:14px;" data-tip="Contact a support agent">
+        <i class="ph-duotone ph-chat-circle-dots"></i>
+        Contact Agent
+      </a>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay"></div>
+
+<main>
+  <div class="wrap">
+    <div class="page-head">
+      <h1>My Wallet</h1>
+      <p>Overview of your assets and earnings.</p>
+    </div>
+
+    <div class="wallet-grid">
+      <section class="balance-hero glass">
+        <div class="hero-top">
+          <span class="hero-label" data-tip="Your current spendable balance">
+            <i class="ph-duotone ph-wallet"></i>
+            Main Balance
+          </span>
+          <span class="chip" data-tip="Currency: US Dollar">
+            <i class="ph-duotone ph-currency-dollar"></i>
+            USD
+          </span>
+        </div>
+        <div class="hero-amount" id="main-balance" data-tip="Available balance in US dollars">
+          <span class="cur">$</span>0.00
+        </div>
+        <p class="hero-sub" data-tip="This is what you can withdraw right now">
+          Ready to spend or withdraw anytime.
+        </p>
+        <div class="hero-actions">
+          <a href="/" class="gbtn solid" data-tip="Go back to your dashboard">
+            <i class="ph-duotone ph-squares-four"></i>
+            Dashboard
+          </a>
+          <a href="transactions" class="gbtn" data-tip="See all transactions">
+            <i class="ph-duotone ph-arrows-left-right"></i>
+            History
+          </a>
+        </div>
+      </section>
+
+      <section class="stat-card glass">
+        <div class="stat-head">
+          <span class="stat-label" data-tip="Lifetime earnings from all sources">Total Earnings</span>
+          <span class="stat-icon info"><i class="ph-duotone ph-chart-line-up"></i></span>
+        </div>
+        <div class="stat-value" id="total-earnings-balance" data-tip="Sum of tasks, referrals, and bonuses">
+          <span class="cur">$</span>0.00
+        </div>
+        <span class="stat-foot" data-tip="Completed earnings added together">
+          All completed earnings combined
+        </span>
+      </section>
+
+      <section class="breakdown glass">
+        <div class="breakdown-head">
+          <h3 data-tip="Detailed breakdown of your earnings">Breakdown</h3>
+          <span>Earnings</span>
+        </div>
+        <div class="breakdown-grid">
+          <div class="bd-item pos" data-tip="Earnings from completing daily tasks">
+            <div class="bd-top"><span class="bd-dot"></span><span class="bd-label">Task Earnings</span></div>
+            <div class="bd-value" id="earnings-balance">$0.00</div>
+            <span class="bd-note">From completed tasks</span>
+          </div>
+          <div class="bd-item info" data-tip="Bonuses earned through referrals">
+            <div class="bd-top"><span class="bd-dot"></span><span class="bd-label">Referrals</span></div>
+            <div class="bd-value" id="referral-balance">$0.00</div>
+            <span class="bd-note">Referral bonuses earned</span>
+          </div>
+          <div class="bd-item warn" data-tip="Promotional and bonus credits">
+            <div class="bd-top"><span class="bd-dot"></span><span class="bd-label">Bonuses</span></div>
+            <div class="bd-value" id="bonuses-balance">$0.00</div>
+            <span class="bd-note">Promotional credits</span>
+          </div>
+          <div class="bd-item neg" data-tip="Total amount you have withdrawn">
+            <div class="bd-top"><span class="bd-dot"></span><span class="bd-label">Withdrawn</span></div>
+            <div class="bd-value" id="withdrawn-balance">$0.00</div>
+            <span class="bd-note">Total payouts received</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<nav class="bottomnav glass" aria-label="Quick navigation">
+  <a href="/" class="bn-item" data-tip="Dashboard">
+    <i class="ph-duotone ph-squares-four"></i>
+    <span>Home</span>
+  </a>
+  <a href="balances" class="bn-item active" data-tip="My Balances">
+    <i class="ph-duotone ph-wallet"></i>
+    <span>Balances</span>
+  </a>
+  <a href="daily-activities" class="bn-item" data-tip="Daily Tasks">
+    <i class="ph-duotone ph-list-checks"></i>
+    <span>Tasks</span>
+  </a>
+  <a href="offers" class="bn-item" data-tip="Special Offers">
+    <i class="ph-duotone ph-gift"></i>
+    <span>Offers</span>
+  </a>
+  <a href="account-settings" class="bn-item" data-tip="Account Settings">
+    <i class="ph-duotone ph-gear-six"></i>
+    <span>Settings</span>
+  </a>
+</nav>
+
+<div id="ctx-menu" class="glass" role="menu" aria-label="Quick actions"></div>
+<div id="tip" role="tooltip"></div>
+<div id="scroll-pill" aria-hidden="true"></div>
+
+<div id="dt-block" role="alertdialog" aria-modal="true">
+  <div class="dt-badge">&#9888;&#65039;</div>
+  <h1 class="dt-title">Access Blocked</h1>
+  <p class="dt-code">ERR_DEVTOOLS_DETECTED :: session terminated</p>
+  <p class="dt-hint">Developer tools are not permitted on this application. Close developer tools to continue.</p>
+  <p class="dt-foot">Malcom Finance &middot; Security</p>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
+    authDomain: "malcolm-finance.firebaseapp.com",
+    projectId: "malcolm-finance",
+    storageBucket: "malcolm-finance.firebasestorage.app",
+    messagingSenderId: "987613399580",
+    appId: "1:987613399580:web:0237b2c8c2c7df54222dd9"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+  let currentUser = null;
+  let userData = null;
+  let allTransactions = [];
+
+  const rootEl = document.documentElement;
+  const menuBtn = document.getElementById('menuBtn');
+  const collapseBtn = document.getElementById('collapseBtn');
+  const overlay = document.getElementById('overlay');
+  const themeBtn = document.getElementById('themeBtn');
+  const themeIcon = document.getElementById('themeIcon');
+  const isDesktop = () => window.matchMedia('(min-width: 1024px)').matches;
+
+  function applyThemeIcon() {
+    const dark = rootEl.classList.contains('dark');
+    themeIcon.className = dark ? 'ph ph-sun' : 'ph ph-moon';
+    themeBtn.setAttribute('data-tip', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+  }
+
+  function updateMenuTip() {
+    if (isDesktop()) {
+      const collapsed = document.body.classList.contains('sb-collapsed');
+      menuBtn.setAttribute('data-tip', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+      menuBtn.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+    } else {
+      menuBtn.setAttribute('data-tip', 'Open menu');
+      menuBtn.setAttribute('aria-label', 'Open menu');
+    }
+  }
+
+  function openNav() { document.body.classList.add('nav-open'); }
+  function closeNav() { document.body.classList.remove('nav-open'); }
+
+  menuBtn.addEventListener('click', () => {
+    if (isDesktop()) {
+      document.body.classList.toggle('sb-collapsed');
+      updateMenuTip();
+    } else {
+      document.body.classList.contains('nav-open') ? closeNav() : openNav();
+    }
+  });
+
+  collapseBtn.addEventListener('click', () => {
+    if (isDesktop()) {
+      document.body.classList.add('sb-collapsed');
+      updateMenuTip();
+    } else {
+      closeNav();
+    }
+  });
+
+  overlay.addEventListener('click', closeNav);
+
+  themeBtn.addEventListener('click', () => {
+    const dark = rootEl.classList.toggle('dark');
+    try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+    applyThemeIcon();
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#070707' : '#f5f5f3');
+  });
+
+  window.addEventListener('resize', () => {
+    if (isDesktop()) closeNav();
+    updateMenuTip();
+  });
+
+  document.querySelectorAll('#sidebar a').forEach(link => {
+    link.addEventListener('click', closeNav);
+  });
+
+  window.toggleFullScreen = function () {
+    if (!document.fullscreenElement) {
+      const el = document.documentElement;
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      else if (el.msRequestFullscreen) el.msRequestFullscreen();
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if (document.msExitFullscreen) document.msExitFullscreen();
+    }
+  };
+
+  window.showAlert = function (message) {
+    window.alert(message);
+  };
+
+  applyThemeIcon();
+  updateMenuTip();
+
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) { window.location.href = 'auth'; return; }
+    currentUser = user;
+    window.currentUser = currentUser;
+    await loadUserData();
+    await loadTransactions();
+    updateBalancesUI();
+  });
+
+  async function loadUserData() {
+    const cached = localStorage.getItem('user_' + currentUser.uid);
+    if (cached) {
+      try { userData = JSON.parse(cached); window.userData = userData; } catch (e) {}
+    }
+    try {
+      const doc = await db.collection('users').doc(currentUser.uid).get();
+      if (doc.exists) {
+        userData = doc.data();
+        userData.id = currentUser.uid;
+        window.userData = userData;
+        localStorage.setItem('user_' + currentUser.uid, JSON.stringify(userData));
+      }
+    } catch (e) {}
+  }
+
+  async function loadTransactions() {
+    const cached = localStorage.getItem('transactions_' + currentUser.uid);
+    if (cached) {
+      try { allTransactions = JSON.parse(cached); } catch (e) {}
+    }
+    try {
+      const snap = await db.collection('transactions').where('userId', '==', currentUser.uid).get();
+      allTransactions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      localStorage.setItem('transactions_' + currentUser.uid, JSON.stringify(allTransactions));
+    } catch (e) {}
+  }
+
+  function fmt(amount) {
+    return '$' + (parseFloat(amount) || 0).toFixed(2);
+  }
+
+  function updateBalancesUI() {
+    if (!userData) return;
+    const main = parseFloat(userData.balance) || 0;
+    let earnings = 0, referral = 0, bonuses = 0, withdrawn = 0;
+
+    allTransactions.filter(t => t.status === 'completed').forEach(t => {
+      const amt = parseFloat(t.amount) || 0;
+      if (t.type === 'earning') earnings += amt;
+      if (t.type === 'referral_bonus') referral += amt;
+      if (t.type === 'bonus') bonuses += amt;
+      if (t.type === 'withdrawal') withdrawn += amt;
     });
 
-    async function loadUserData() {
-      const cached = localStorage.getItem(`user_${currentUser.uid}`);
-      if (cached) {
-        try { userData = JSON.parse(cached); window.userData = userData; updateSidebar?.(); } catch {}
+    const total = earnings + referral + bonuses;
+
+    const mainEl = document.getElementById('main-balance');
+    if (mainEl) mainEl.innerHTML = '<span class="cur">$</span>' + main.toFixed(2);
+
+    const totalEl = document.getElementById('total-earnings-balance');
+    if (totalEl) totalEl.innerHTML = '<span class="cur">$</span>' + total.toFixed(2);
+
+    document.getElementById('earnings-balance').textContent = fmt(earnings);
+    document.getElementById('referral-balance').textContent = fmt(referral);
+    document.getElementById('bonuses-balance').textContent = fmt(bonuses);
+    document.getElementById('withdrawn-balance').textContent = fmt(withdrawn);
+  }
+</script>
+
+<script>
+  (function () {
+    const tip = document.getElementById('tip');
+    let target = null;
+
+    function hide() {
+      target = null;
+      tip.classList.remove('show');
+    }
+
+    function show(el) {
+      const text = el.getAttribute('data-tip');
+      if (!text) return;
+      target = el;
+      tip.textContent = text;
+      tip.classList.remove('below');
+      tip.classList.add('show');
+
+      const r = el.getBoundingClientRect();
+      const tw = tip.offsetWidth;
+      const th = tip.offsetHeight;
+
+      let placeBelow = r.top - th - 14 < 4;
+      if (placeBelow) tip.classList.add('below');
+
+      let left = r.left + r.width / 2;
+      left = Math.min(Math.max(left, tw / 2 + 8), window.innerWidth - tw / 2 - 8);
+
+      const top = placeBelow ? r.bottom : r.top;
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+    }
+
+    document.addEventListener('mouseover', function (e) {
+      const el = e.target.closest('[data-tip]');
+      if (el && el !== target) show(el);
+    }, true);
+
+    document.addEventListener('mouseout', function (e) {
+      const el = e.target.closest('[data-tip]');
+      if (el && !el.contains(e.relatedTarget)) hide();
+    }, true);
+
+    document.addEventListener('focusin', function (e) {
+      const el = e.target.closest('[data-tip]');
+      if (el) show(el);
+    });
+
+    document.addEventListener('focusout', hide);
+    document.addEventListener('scroll', hide, true);
+    window.addEventListener('resize', hide);
+    document.addEventListener('click', hide, true);
+  })();
+</script>
+
+<script>
+  (function () {
+    const pill = document.getElementById('scroll-pill');
+    if (!pill) return;
+
+    let hideTimer = null;
+    let drag = null;
+
+    function vh() { return window.innerHeight; }
+    function dh() { return Math.max(document.documentElement.scrollHeight, document.body.scrollHeight); }
+    function maxScroll() { return Math.max(0, dh() - vh()); }
+    function trackTop() { return 14; }
+    function trackBottom() { return window.innerWidth < 768 ? 104 : 18; }
+
+    function layout() {
+      const total = dh();
+      const view = vh();
+
+      if (total <= view + 4) {
+        pill.classList.remove('visible');
+        pill.style.height = '0px';
+        return;
       }
-      try {
-        const doc = await db.collection('users').doc(currentUser.uid).get();
-        if (doc.exists) {
-          userData = doc.data(); userData.id = currentUser.uid;
-          window.userData = userData;
-          localStorage.setItem(`user_${currentUser.uid}`, JSON.stringify(userData));
-          updateSidebar?.();
+
+      const tTop = trackTop();
+      const tBot = trackBottom();
+      const tH = Math.max(40, view - tTop - tBot);
+      const ratio = view / total;
+      const h = Math.max(44, Math.round(tH * ratio));
+      const travel = Math.max(1, tH - h);
+      const progress = maxScroll() > 0 ? window.scrollY / maxScroll() : 0;
+      const y = tTop + progress * travel;
+
+      pill.style.height = h + 'px';
+      pill.style.transform = 'translateY(' + y + 'px)';
+    }
+
+    function reveal() {
+      pill.classList.add('visible');
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(function () {
+        if (!drag) pill.classList.remove('visible');
+      }, 1100);
+    }
+
+    window.addEventListener('scroll', function () { layout(); reveal(); }, { passive: true });
+    window.addEventListener('resize', function () { layout(); reveal(); });
+
+    pill.addEventListener('pointerenter', function () { pill.classList.add('hover'); });
+    pill.addEventListener('pointerleave', function () {
+      if (!drag) pill.classList.remove('hover');
+    });
+
+    pill.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      try { pill.setPointerCapture(e.pointerId); } catch (err) {}
+      drag = { y: e.clientY, scroll: window.scrollY };
+      pill.classList.add('dragging');
+      clearTimeout(hideTimer);
+    });
+
+    pill.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      const tTop = trackTop();
+      const tBot = trackBottom();
+      const tH = Math.max(40, vh() - tTop - tBot);
+      const h = pill.offsetHeight;
+      const travel = Math.max(1, tH - h);
+      const dy = e.clientY - drag.y;
+      window.scrollTo(0, drag.scroll + (dy / travel) * maxScroll());
+    });
+
+    function endDrag(e) {
+      if (!drag) return;
+      drag = null;
+      pill.classList.remove('dragging');
+      try { pill.releasePointerCapture(e.pointerId); } catch (err) {}
+      hideTimer = setTimeout(function () { pill.classList.remove('visible'); }, 900);
+    }
+
+    pill.addEventListener('pointerup', endDrag);
+    pill.addEventListener('pointercancel', endDrag);
+
+    if (window.ResizeObserver) {
+      new ResizeObserver(function () { layout(); }).observe(document.body);
+    }
+
+    window.addEventListener('load', function () { layout(); reveal(); });
+    layout();
+    setTimeout(reveal, 400);
+  })();
+</script>
+
+<script>
+  (function () {
+    const ctxMenu = document.getElementById('ctx-menu');
+    let pressTimer = null;
+    let pressStart = null;
+    let longPressed = false;
+
+    const items = [
+      { icon: 'ph-arrow-clockwise', label: 'Reload', run: () => window.location.reload() },
+      { icon: 'ph-wallet', label: 'Wallet', run: () => { window.location.href = 'balances'; } },
+      { icon: 'ph-list-checks', label: 'Tasks', run: () => { window.location.href = 'daily-activities'; } },
+      { icon: 'ph-gift', label: 'Offers', run: () => { window.location.href = 'offers'; } },
+      { icon: 'ph-gear-six', label: 'Settings', run: () => { window.location.href = 'account-settings'; } },
+      { sep: true },
+      { icon: 'ph-question', label: 'Help', run: () => showAlert('Need help? Reach us at support@malcomfinance.com or use the Contact Agent button in the sidebar.') },
+      { icon: 'ph-lifebuoy', label: 'Support', run: () => { window.location.href = 'contact'; } }
+    ];
+
+    function buildMenu() {
+      ctxMenu.innerHTML = '';
+      items.forEach(item => {
+        if (item.sep) {
+          const sep = document.createElement('div');
+          sep.className = 'ctx-sep';
+          ctxMenu.appendChild(sep);
+          return;
         }
-      } catch {}
-    }
-
-    async function loadTransactions() {
-      const cached = localStorage.getItem(`transactions_${currentUser.uid}`);
-      if (cached) {
-        try { allTransactions = JSON.parse(cached); } catch {}
-      }
-      try {
-        const snap = await db.collection('transactions').where('userId', '==', currentUser.uid).get();
-        allTransactions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        localStorage.setItem(`transactions_${currentUser.uid}`, JSON.stringify(allTransactions));
-      } catch {}
-    }
-
-    function updateBalancesUI() {
-      if (!userData) return;
-      let main = parseFloat(userData.balance) || 0;
-      let earnings = 0, referral = 0, bonuses = 0, withdrawn = 0;
-      allTransactions.filter(t => t.status === 'completed').forEach(t => {
-        const amt = parseFloat(t.amount) || 0;
-        if (t.type === 'earning') earnings += amt;
-        if (t.type === 'referral_bonus') referral += amt;
-        if (t.type === 'bonus') bonuses += amt;
-        if (t.type === 'withdrawal') withdrawn += amt;
+        const btn = document.createElement('button');
+        btn.className = 'ctx-item';
+        btn.type = 'button';
+        btn.innerHTML = '<i class="ph ' + item.icon + '"></i><span>' + item.label + '</span>';
+        btn.addEventListener('click', () => {
+          hideMenu();
+          item.run();
+        });
+        ctxMenu.appendChild(btn);
       });
-      const total = earnings + referral + bonuses;
-      document.getElementById('main-balance').innerHTML = `$${main.toFixed(2)}`;
-      document.getElementById('earnings-balance').innerHTML = `$${earnings.toFixed(2)}`;
-      document.getElementById('referral-balance').innerHTML = `$${referral.toFixed(2)}`;
-      document.getElementById('bonuses-balance').innerHTML = `$${bonuses.toFixed(2)}`;
-      document.getElementById('withdrawn-balance').innerHTML = `$${withdrawn.toFixed(2)}`;
-      document.getElementById('total-earnings-balance').innerHTML = `$${total.toFixed(2)}`;
     }
-  </script>
 
-  <main id="page-root" class="max-w-xl mx-auto px-6 pt-10">
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h1 class="text-2xl font-bold">My Wallet</h1>
-        <p class="text-sm text-muted">Overview of your assets</p>
-      </div>
-    </div>
+    function showMenu(x, y) {
+      document.getElementById('tip').classList.remove('show');
+      ctxMenu.classList.add('open');
+      ctxMenu.style.left = '0px';
+      ctxMenu.style.top = '0px';
+      requestAnimationFrame(() => {
+        const rect = ctxMenu.getBoundingClientRect();
+        const maxX = window.innerWidth - rect.width - 12;
+        const maxY = window.innerHeight - rect.height - 12;
+        ctxMenu.style.left = Math.max(8, Math.min(x, maxX)) + 'px';
+        ctxMenu.style.top = Math.max(8, Math.min(y, maxY)) + 'px';
+      });
+    }
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-      <!-- Main Balance -->
-      <div class="card p-6 shadow-sm hover:shadow-md transition">
-        <div class="flex items-center mb-3">
-            <div class="w-8 h-8 rounded-full soft-accent-bg flex items-center justify-center mr-3">
-                <i class="fas fa-wallet accent-text text-sm"></i>
-            </div>
-            <h4 class="text-[10px] font-bold uppercase tracking-widest text-muted">Main Balance</h4>
-        </div>
-        <div class="text-3xl font-bold accent-text tracking-tight" id="main-balance">$0.00</div>
-      </div>
+    function hideMenu() {
+      ctxMenu.classList.remove('open');
+    }
 
-      <!-- Total Earnings -->
-      <div class="card p-6 shadow-sm hover:shadow-md transition">
-         <div class="flex items-center mb-3">
-            <div class="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mr-3">
-                <i class="fas fa-chart-line text-blue-500 text-sm"></i>
-            </div>
-            <h4 class="text-[10px] font-bold uppercase tracking-widest text-muted">Total Earnings</h4>
-        </div>
-        <div class="text-3xl font-bold text-blue-500 tracking-tight" id="total-earnings-balance">$0.00</div>
-      </div>
+    buildMenu();
 
-      <!-- Breakdown Grid -->
-      <div class="card p-6 shadow-sm hover:shadow-md transition md:col-span-2 grid grid-cols-2 gap-6">
-          
-          <div>
-            <h4 class="text-[10px] font-bold uppercase tracking-widest text-muted mb-1">Task Earnings</h4>
-            <div class="text-xl font-bold" id="earnings-balance">$0.00</div>
-          </div>
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showMenu(e.clientX, e.clientY);
+    });
 
-          <div>
-            <h4 class="text-[10px] font-bold uppercase tracking-widest text-muted mb-1">Referrals</h4>
-            <div class="text-xl font-bold" id="referral-balance">$0.00</div>
-          </div>
+    document.addEventListener('mousedown', (e) => {
+      if (ctxMenu.classList.contains('open') && !ctxMenu.contains(e.target)) hideMenu();
+    });
 
-          <div>
-            <h4 class="text-[10px] font-bold uppercase tracking-widest text-muted mb-1">Bonuses</h4>
-            <div class="text-xl font-bold" id="bonuses-balance">$0.00</div>
-          </div>
+    document.addEventListener('scroll', hideMenu, true);
+    window.addEventListener('resize', hideMenu);
 
-          <div>
-            <h4 class="text-[10px] font-bold uppercase tracking-widest text-muted mb-1">Withdrawn</h4>
-            <div class="text-xl font-bold text-red-400" id="withdrawn-balance">$0.00</div>
-          </div>
+    document.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0];
+      pressStart = { x: t.clientX, y: t.clientY };
+      longPressed = false;
+      pressTimer = setTimeout(() => {
+        longPressed = true;
+        showMenu(pressStart.x, pressStart.y);
+      }, 600);
+    }, { passive: true });
 
-      </div>
-    </div>
-  </main>
-  
-  <script src="sidebar.js"></script>
+    document.addEventListener('touchmove', (e) => {
+      if (!pressStart) return;
+      const t = e.touches[0];
+      const dx = Math.abs(t.clientX - pressStart.x);
+      const dy = Math.abs(t.clientY - pressStart.y);
+      if (dx > 10 || dy > 10) {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+        pressStart = null;
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchend', () => {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+      pressStart = null;
+    }, { passive: true });
+
+    document.addEventListener('touchcancel', () => {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+      pressStart = null;
+    }, { passive: true });
+
+    document.addEventListener('click', (e) => {
+      if (longPressed) {
+        longPressed = false;
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      if (ctxMenu.classList.contains('open') && !ctxMenu.contains(e.target)) hideMenu();
+    }, true);
+  })();
+</script>
+
+<script>
+  (function () {
+    let locked = false;
+    const THRESHOLD = 200;
+
+    function devtoolsOpen() {
+      const w = window.outerWidth - window.innerWidth;
+      const h = window.outerHeight - window.innerHeight;
+      return w > THRESHOLD || h > THRESHOLD;
+    }
+
+    function loop() {
+      if (!locked) return;
+      if (!devtoolsOpen()) {
+        locked = false;
+        document.body.classList.remove('dt-open');
+        return;
+      }
+      setTimeout(function () {
+        if (!locked) return;
+        alert('Close developer tools to continue');
+        loop();
+      }, 260);
+    }
+
+    function check() {
+      const open = devtoolsOpen();
+      if (open && !locked) {
+        locked = true;
+        document.body.classList.add('dt-open');
+        loop();
+      }
+    }
+
+    setInterval(check, 800);
+    window.addEventListener('resize', check);
+
+    document.addEventListener('keydown', function (e) {
+      const key = (e.key || '').toUpperCase();
+      if (e.key === 'F12' ||
+          (e.ctrlKey && e.shiftKey && (key === 'I' || key === 'J' || key === 'C')) ||
+          (e.ctrlKey && key === 'U')) {
+        e.preventDefault();
+        e.stopPropagation();
+        check();
+        return false;
+      }
+    }, true);
+  })();
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
+</script>
 </body>
 </html>
