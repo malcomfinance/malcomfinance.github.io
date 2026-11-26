@@ -1,19 +1,19 @@
 {
-  "name": "Malcom Finance",
-  "short_name": "Malcom",
+  "name": "Malcom Ventures",
+  "short_name": "MVent",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4A90E2",
   "icons": [
     {
-      "src": "favicon.png",
+      "src": "logo.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "favicon.png",
+      "src": "logo.png",
       "sizes": "512x512",
       "type": "image/png"
     }
