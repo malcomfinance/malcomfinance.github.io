@@ -446,7 +446,6 @@ main {
   color: var(--fg-soft);
 }
 
-/* ---------- Countdown card ---------- */
 .countdown-card {
   padding: 20px;
   border-radius: 28px;
@@ -509,20 +508,14 @@ main {
   transition: color .3s ease;
 }
 
-.countdown-time.urgent {
-  animation: pulseUrgent 1s ease-in-out infinite;
-}
+.countdown-time.urgent { animation: pulseUrgent 1s ease-in-out infinite; }
 
 @keyframes pulseUrgent {
   0%, 100% { opacity: 1; }
   50% { opacity: .55; }
 }
 
-.countdown-progress {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+.countdown-progress { display: flex; flex-direction: column; gap: 8px; }
 
 .progress-bar {
   height: 6px;
@@ -553,40 +546,13 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
   color: var(--fg-soft);
 }
 
-.progress-meta strong {
-  color: var(--fg);
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
+.progress-meta strong { color: var(--fg); font-weight: 800; font-variant-numeric: tabular-nums; }
 
-/* ---------- Quote card ---------- */
-.quote-card {
-  padding: 20px 22px;
-  border-radius: 24px;
-  margin-bottom: 16px;
-}
+.quote-card { padding: 20px 22px; border-radius: 24px; margin-bottom: 16px; }
+.quote-text { margin: 0; font-size: .9rem; line-height: 1.6; font-style: italic; color: var(--fg-soft); }
+.quote-author { margin: 8px 0 0; font-size: .78rem; font-weight: 800; color: var(--fg); }
 
-.quote-text {
-  margin: 0;
-  font-size: .9rem;
-  line-height: 1.6;
-  font-style: italic;
-  color: var(--fg-soft);
-}
-
-.quote-author {
-  margin: 8px 0 0;
-  font-size: .78rem;
-  font-weight: 800;
-  color: var(--fg);
-}
-
-/* ---------- Activity feed ---------- */
-.activities-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+.activities-container { display: flex; flex-direction: column; gap: 12px; }
 
 .activity-card {
   border-radius: 26px;
@@ -632,13 +598,7 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
   border-bottom: 1px solid var(--line);
 }
 
-.activity-type {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-  flex: 1;
-}
+.activity-type { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
 
 .activity-icon {
   width: 40px;
@@ -666,12 +626,7 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
   text-overflow: ellipsis;
 }
 
-.activity-header-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: none;
-}
+.activity-header-right { display: flex; align-items: center; gap: 8px; flex: none; }
 
 .activity-reward {
   display: inline-flex;
@@ -698,22 +653,11 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
   flex: none;
 }
 
-.status-completed {
-  background: var(--solid);
-  color: var(--solid-fg);
-}
+.status-completed { background: var(--solid); color: var(--solid-fg); }
+.status-pending { background: var(--btn-bg); color: var(--fg-soft); border: 1px solid var(--glass-border); }
 
-.status-pending {
-  background: var(--btn-bg);
-  color: var(--fg-soft);
-  border: 1px solid var(--glass-border);
-}
+.activity-content { padding: 16px 18px 18px; }
 
-.activity-content {
-  padding: 16px 18px 18px;
-}
-
-/* ---------- Video ---------- */
 .video-wrapper { display: flex; flex-direction: column; gap: 10px; }
 
 .video-container {
@@ -767,19 +711,9 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.video-loading p {
-  margin: 0;
-  font-size: .78rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, .82);
-}
+.video-loading p { margin: 0; font-size: .78rem; font-weight: 600; color: rgba(255, 255, 255, .82); }
 
-.custom-video-controls,
-.youtube-controls {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
+.custom-video-controls, .youtube-controls { display: flex; justify-content: center; gap: 10px; }
 
 .custom-control-btn {
   width: 46px;
@@ -801,8 +735,9 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
   transition: transform .2s ease, background .2s ease;
 }
 
-.custom-control-btn:hover { background: var(--btn-hover); transform: scale(1.06); }
-.custom-control-btn:active { transform: scale(.94); }
+.custom-control-btn:hover:not(:disabled) { background: var(--btn-hover); transform: scale(1.06); }
+.custom-control-btn:active:not(:disabled) { transform: scale(.94); }
+.custom-control-btn:disabled { opacity: .55; cursor: not-allowed; }
 
 .video-hint {
   margin: 10px 0 0;
@@ -826,7 +761,6 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
 
 .video-progress-label i { font-size: .95rem; }
 
-/* ---------- Text ---------- */
 .text-content {
   max-height: 260px;
   overflow-y: auto;
@@ -846,7 +780,6 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
 .text-content::-webkit-scrollbar { width: 6px; }
 .text-content::-webkit-scrollbar-thumb { background: var(--line); border-radius: 6px; }
 
-/* ---------- Link ---------- */
 .link-container {
   padding: 16px;
   border-radius: 16px;
@@ -856,12 +789,7 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
   backdrop-filter: blur(6px) saturate(180%);
 }
 
-.link-container p {
-  margin: 0 0 12px;
-  font-size: .85rem;
-  line-height: 1.55;
-  color: var(--fg-soft);
-}
+.link-container p { margin: 0 0 12px; font-size: .85rem; line-height: 1.55; color: var(--fg-soft); }
 
 .link-button {
   display: inline-flex;
@@ -881,7 +809,6 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
 .link-button:hover { transform: translateY(-2px); opacity: .92; }
 .link-button i { font-size: 1rem; }
 
-/* ---------- Share ---------- */
 .share-container {
   padding: 16px;
   border-radius: 16px;
@@ -891,18 +818,9 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
   backdrop-filter: blur(6px) saturate(180%);
 }
 
-.share-container > p {
-  margin: 0 0 12px;
-  font-size: .85rem;
-  line-height: 1.55;
-  color: var(--fg-soft);
-}
+.share-container > p { margin: 0 0 12px; font-size: .85rem; line-height: 1.55; color: var(--fg-soft); }
 
-.share-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
+.share-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 
 .share-button {
   display: flex;
@@ -930,17 +848,9 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
 .share-button:active { transform: translateY(0) scale(.97); }
 .share-button i { font-size: 1.1rem; }
 
-.share-hint {
-  margin-top: 10px;
-  text-align: center;
-  font-size: .76rem;
-  font-weight: 600;
-  color: var(--fg-soft);
-}
-
+.share-hint { margin-top: 10px; text-align: center; font-size: .76rem; font-weight: 600; color: var(--fg-soft); }
 .share-hint strong { color: var(--fg); font-weight: 800; }
 
-/* ---------- Survey ---------- */
 .survey-container {
   padding: 16px;
   border-radius: 16px;
@@ -950,13 +860,7 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
   backdrop-filter: blur(6px) saturate(180%);
 }
 
-.survey-question {
-  font-size: .88rem;
-  font-weight: 700;
-  color: var(--fg);
-  margin-bottom: 14px;
-  line-height: 1.5;
-}
+.survey-question { font-size: .88rem; font-weight: 700; color: var(--fg); margin-bottom: 14px; line-height: 1.5; }
 
 .survey-option {
   padding: 13px 16px;
@@ -981,7 +885,6 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
   box-shadow: 0 10px 22px rgba(0, 0, 0, .22);
 }
 
-/* ---------- Blog / Custom ---------- */
 .info-box {
   padding: 16px;
   border-radius: 16px;
@@ -991,20 +894,8 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
   backdrop-filter: blur(6px) saturate(180%);
 }
 
-.info-box h4 {
-  margin: 0 0 6px;
-  font-size: .88rem;
-  font-weight: 800;
-  color: var(--fg);
-  line-height: 1.5;
-}
-
-.info-box p {
-  margin: 0;
-  font-size: .82rem;
-  line-height: 1.55;
-  color: var(--fg-soft);
-}
+.info-box h4 { margin: 0 0 6px; font-size: .88rem; font-weight: 800; color: var(--fg); line-height: 1.5; }
+.info-box p { margin: 0; font-size: .82rem; line-height: 1.55; color: var(--fg-soft); }
 
 .info-box .info-hint {
   margin-top: 10px;
@@ -1017,13 +908,8 @@ html.dark .progress-fill { box-shadow: 0 0 14px rgba(255, 255, 255, .28); }
   color: var(--fg-soft);
 }
 
-.info-box .info-hint i {
-  font-size: .95rem;
-  flex: none;
-  margin-top: 1px;
-}
+.info-box .info-hint i { font-size: .95rem; flex: none; margin-top: 1px; }
 
-/* ---------- Submitted overlay ---------- */
 .submitted-overlay {
   position: absolute;
   inset: 0;
@@ -1063,22 +949,9 @@ html.dark .submitted-overlay { background: rgba(0, 0, 0, .76); }
   50% { transform: translateY(-6px); }
 }
 
-.submitted-title {
-  font-size: 1.05rem;
-  font-weight: 800;
-  letter-spacing: -.01em;
-  margin: 0;
-}
+.submitted-title { font-size: 1.05rem; font-weight: 800; letter-spacing: -.01em; margin: 0; }
+.submitted-message { margin: 0; max-width: 320px; font-size: .82rem; line-height: 1.55; color: rgba(255, 255, 255, .72); }
 
-.submitted-message {
-  margin: 0;
-  max-width: 320px;
-  font-size: .82rem;
-  line-height: 1.55;
-  color: rgba(255, 255, 255, .72);
-}
-
-/* ---------- Empty & loading ---------- */
 .empty-state {
   padding: 40px 24px 44px;
   border-radius: 30px;
@@ -1108,20 +981,8 @@ html.dark .submitted-overlay { background: rgba(0, 0, 0, .76); }
     inset -1px -1px 1px -1px var(--rim-2);
 }
 
-.empty-title {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 800;
-  letter-spacing: -.02em;
-}
-
-.empty-text {
-  margin: 6px 0 20px;
-  max-width: 360px;
-  font-size: .84rem;
-  line-height: 1.6;
-  color: var(--fg-soft);
-}
+.empty-title { margin: 0; font-size: 1.1rem; font-weight: 800; letter-spacing: -.02em; }
+.empty-text { margin: 6px 0 20px; max-width: 360px; font-size: .84rem; line-height: 1.6; color: var(--fg-soft); }
 
 .skeleton {
   padding: 16px 18px;
@@ -1136,11 +997,7 @@ html.dark .submitted-overlay { background: rgba(0, 0, 0, .76); }
   animation: skelPulse 1.6s ease-in-out infinite;
 }
 
-.skeleton-block {
-  border-radius: 8px;
-  background: var(--line);
-}
-
+.skeleton-block { border-radius: 8px; background: var(--line); }
 .skeleton-icon { width: 40px; height: 40px; border-radius: 12px; flex: none; }
 .skeleton-lines { flex: 1; display: flex; flex-direction: column; gap: 8px; }
 .skeleton-line { height: 11px; }
@@ -1151,7 +1008,6 @@ html.dark .submitted-overlay { background: rgba(0, 0, 0, .76); }
   50% { opacity: .85; }
 }
 
-/* ---------- Submit ---------- */
 .submit-section {
   margin-top: 22px;
   display: flex;
@@ -1160,21 +1016,9 @@ html.dark .submitted-overlay { background: rgba(0, 0, 0, .76); }
   gap: 10px;
 }
 
-.submit-section .gbtn {
-  max-width: 420px;
-  width: 100%;
-  padding: 16px 24px;
-  font-size: .9rem;
-}
+.submit-section .gbtn { max-width: 420px; width: 100%; padding: 16px 24px; font-size: .9rem; }
+.submit-hint { font-size: .76rem; font-weight: 500; color: var(--fg-soft); text-align: center; }
 
-.submit-hint {
-  font-size: .76rem;
-  font-weight: 500;
-  color: var(--fg-soft);
-  text-align: center;
-}
-
-/* ---------- Modals ---------- */
 .modal {
   position: fixed;
   inset: 0;
@@ -1199,31 +1043,11 @@ html.dark .submitted-overlay { background: rgba(0, 0, 0, .76); }
   margin: auto;
 }
 
-.modal-title {
-  margin: 0 0 14px;
-  font-size: 1.1rem;
-  font-weight: 800;
-  letter-spacing: -.015em;
-  text-align: center;
-}
-
-.modal-body {
-  margin: 0 0 20px;
-  font-size: .88rem;
-  line-height: 1.6;
-  color: var(--fg-soft);
-  text-align: center;
-}
-
-.modal-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
+.modal-title { margin: 0 0 14px; font-size: 1.1rem; font-weight: 800; letter-spacing: -.015em; text-align: center; }
+.modal-body { margin: 0 0 20px; font-size: .88rem; line-height: 1.6; color: var(--fg-soft); text-align: center; }
+.modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .modal-actions.single { grid-template-columns: 1fr; }
 
-/* ---------- Bottom nav ---------- */
 .bottomnav {
   position: fixed;
   left: 12px;
@@ -1259,7 +1083,6 @@ html.dark .submitted-overlay { background: rgba(0, 0, 0, .76); }
 .bn-item i { font-size: 1.35rem; }
 .bn-item.active { color: var(--nav-active-fg); background: var(--nav-active-bg); }
 
-/* ---------- Context menu ---------- */
 #ctx-menu {
   position: fixed;
   z-index: 350;
@@ -1301,7 +1124,6 @@ html.dark .submitted-overlay { background: rgba(0, 0, 0, .76); }
 
 .ctx-sep { height: 1px; margin: 6px 8px; background: var(--line); }
 
-/* ---------- Tooltip ---------- */
 #tip {
   position: fixed;
   left: 0;
@@ -1332,7 +1154,6 @@ html.dark .submitted-overlay { background: rgba(0, 0, 0, .76); }
 #tip.below { transform: translate(-50%, 8px) scale(.96); }
 #tip.below.show { transform: translate(-50%, 8px) scale(1); }
 
-/* ---------- Scroll pill ---------- */
 #scroll-pill {
   position: fixed;
   right: 9px;
@@ -1383,11 +1204,9 @@ html.dark .submitted-overlay { background: rgba(0, 0, 0, .76); }
 }
 
 #scroll-pill.visible { opacity: .6; }
-#scroll-pill.hover,
-#scroll-pill.dragging { opacity: 1; width: 13px; }
+#scroll-pill.hover, #scroll-pill.dragging { opacity: 1; width: 13px; }
 #scroll-pill.dragging { cursor: grabbing; }
 
-/* ---------- Devtools ---------- */
 #dt-block {
   position: fixed;
   inset: 0;
@@ -1421,13 +1240,7 @@ body.dt-open #dt-block { display: flex; }
   margin-bottom: 10px;
 }
 
-#dt-block .dt-title {
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -.02em;
-  margin: 0;
-}
-
+#dt-block .dt-title { font-size: 22px; font-weight: 800; letter-spacing: -.02em; margin: 0; }
 #dt-block .dt-code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 12px;
@@ -1437,22 +1250,8 @@ body.dt-open #dt-block { display: flex; }
   max-width: 520px;
   margin: 0;
 }
-
-#dt-block .dt-hint {
-  font-size: 13.5px;
-  color: #9c9c98;
-  max-width: 400px;
-  line-height: 1.6;
-  margin: 0;
-}
-
-#dt-block .dt-foot {
-  font-size: 10px;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: #5f5f5c;
-  margin: 18px 0 0;
-}
+#dt-block .dt-hint { font-size: 13.5px; color: #9c9c98; max-width: 400px; line-height: 1.6; margin: 0; }
+#dt-block .dt-foot { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: #5f5f5c; margin: 18px 0 0; }
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
@@ -1474,9 +1273,7 @@ body.dt-open #dt-block { display: flex; }
   .youtube-iframe { height: 240px; }
 }
 
-@media (min-width: 768px) {
-  .brand-mini { display: none; }
-}
+@media (min-width: 768px) { .brand-mini { display: none; } }
 
 @media (min-width: 1024px) {
   .sidebar { transform: none; width: var(--sb-w); }
@@ -1502,9 +1299,7 @@ body.dt-open #dt-block { display: flex; }
   body.sb-collapsed .sidebar-nav { overflow: visible; padding: 16px 10px; }
 }
 
-@media (min-width: 1600px) {
-  .wrap { max-width: 1080px; }
-}
+@media (min-width: 1600px) { .wrap { max-width: 1080px; } }
 </style>
 </head>
 
@@ -1519,7 +1314,7 @@ body.dt-open #dt-block { display: flex; }
 
 <div class="scene" aria-hidden="true">
   <video class="scene-video" id="scene-video" autoplay loop muted playsinline preload="auto">
-    <source src="/money-c.mp4" type="video/mp4">
+    <source src="https://www.shutterstock.com/shutterstock/videos/3995007179/preview/stock-footage-abstract-background-with-reeded-glass-effect-k-seamless-loop-d-animation.webm" type="video/webm">
   </video>
   <div class="scene-tint"></div>
   <div class="stripes"></div>
@@ -1812,7 +1607,6 @@ body.dt-open #dt-block { display: flex; }
   applyThemeIcon();
   updateMenuTip();
 
-  /* ---------- Video safety net ---------- */
   (function () {
     const video = document.getElementById('scene-video');
     if (!video) return;
@@ -1825,21 +1619,16 @@ body.dt-open #dt-block { display: flex; }
     const source = video.querySelector('source');
     if (source) source.addEventListener('error', fail);
     video.addEventListener('error', fail);
-    video.addEventListener('stalled', () => {
-      setTimeout(() => { if (video.readyState < 2) fail(); }, 4000);
-    });
+    video.addEventListener('stalled', () => { setTimeout(() => { if (video.readyState < 2) fail(); }, 4000); });
     const tryPlay = () => {
       const p = video.play();
-      if (p && p.catch) p.catch(() => {
-        setTimeout(() => { if (video.readyState < 2) fail(); }, 2500);
-      });
+      if (p && p.catch) p.catch(() => { setTimeout(() => { if (video.readyState < 2) fail(); }, 2500); });
     };
     if (video.readyState >= 1) tryPlay();
     else video.addEventListener('loadedmetadata', tryPlay, { once: true });
     setTimeout(() => { if (video.readyState < 2) fail(); }, 6000);
   })();
 
-  /* ---------- Activity state ---------- */
   let currentUser = null;
   let userData = null;
   let todayActivities = [];
@@ -2167,15 +1956,22 @@ body.dt-open #dt-block { display: flex; }
           }
           return (
             '<div class="info-box">' +
-              '<div class="info-hint" style="border-top:none;padding-top:0;margin-top:0;color:var(--neg)"><i class="ph ph-warning"></i> Unable to load YouTube video.</div>' +
+              '<div class="info-hint" style="border-top:none;padding-top:0;margin-top:0;color:var(--neg)"><i class="ph ph-warning"></i> Unable to load YouTube video — the URL could not be parsed.</div>' +
             '</div>'
           );
         }
         return (
           '<div class="video-wrapper">' +
             '<div class="video-container">' +
-              '<video class="activity-video" id="video-' + index + '"' + (activity.videoThumbnail ? ' poster="' + activity.videoThumbnail + '"' : '') + ' playsinline><source src="' + videoUrl + '" type="video/mp4"></video>' +
-              '<div class="video-loading" id="video-loading-' + index + '" style="display:none"><div class="loader-spinner"></div><p>Loading video…</p></div>' +
+              '<video class="activity-video" id="video-' + index + '"' +
+                (activity.videoThumbnail ? ' poster="' + activity.videoThumbnail + '"' : '') +
+                ' preload="metadata" playsinline>' +
+                '<source src="' + videoUrl + '">' +
+              '</video>' +
+              '<div class="video-loading" id="video-loading-' + index + '" style="display:none">' +
+                '<div class="loader-spinner"></div>' +
+                '<p>Loading video…</p>' +
+              '</div>' +
             '</div>' +
             '<div class="custom-video-controls">' +
               '<button class="custom-control-btn" id="play-pause-' + index + '" data-tip="Play or pause the video"><i class="ph ph-play"></i></button>' +
@@ -2261,20 +2057,127 @@ body.dt-open #dt-block { display: flex; }
     });
   }
 
+  /* ---------- Robust raw video player ---------- */
   function setupRegularVideoObserver(index) {
     const video = document.getElementById(`video-${index}`);
     if (!video) return;
-    videoPlayers[index] = { element: video, isPlaying: false, progress: 0, completed: false };
+
     const playPauseBtn = document.getElementById(`play-pause-${index}`);
-    if (playPauseBtn) playPauseBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleRegularVideoPlay(index); });
-    video.controls = false;
-    video.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; });
+    const loadingEl = document.getElementById(`video-loading-${index}`);
+    const progressEl = document.getElementById(`video-progress-${index}`);
+    const sourceEl = video.querySelector('source');
+
+    videoPlayers[index] = {
+      element: video,
+      isPlaying: false,
+      progress: 0,
+      completed: false,
+      hasError: false,
+      duration: 0
+    };
+
+    function setLoading(show) {
+      if (!loadingEl) return;
+      if (show) loadingEl.style.display = 'flex';
+      else loadingEl.style.display = 'none';
+    }
+
+    function setErrorState(message) {
+      if (videoPlayers[index].hasError) return;
+      videoPlayers[index].hasError = true;
+      if (loadingEl) {
+        loadingEl.innerHTML =
+          '<div style="text-align:center;padding:16px;max-width:90%">' +
+            '<i class="ph ph-warning-circle" style="font-size:2rem;color:#fff;display:block;margin-bottom:10px"></i>' +
+            '<p style="color:#fff;font-size:.82rem;margin:0;line-height:1.4">' + message + '</p>' +
+          '</div>';
+        loadingEl.style.display = 'flex';
+      }
+      if (playPauseBtn) {
+        playPauseBtn.disabled = true;
+        playPauseBtn.innerHTML = '<i class="ph ph-warning"></i>';
+      }
+      if (progressEl) progressEl.textContent = 'Error';
+    }
+
+    function attemptPlay() {
+      if (videoPlayers[index].hasError) return;
+      let promise;
+      try {
+        promise = video.play();
+      } catch (e) {
+        setErrorState('Playback was blocked by the browser.');
+        return;
+      }
+      if (promise && typeof promise.catch === 'function') {
+        promise.catch((err) => {
+          console.warn('Video play rejected:', err);
+          if (!video.muted) {
+            video.muted = true;
+            const p2 = video.play();
+            if (p2 && typeof p2.catch === 'function') {
+              p2.catch(() => {
+                video.controls = true;
+              });
+            }
+          } else {
+            video.controls = true;
+          }
+        });
+      }
+    }
+
+    if (playPauseBtn) {
+      playPauseBtn.disabled = false;
+      playPauseBtn.innerHTML = '<i class="ph ph-play"></i>';
+      playPauseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (videoPlayers[index].hasError) return;
+        if (video.paused || video.ended) attemptPlay();
+        else video.pause();
+      });
+    }
+
+    video.addEventListener('loadedmetadata', () => {
+      videoPlayers[index].duration = video.duration || 0;
+      setLoading(false);
+    });
+
+    video.addEventListener('loadeddata', () => setLoading(false));
+    video.addEventListener('canplay', () => setLoading(false));
+
+    video.addEventListener('playing', () => {
+      setLoading(false);
+      videoPlayers[index].isPlaying = true;
+      if (playPauseBtn && !videoPlayers[index].completed) {
+        playPauseBtn.innerHTML = '<i class="ph ph-pause"></i>';
+      }
+    });
+
+    video.addEventListener('waiting', () => {
+      if (!videoPlayers[index].completed) setLoading(true);
+    });
+
+    video.addEventListener('pause', () => {
+      videoPlayers[index].isPlaying = false;
+      if (playPauseBtn && !videoPlayers[index].completed) {
+        playPauseBtn.innerHTML = '<i class="ph ph-play"></i>';
+      }
+    });
+
+    video.addEventListener('play', () => {
+      videoPlayers[index].isPlaying = true;
+      if (playPauseBtn && !videoPlayers[index].completed) {
+        playPauseBtn.innerHTML = '<i class="ph ph-pause"></i>';
+      }
+    });
+
     video.addEventListener('timeupdate', () => {
       if (video.duration && video.currentTime) {
         const progress = (video.currentTime / video.duration) * 100;
         videoPlayers[index].progress = progress;
-        const progressElement = document.getElementById(`video-progress-${index}`);
-        if (progressElement) progressElement.textContent = `${Math.round(progress)}%`;
+        if (progressEl) progressEl.textContent = Math.round(progress) + '%';
         if (progress >= 95 && !videoPlayers[index].completed) {
           videoPlayers[index].completed = true;
           markActivityAsCompleted(index);
@@ -2283,32 +2186,55 @@ body.dt-open #dt-block { display: flex; }
         }
       }
     });
+
     video.addEventListener('ended', () => {
       videoPlayers[index].completed = true;
       videoPlayers[index].isPlaying = false;
       markActivityAsCompleted(index);
       if (playPauseBtn) playPauseBtn.innerHTML = '<i class="ph ph-check"></i>';
-      const progressElement = document.getElementById(`video-progress-${index}`);
-      if (progressElement) progressElement.textContent = "100%";
+      if (progressEl) progressEl.textContent = '100%';
     });
-    video.addEventListener('pause', () => {
-      videoPlayers[index].isPlaying = false;
-      if (playPauseBtn && !videoPlayers[index].completed) playPauseBtn.innerHTML = '<i class="ph ph-play"></i>';
-    });
-    video.addEventListener('play', () => {
-      videoPlayers[index].isPlaying = true;
-      if (playPauseBtn && !videoPlayers[index].completed) playPauseBtn.innerHTML = '<i class="ph ph-pause"></i>';
-    });
-    video.addEventListener('waiting', () => { const loading = document.getElementById(`video-loading-${index}`); if (loading) loading.style.display = 'flex'; });
-    video.addEventListener('canplay', () => { const loading = document.getElementById(`video-loading-${index}`); if (loading) loading.style.display = 'none'; });
-    video.addEventListener('keydown', (e) => e.preventDefault());
-    video.load();
-  }
 
-  function toggleRegularVideoPlay(index) {
-    const video = videoPlayers[index]?.element;
-    if (!video) return;
-    if (video.paused) video.play(); else video.pause();
+    video.addEventListener('error', () => {
+      const err = video.error;
+      let msg = 'Video could not be loaded.';
+      if (err) {
+        switch (err.code) {
+          case 1: msg = 'Video loading was aborted.'; break;
+          case 2: msg = 'Network error while loading video.'; break;
+          case 3: msg = 'Video could not be decoded.'; break;
+          case 4: msg = 'Video format not supported or URL is invalid.'; break;
+        }
+      }
+      setErrorState(msg);
+    });
+
+    if (sourceEl) {
+      sourceEl.addEventListener('error', () => {
+        setErrorState('Video source failed to load. Check the URL.');
+      });
+    }
+
+    video.addEventListener('contextmenu', (e) => e.preventDefault());
+    video.addEventListener('keydown', (e) => e.preventDefault());
+
+    if (!video.currentSrc && !(sourceEl && sourceEl.src)) {
+      setErrorState('No video URL was provided for this activity.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      video.load();
+    } catch (e) {
+      setErrorState('Could not initialize the video player.');
+    }
+
+    setTimeout(() => {
+      if (!videoPlayers[index].hasError && video.readyState < 1) {
+        video.controls = true;
+      }
+    }, 10000);
   }
 
   function setupYouTubeObserver(index, videoUrl) {
@@ -2604,7 +2530,6 @@ body.dt-open #dt-block { display: flex; }
     document.title = `Activities for ${today.getDate()} ${months[today.getMonth()]}, ${today.getFullYear()} · Malcom Finance`;
   })();
 
-  /* ---------- Tooltip ---------- */
   (function () {
     const tip = document.getElementById('tip');
     let target = null;
@@ -2645,7 +2570,6 @@ body.dt-open #dt-block { display: flex; }
     document.addEventListener('click', hide, true);
   })();
 
-  /* ---------- Scroll pill ---------- */
   (function () {
     const pill = document.getElementById('scroll-pill');
     if (!pill) return;
@@ -2714,7 +2638,6 @@ body.dt-open #dt-block { display: flex; }
     setTimeout(reveal, 400);
   })();
 
-  /* ---------- Context menu ---------- */
   (function () {
     const ctxMenu = document.getElementById('ctx-menu');
     let pressTimer = null;
@@ -2802,7 +2725,6 @@ body.dt-open #dt-block { display: flex; }
     }, true);
   })();
 
-  /* ---------- Devtools blocker ---------- */
   (function () {
     let locked = false;
     const THRESHOLD = 200;
