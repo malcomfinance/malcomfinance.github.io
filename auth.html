@@ -1,208 +1,964 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <title>Malcom Finance · Access</title>
-  <link href="tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sign In · Malcom Finance</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#f5f5f3">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
 <script src="firebase-app-compat.js"></script>
-  <script src="firebase-auth-compat.js"></script>
-  <script src="firebase-firestore-compat.js"></script>
-  <script src="firebase-storage-compat.js"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    :root {
-      --bg-main: #f9fafb; --bg-card: #ffffff; --text-main: #111827; --text-muted: #6b7280;
-      --border-color: #e5e7eb; --accent-green: #059669; --accent-soft: #ecfdf5; --input-bg: #f3f4f6;
-    }
-    
-html,body{overflow:hidden}html{overflow:scroll;scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar{display:none}
-    html.dark {
-      --bg-main: #0f172a; --bg-card: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8;
-      --border-color: #334155; --accent-green: #10b981; --accent-soft: #064e3b; --input-bg: #0f172a;
-    }
-    body { background-color: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; transition: background-color 0.3s ease; }
-    .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 2rem; }
-    .accent-bg { background-color: var(--accent-green); }
-    .accent-text { color: var(--accent-green); }
-    .input-group { background-color: var(--input-bg); border: 1px solid var(--border-color); transition: border-color 0.2s; }
-    .input-group:focus-within { border-color: var(--accent-green); }
-    input { background: transparent; color: var(--text-main); outline: none; }
-  </style>
-  <script>
-    // Immediate theme application to prevent flicker
-    if (localStorage.getItem('theme') === 'dark') {
-      document.documentElement.classList.add('dark');
-    }
-  </script>
+<script src="firebase-auth-compat.js"></script>
+<script src="firebase-firestore-compat.js"></script>
+<script src="firebase-storage-compat.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --font: 'DM Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --bg-1: #f5f5f3;
+  --bg-2: #e5e5e1;
+  --fg: #0b0b0b;
+  --fg-soft: #5f5f5c;
+  --line: rgba(11, 11, 11, 0.10);
+  --glass-tint: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.85);
+  --glass-shadow: 0 20px 45px rgba(20, 20, 20, 0.13);
+  --rim-1: rgba(255, 255, 255, 0.95);
+  --rim-2: rgba(255, 255, 255, 0.55);
+  --rim-inner: rgba(255, 255, 255, 0.08);
+  --btn-bg: rgba(255, 255, 255, 0.34);
+  --btn-hover: rgba(255, 255, 255, 0.62);
+  --tip-bg: #0b0b0b;
+  --tip-fg: #f6f6f4;
+  --solid: #0b0b0b;
+  --solid-fg: #f7f7f5;
+  --stripe: rgba(11, 11, 11, 0.045);
+  --scene-tint: rgba(245, 245, 243, 0.42);
+  --neg: #d64545;
+  --pos: #178a52;
+  --neg-soft: rgba(214, 69, 69, 0.10);
+  --pos-soft: rgba(23, 138, 82, 0.12);
+}
+
+html, body { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg-1);
+  color: var(--fg);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+}
+
+.scene-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: .88;
+  filter: brightness(1.22) contrast(.92) saturate(1.05);
+}
+
+.scene-tint {
+  position: absolute;
+  inset: 0;
+  background: var(--scene-tint);
+  pointer-events: none;
+}
+
+.scene .stripes {
+  position: absolute;
+  inset: -20%;
+  background: repeating-linear-gradient(115deg, transparent 0 58px, var(--stripe) 58px 60px);
+  opacity: .55;
+}
+
+.glass {
+  position: relative;
+  isolation: isolate;
+  border-radius: 28px;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  box-shadow:
+    var(--glass-shadow),
+    inset 1.5px 1.5px 1px -1px var(--rim-1),
+    inset -1px -1px 1px -1px var(--rim-2),
+    inset 0 0 24px 4px var(--rim-inner);
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -3;
+  -webkit-backdrop-filter: url(#glass-distortion);
+  backdrop-filter: url(#glass-distortion);
+  pointer-events: none;
+}
+
+.glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -2;
+  background: var(--glass-tint);
+  -webkit-backdrop-filter: blur(3px) saturate(180%) brightness(1.06);
+  backdrop-filter: blur(3px) saturate(180%) brightness(1.06);
+  pointer-events: none;
+}
+
+@supports not (backdrop-filter: url(#glass-distortion)) {
+  .glass::before {
+    -webkit-backdrop-filter: blur(16px) saturate(185%);
+    backdrop-filter: blur(16px) saturate(185%);
+  }
+}
+
+.auth-main {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 18px 44px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 32px 26px 26px;
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.auth-brand img {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  object-fit: cover;
+  display: block;
+}
+
+.auth-brand span {
+  font-size: .95rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  color: var(--fg);
+}
+
+.view { display: none; }
+.view.active { display: block; }
+
+.auth-h1 {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+  line-height: 1.22;
+  font-weight: 800;
+  letter-spacing: -.025em;
+  color: var(--fg);
+}
+
+.auth-sub {
+  margin: 0 0 24px;
+  font-size: .85rem;
+  line-height: 1.55;
+  font-weight: 500;
+  color: var(--fg-soft);
+}
+
+.field-row {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+
+.field-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+  padding-left: 2px;
+}
+
+.field-label .optional {
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--fg-soft);
+  opacity: .65;
+  margin-left: 4px;
+}
+
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  background: var(--btn-bg);
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
+  backdrop-filter: blur(8px) saturate(180%);
+  transition: border-color .2s ease, background .2s ease;
+}
+
+.input-wrap:focus-within {
+  border-color: var(--fg);
+  background: var(--btn-hover);
+}
+
+.input-wrap input {
+  flex: 1;
+  min-width: 0;
+  padding: 15px 16px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--fg);
+  font-family: inherit;
+  font-size: .92rem;
+  font-weight: 600;
+  border-radius: inherit;
+}
+
+.input-wrap.has-toggle input {
+  padding-right: 46px;
+}
+
+.input-wrap input::placeholder {
+  color: var(--fg-soft);
+  font-weight: 500;
+}
+
+.input-wrap input::-webkit-outer-spin-button,
+.input-wrap input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input-wrap input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Autofill override — keeps the glass look, no yellow/blue */
+.input-wrap input:-webkit-autofill,
+.input-wrap input:-webkit-autofill:hover,
+.input-wrap input:-webkit-autofill:focus,
+.input-wrap input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--fg) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  caret-color: var(--fg) !important;
+}
+
+.toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--fg-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.05rem;
+  padding: 0;
+  transition: background .18s ease, color .18s ease;
+  touch-action: manipulation;
+}
+
+.toggle:hover { background: var(--btn-bg); color: var(--fg); }
+.toggle:active { transform: translateY(-50%) scale(.92); }
+
+.hint {
+  margin: 0;
+  padding-left: 2px;
+  font-size: .72rem;
+  font-weight: 500;
+  color: var(--fg-soft);
+  line-height: 1.4;
+}
+
+.field-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--fg-soft);
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+  display: inline-block;
+  transition: color .18s ease;
+}
+
+.link-btn:hover { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
+.link-btn:active { opacity: .7; }
+
+.submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 15px 20px;
+  margin-top: 10px;
+  border-radius: 16px;
+  border: none;
+  background: var(--solid);
+  color: var(--solid-fg);
+  font-family: inherit;
+  font-size: .9rem;
+  font-weight: 700;
+  letter-spacing: .01em;
+  cursor: pointer;
+  box-shadow:
+    inset 1.5px 1.5px 1px -1px rgba(255, 255, 255, .35),
+    0 12px 26px rgba(0, 0, 0, .28);
+  transition: transform .22s ease, opacity .22s ease;
+}
+
+.submit-btn:hover:not(:disabled) { transform: translateY(-2px); opacity: .94; }
+.submit-btn:active:not(:disabled) { transform: translateY(0) scale(.98); }
+.submit-btn:disabled { opacity: .7; cursor: not-allowed; }
+
+.submit-btn.loading::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.auth-switch {
+  margin: 22px 0 0;
+  text-align: center;
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--fg-soft);
+}
+
+.auth-switch button {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  color: var(--fg);
+  cursor: pointer;
+  padding: 0 0 0 2px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+}
+
+.auth-switch button:hover { opacity: .8; }
+
+.feedback {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: .82rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.feedback.error {
+  background: var(--neg-soft);
+  border: 1px solid rgba(214, 69, 69, 0.28);
+  color: var(--neg);
+}
+
+.feedback.success {
+  background: var(--pos-soft);
+  border: 1px solid rgba(23, 138, 82, 0.28);
+  color: var(--pos);
+}
+
+@media (min-width: 520px) {
+  .auth-card { padding: 40px 34px 30px; }
+  .auth-h1 { font-size: 1.65rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6">
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
-      authDomain: "malcolm-finance.firebaseapp.com",
-      projectId: "malcolm-finance",
-      storageBucket: "malcolm-finance.firebasestorage.app",
-      messagingSenderId: "987613399580",
-      appId: "1:987613399580:web:0237b2c8c2c7df54222dd9"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+<body>
 
-    function togglePassword(id, iconId) {
-      const input = document.getElementById(id);
-      const icon = document.getElementById(iconId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.replace('fa-eye', 'fa-eye-slash');
-      } else {
-        input.type = 'password';
-        icon.classList.replace('fa-eye-slash', 'fa-eye');
-      }
-    }
-  </script>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="92" result="noise" />
+    <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+    <feDisplacementMap in="SourceGraphic" in2="blurred" scale="70" xChannelSelector="R" yChannelSelector="G" />
+  </filter>
+</svg>
 
-  <div class="max-w-md w-full">
-    <div class="text-center mb-8">
-      <div class="w-16 h-16 accent-bg rounded-2xl flex items-center justify-center text-white text-2xl mx-auto mb-4 shadow-lg shadow-green-200 dark:shadow-none">
-        <i class="fas fa-leaf"></i>
-      </div>
-      <h1 class="text-3xl font-extrabold tracking-tight">Malcom Finance</h1>
-      <p class="text-muted text-sm mt-2 font-medium">Secure Wealth Management</p>
+<div class="scene" aria-hidden="true">
+  <video class="scene-video" id="scene-video" autoplay loop muted playsinline preload="auto">
+    <source src="https://www.shutterstock.com/shutterstock/videos/3995007179/preview/stock-footage-abstract-background-with-reeded-glass-effect-k-seamless-loop-d-animation.webm" type="video/webm">
+  </video>
+  <div class="scene-tint"></div>
+  <div class="stripes"></div>
+</div>
+
+<main class="auth-main">
+  <div class="auth-card glass">
+    <div class="auth-brand">
+      <img src="logo.png" alt="Malcom Finance logo">
+      <span>Malcom Finance</span>
     </div>
 
-    <div class="card p-8 shadow-xl">
-      <!-- Login View -->
-      <div id="login-view">
-        <h2 class="text-xl font-bold mb-6">Welcome Back</h2>
-        <div class="space-y-4">
-          <div class="input-group flex items-center p-4 rounded-2xl">
-            <i class="fas fa-envelope text-muted mr-3"></i>
-            <input type="email" id="login-email" class="w-full text-sm" placeholder="Email Address">
-          </div>
-          <div class="input-group flex items-center p-4 rounded-2xl">
-            <i class="fas fa-lock text-muted mr-3"></i>
-            <input type="password" id="login-pwd" class="w-full text-sm" placeholder="Password">
-            <i class="fas fa-eye text-muted cursor-pointer hover:accent-text" id="eye-login" onclick="togglePassword('login-pwd', 'eye-login')"></i>
-          </div>
-          <button onclick="login()" id="login-btn" class="w-full accent-bg text-white font-bold py-4 rounded-2xl shadow-lg transition transform active:scale-95">Sign In</button>
+    <!-- LOGIN -->
+    <form class="view active" data-view="login" id="form-login" novalidate>
+      <h1 class="auth-h1">Welcome back</h1>
+      <p class="auth-sub">Sign in to continue to your account.</p>
+
+      <div class="field-row">
+        <label class="field-label" for="login-identifier">Email or phone number</label>
+        <div class="input-wrap">
+          <input
+            type="text"
+            id="login-identifier"
+            name="identifier"
+            placeholder="Email or phone number"
+            autocomplete="username"
+            spellcheck="false"
+            required
+            data-tip="Use the email or phone number on your account">
         </div>
-        <p class="text-center text-sm text-muted mt-6">New here? <button onclick="toggleView()" class="accent-text font-bold">Create account</button></p>
       </div>
 
-      <!-- Signup View -->
-      <div id="signup-view" class="hidden">
-        <h2 class="text-xl font-bold mb-6">Join Malcom</h2>
-        <div class="space-y-4">
-          <div class="input-group flex items-center p-4 rounded-2xl">
-            <i class="fas fa-user text-muted mr-3"></i>
-            <input type="text" id="name" class="w-full text-sm" placeholder="Full Name">
-          </div>
-          <div class="input-group flex items-center p-4 rounded-2xl">
-            <i class="fas fa-envelope text-muted mr-3"></i>
-            <input type="email" id="email" class="w-full text-sm" placeholder="Email Address">
-          </div>
-          <div class="input-group flex items-center p-4 rounded-2xl">
-            <i class="fas fa-phone text-muted mr-3"></i>
-            <input type="text" id="phone" class="w-full text-sm" placeholder="Phone Number">
-          </div>
-          <div class="input-group flex items-center p-4 rounded-2xl">
-            <i class="fas fa-lock text-muted mr-3"></i>
-            <input type="password" id="pwd" class="w-full text-sm" placeholder="Password">
-            <i class="fas fa-eye text-muted cursor-pointer hover:accent-text" id="eye-signup" onclick="togglePassword('pwd', 'eye-signup')"></i>
-          </div>
-          <div class="input-group flex items-center p-4 rounded-2xl">
-            <i class="fas fa-user-friends text-muted mr-3"></i>
-            <input type="text" id="referral-code" class="w-full text-sm" placeholder="Referral Code (Optional)">
-          </div>
-          <button onclick="signup()" id="signup-btn" class="w-full accent-bg text-white font-bold py-4 rounded-2xl shadow-lg transition transform active:scale-95">Get Started</button>
+      <div class="field-row">
+        <label class="field-label" for="login-password">Password</label>
+        <div class="input-wrap has-toggle">
+          <input
+            type="password"
+            id="login-password"
+            name="password"
+            placeholder="Password"
+            autocomplete="current-password"
+            required
+            data-tip="Enter your account password">
+          <button type="button" class="toggle" data-target="login-password" aria-label="Show password" data-tip="Show password">
+            <i class="ph ph-eye"></i>
+          </button>
         </div>
-        <p class="text-center text-sm text-muted mt-6">Have an account? <button onclick="toggleView()" class="accent-text font-bold">Sign in</button></p>
+        <div class="field-actions">
+          <a href="/reset" class="link-btn" data-tip="Reset your password">Forgot password?</a>
+        </div>
       </div>
 
-      <!-- Messages -->
-      <div id="err" class="mt-4 p-3 bg-red-50 text-red-500 text-xs rounded-xl hidden text-center font-bold"></div>
-      <div id="success" class="mt-4 p-3 bg-green-50 text-green-600 text-xs rounded-xl hidden text-center font-bold"></div>
-    </div>
+      <button type="submit" class="submit-btn" id="btn-login">
+        <span>Sign in</span>
+      </button>
+
+      <p class="auth-switch">New here? <button type="button" data-switch="signup">Create account</button></p>
+    </form>
+
+    <!-- SIGNUP -->
+    <form class="view" data-view="signup" id="form-signup" novalidate>
+      <h1 class="auth-h1">Create your account</h1>
+      <p class="auth-sub">Join Malcom Finance in under a minute.</p>
+
+      <div class="field-row">
+        <label class="field-label" for="signup-name">Full name</label>
+        <div class="input-wrap">
+          <input
+            type="text"
+            id="signup-name"
+            name="name"
+            placeholder="Full name"
+            autocomplete="name"
+            required
+            data-tip="Your full names as they appear on ID">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <label class="field-label" for="signup-email">Email address</label>
+        <div class="input-wrap">
+          <input
+            type="email"
+            id="signup-email"
+            name="email"
+            placeholder="Email address"
+            autocomplete="email"
+            spellcheck="false"
+            required
+            data-tip="The email you will use to sign in">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <label class="field-label" for="signup-phone">Phone number</label>
+        <div class="input-wrap">
+          <input
+            type="tel"
+            id="signup-phone"
+            name="phone"
+            placeholder="Phone number"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="10"
+            autocomplete="tel"
+            spellcheck="false"
+            required
+            data-tip="10 digits, numbers only">
+        </div>
+        <p class="hint">10 digits, numbers only. Any + prefix is removed automatically.</p>
+      </div>
+
+      <div class="field-row">
+        <label class="field-label" for="signup-password">Password</label>
+        <div class="input-wrap has-toggle">
+          <input
+            type="password"
+            id="signup-password"
+            name="password"
+            placeholder="Password"
+            autocomplete="new-password"
+            minlength="6"
+            required
+            data-tip="Choose a password, at least 6 characters">
+          <button type="button" class="toggle" data-target="signup-password" aria-label="Show password" data-tip="Show password">
+            <i class="ph ph-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <label class="field-label" for="signup-referral">Referral code <span class="optional">(optional)</span></label>
+        <div class="input-wrap">
+          <input
+            type="text"
+            id="signup-referral"
+            name="referral"
+            placeholder="Referral code"
+            autocomplete="off"
+            spellcheck="false"
+            data-tip="If someone referred you, enter their code">
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="btn-signup">
+        <span>Create account</span>
+      </button>
+
+      <p class="auth-switch">Already have an account? <button type="button" data-switch="login">Sign in</button></p>
+    </form>
+
+    <div id="feedback" class="feedback" role="alert" aria-live="polite" hidden></div>
   </div>
+</main>
 
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const refFromUrl = urlParams.get('ref');
-    if (refFromUrl) {
-      document.getElementById('referral-code').value = refFromUrl;
+<div id="tip" role="tooltip" style="position:fixed;left:0;top:0;z-index:500;max-width:78vw;padding:7px 11px;border-radius:10px;font-family:var(--font);font-size:11.5px;font-weight:600;letter-spacing:.01em;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--tip-fg);background:var(--tip-bg);border:1px solid rgba(255,255,255,.14);box-shadow:0 12px 26px rgba(0,0,0,.28);pointer-events:none;opacity:0;transform:translate(-50%,calc(-100% - 8px)) scale(.96);transition:opacity .16s ease,transform .16s ease;"></div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
+    authDomain: "malcolm-finance.firebaseapp.com",
+    projectId: "malcolm-finance",
+    storageBucket: "malcolm-finance.firebasestorage.app",
+    messagingSenderId: "987613399580",
+    appId: "1:987613399580:web:0237b2c8c2c7df54222dd9"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  /* ---------- Video background safety ---------- */
+  (function () {
+    const video = document.getElementById('scene-video');
+    if (!video) return;
+    let failed = false;
+    function fail() {
+      if (failed) return;
+      failed = true;
+      video.style.display = 'none';
+    }
+    const source = video.querySelector('source');
+    if (source) source.addEventListener('error', fail);
+    video.addEventListener('error', fail);
+    video.addEventListener('stalled', () => { setTimeout(() => { if (video.readyState < 2) fail(); }, 4000); });
+    const tryPlay = () => {
+      const p = video.play();
+      if (p && p.catch) p.catch(() => { setTimeout(() => { if (video.readyState < 2) fail(); }, 2500); });
+    };
+    if (video.readyState >= 1) tryPlay();
+    else video.addEventListener('loadedmetadata', tryPlay, { once: true });
+    setTimeout(() => { if (video.readyState < 2) fail(); }, 6000);
+  })();
+
+  /* ---------- State helpers ---------- */
+  const feedbackEl = document.getElementById('feedback');
+  const buttons = {
+    login: document.getElementById('btn-login'),
+    signup: document.getElementById('btn-signup')
+  };
+  const labels = {
+    login: 'Sign in',
+    signup: 'Create account'
+  };
+
+  function showFeedback(message, type) {
+    if (!feedbackEl) return;
+    feedbackEl.textContent = message;
+    feedbackEl.className = 'feedback ' + (type || 'error');
+    feedbackEl.hidden = false;
+  }
+
+  function clearFeedback() {
+    if (!feedbackEl) return;
+    feedbackEl.hidden = true;
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'feedback';
+  }
+
+  function setLoading(key, loading) {
+    const btn = buttons[key];
+    if (!btn) return;
+    btn.disabled = loading;
+    btn.classList.toggle('loading', loading);
+    const span = btn.querySelector('span');
+    if (span) span.textContent = loading ? 'Please wait…' : labels[key];
+  }
+
+  function switchView(name) {
+    document.querySelectorAll('.view').forEach(v => {
+      v.classList.toggle('active', v.dataset.view === name);
+    });
+    clearFeedback();
+    const active = document.querySelector('.view.active');
+    if (active) {
+      const firstInput = active.querySelector('input');
+      if (firstInput) {
+        setTimeout(() => {
+          try { firstInput.focus({ preventScroll: true }); } catch (e) {}
+        }, 80);
+      }
+    }
+  }
+
+  /* ---------- Password toggle ---------- */
+  document.querySelectorAll('.toggle').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const target = document.getElementById(btn.dataset.target);
+      if (!target) return;
+      const isPwd = target.type === 'password';
+      target.type = isPwd ? 'text' : 'password';
+      const icon = btn.querySelector('i');
+      if (icon) icon.className = isPwd ? 'ph ph-eye-slash' : 'ph ph-eye';
+      btn.setAttribute('aria-label', isPwd ? 'Hide password' : 'Show password');
+      btn.setAttribute('data-tip', isPwd ? 'Hide password' : 'Show password');
+    });
+  });
+
+  /* ---------- View switches ---------- */
+  document.querySelectorAll('[data-switch]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchView(el.dataset.switch);
+    });
+  });
+
+  /* ---------- Phone input: digits only, 10 max ---------- */
+  (function () {
+    const phoneInput = document.getElementById('signup-phone');
+    if (!phoneInput) return;
+
+    function sanitize() {
+      const cleaned = phoneInput.value.replace(/\D/g, '').slice(0, 10);
+      if (phoneInput.value !== cleaned) phoneInput.value = cleaned;
     }
 
-    function toggleView() {
-      document.getElementById('login-view').classList.toggle('hidden');
-      document.getElementById('signup-view').classList.toggle('hidden');
-      document.getElementById('err').classList.add('hidden');
-    }
+    phoneInput.addEventListener('input', sanitize);
+    phoneInput.addEventListener('paste', () => setTimeout(sanitize, 0));
+    phoneInput.addEventListener('blur', sanitize);
+  })();
 
-    async function login() {
-      const email = document.getElementById('login-email').value;
-      const pwd = document.getElementById('login-pwd').value;
-      const btn = document.getElementById('login-btn');
-      const err = document.getElementById('err');
-      
-      if(!email || !pwd) { err.textContent = 'Please enter email and password'; err.classList.remove('hidden'); return; }
-      btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      
+  /* ---------- Auth error mapping ---------- */
+  function mapAuthError(err) {
+    const code = (err && err.code) ? String(err.code) : '';
+    switch (code) {
+      case 'auth/invalid-email': return 'That email address is not valid.';
+      case 'auth/user-not-found': return 'No account found with those details.';
+      case 'auth/wrong-password':
+      case 'auth/invalid-credential': return 'Incorrect password. Try again or reset it.';
+      case 'auth/too-many-requests': return 'Too many attempts. Wait a moment and try again.';
+      case 'auth/network-request-failed': return 'Network error. Check your connection and try again.';
+      case 'auth/email-already-in-use': return 'That email is already registered.';
+      case 'auth/weak-password': return 'Password should be at least 6 characters.';
+      case 'auth/missing-email': return 'Please enter your email or phone number.';
+      case 'auth/user-disabled': return 'This account has been disabled. Contact support.';
+      default: return (err && err.message) ? err.message : 'Something went wrong. Please try again.';
+    }
+  }
+
+  /* ---------- Resolve email from email or phone ---------- */
+  async function resolveEmailFromIdentifier(identifier) {
+    const trimmed = (identifier || '').trim();
+    if (!trimmed) throw new Error('Enter your email or phone number.');
+    if (trimmed.includes('@')) return trimmed;
+
+    const digits = trimmed.replace(/\D/g, '');
+    if (!digits) throw new Error('Enter a valid email or phone number.');
+
+    const candidates = new Set();
+    candidates.add(digits);
+    candidates.add('+' + digits);
+    if (digits.length > 10) candidates.add(digits.slice(-10));
+    if (digits.length === 9) candidates.add('0' + digits);
+    if (digits.length === 10 && digits.charAt(0) === '0') candidates.add('256' + digits.slice(1));
+    if (digits.length === 12 && digits.indexOf('256') === 0) candidates.add('0' + digits.slice(3));
+
+    for (const candidate of candidates) {
       try {
-        await auth.signInWithEmailAndPassword(email, pwd);
-        window.location.href = 'home.html';
+        const snap = await db.collection('users').where('phone', '==', candidate).limit(1).get();
+        if (!snap.empty) {
+          const userData = snap.docs[0].data();
+          if (!userData.email) throw new Error('This account has no email on file.');
+          return userData.email;
+        }
       } catch (e) {
-        err.textContent = e.message; err.classList.remove('hidden');
-        btn.disabled = false; btn.textContent = 'Sign In';
+        if (e.message === 'This account has no email on file.') throw e;
       }
     }
 
-    async function signup() {
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const phone = document.getElementById('phone').value;
-      const pwd = document.getElementById('pwd').value;
-      const refInput = document.getElementById('referral-code').value;
-      
-      const btn = document.getElementById('signup-btn');
-      const err = document.getElementById('err');
-      const success = document.getElementById('success');
+    throw new Error('No account found with that email or phone number.');
+  }
 
-      if(!name || !email || !phone || !pwd) { err.textContent = 'Fill all required fields'; err.classList.remove('hidden'); return; }
-      btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  /* ---------- Login ---------- */
+  document.getElementById('form-login').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearFeedback();
 
-      try {
-        const emailCheck = await db.collection('users').where('email', '==', email).get();
-        if (!emailCheck.empty) { throw new Error('Email already registered'); }
+    const identifier = document.getElementById('login-identifier').value.trim();
+    const password = document.getElementById('login-password').value;
 
-        const cred = await auth.createUserWithEmailAndPassword(email, pwd);
-        const code = (name.substring(0,3).toUpperCase() + Math.random().toString(36).substring(2,7).toUpperCase()).replace(/[^A-Z0-9]/g,'A');
+    if (!identifier || !password) {
+      showFeedback('Please enter your credentials.', 'error');
+      return;
+    }
 
-        await db.collection('users').doc(cred.user.uid).set({
-          name, email, phone, referralCode: code, referredBy: refInput || null,
-          balance: 0, isActive: false, referrals: 0, earningsBalance: 0, referralBalance: 0,
-          bonusesBalance: 0, totalWithdrawn: 0, totalEarnings: 0,
-          createdAt: new Date().toISOString(), lastLogin: new Date().toISOString(), profilePictureUrl: ''
-        });
+    setLoading('login', true);
 
-        if (refInput) {
-          const refSnap = await db.collection('users').where('referralCode', '==', refInput).get();
+    try {
+      const email = await resolveEmailFromIdentifier(identifier);
+      await auth.signInWithEmailAndPassword(email, password);
+      window.location.href = 'home';
+    } catch (err) {
+      showFeedback(mapAuthError(err), 'error');
+      setLoading('login', false);
+    }
+  });
+
+  /* ---------- Signup ---------- */
+  document.getElementById('form-signup').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearFeedback();
+
+    const name = document.getElementById('signup-name').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const phoneRaw = document.getElementById('signup-phone').value;
+    const password = document.getElementById('signup-password').value;
+    const referral = document.getElementById('signup-referral').value.trim();
+
+    const phone = (phoneRaw || '').replace(/\D/g, '').slice(0, 10);
+
+    if (!name || !email || !phone || !password) {
+      showFeedback('Please fill in all required fields.', 'error');
+      return;
+    }
+    if (phone.length !== 10) {
+      showFeedback('Please enter a valid 10-digit phone number.', 'error');
+      return;
+    }
+    if (password.length < 6) {
+      showFeedback('Password must be at least 6 characters.', 'error');
+      return;
+    }
+
+    setLoading('signup', true);
+
+    try {
+      const emailCheck = await db.collection('users').where('email', '==', email).limit(1).get();
+      if (!emailCheck.empty) throw new Error('That email is already registered.');
+
+      const phoneCheck = await db.collection('users').where('phone', '==', phone).limit(1).get();
+      if (!phoneCheck.empty) throw new Error('That phone number is already registered.');
+
+      const cred = await auth.createUserWithEmailAndPassword(email, password);
+
+      const code = (name.substring(0, 3).toUpperCase() + Math.random().toString(36).substring(2, 7).toUpperCase()).replace(/[^A-Z0-9]/g, 'A');
+
+      await db.collection('users').doc(cred.user.uid).set({
+        name: name,
+        email: email,
+        phone: phone,
+        referralCode: code,
+        referredBy: referral || null,
+        balance: 0,
+        isActive: false,
+        referrals: 0,
+        earningsBalance: 0,
+        referralBalance: 0,
+        bonusesBalance: 0,
+        totalWithdrawn: 0,
+        totalEarnings: 0,
+        createdAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+        profilePictureUrl: ''
+      });
+
+      if (referral) {
+        try {
+          const refSnap = await db.collection('users').where('referralCode', '==', referral).limit(1).get();
           if (!refSnap.empty) {
             await db.collection('users').doc(refSnap.docs[0].id).update({
               referrals: firebase.firestore.FieldValue.increment(1)
             });
           }
-        }
-
-        success.textContent = 'Account created! Redirecting...'; success.classList.remove('hidden');
-        setTimeout(() => window.location.href = 'index.html', 2000);
-      } catch (e) {
-        err.textContent = e.message; err.classList.remove('hidden');
-        btn.disabled = false; btn.textContent = 'Get Started';
+        } catch (refErr) {}
       }
+
+      showFeedback('Account created! Redirecting to your dashboard…', 'success');
+      setTimeout(() => { window.location.href = 'home'; }, 1400);
+    } catch (err) {
+      showFeedback(mapAuthError(err), 'error');
+      setLoading('signup', false);
     }
-  </script>
+  });
+
+  /* ---------- Referral URL parameter ---------- */
+  (function () {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get('ref');
+      if (!ref) return;
+      const refInput = document.getElementById('signup-referral');
+      if (refInput) refInput.value = ref;
+      switchView('signup');
+    } catch (e) {}
+  })();
+
+  /* ---------- Tooltip ---------- */
+  (function () {
+    const tip = document.getElementById('tip');
+    let target = null;
+
+    function hide() {
+      target = null;
+      tip.style.opacity = '0';
+      tip.style.transform = 'translate(-50%, calc(-100% - 8px)) scale(.96)';
+    }
+
+    function show(el) {
+      const text = el.getAttribute('data-tip');
+      if (!text) return;
+      target = el;
+      tip.textContent = text;
+
+      const r = el.getBoundingClientRect();
+      tip.style.opacity = '0';
+      tip.style.transform = 'translate(-50%, calc(-100% - 8px)) scale(.96)';
+
+      const tw = tip.offsetWidth;
+      const th = tip.offsetHeight;
+      const placeBelow = r.top - th - 14 < 4;
+
+      let left = r.left + r.width / 2;
+      left = Math.min(Math.max(left, tw / 2 + 8), window.innerWidth - tw / 2 - 8);
+
+      const top = placeBelow ? r.bottom : r.top;
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+
+      if (placeBelow) {
+        tip.style.transform = 'translate(-50%, 8px) scale(1)';
+      } else {
+        tip.style.transform = 'translate(-50%, calc(-100% - 8px)) scale(1)';
+      }
+      tip.style.opacity = '1';
+    }
+
+    document.addEventListener('mouseover', (e) => {
+      const el = e.target.closest('[data-tip]');
+      if (el && el !== target) show(el);
+    }, true);
+
+    document.addEventListener('mouseout', (e) => {
+      const el = e.target.closest('[data-tip]');
+      if (el && !el.contains(e.relatedTarget)) hide();
+    }, true);
+
+    document.addEventListener('focusin', (e) => {
+      const el = e.target.closest('[data-tip]');
+      if (el) show(el);
+    });
+
+    document.addEventListener('focusout', hide);
+    document.addEventListener('scroll', hide, true);
+    window.addEventListener('resize', hide);
+    document.addEventListener('click', hide, true);
+  })();
+
+  /* ---------- Service Worker ---------- */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
+</script>
 </body>
 </html>
