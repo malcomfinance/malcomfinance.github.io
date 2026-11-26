@@ -52,11 +52,7 @@
   --nav-active-fg: #ffffff;
   --stripe: rgba(11, 11, 11, 0.045);
   --scene-tint: rgba(245, 245, 243, 0.42);
-  --pos: #178a52;
   --neg: #d64545;
-  --info: #3b6fd4;
-  --info-soft: rgba(59, 111, 212, 0.12);
-  --pos-soft: rgba(23, 138, 82, 0.12);
   --neg-soft: rgba(214, 69, 69, 0.10);
 }
 
@@ -82,11 +78,7 @@ html.dark {
   --nav-active-fg: #0a0a0a;
   --stripe: rgba(255, 255, 255, 0.05);
   --scene-tint: rgba(7, 7, 7, 0.72);
-  --pos: #34d399;
   --neg: #f87171;
-  --info: #7aa2f7;
-  --info-soft: rgba(122, 162, 247, 0.14);
-  --pos-soft: rgba(52, 211, 153, 0.14);
   --neg-soft: rgba(248, 113, 113, 0.12);
 }
 
@@ -379,8 +371,8 @@ body.nav-open .sidebar { transform: translateX(0); }
   box-shadow: 0 10px 22px rgba(0, 0, 0, .22);
 }
 
-.nav-item.danger { color: var(--neg); }
-.nav-item.danger:hover { background: var(--neg-soft); border-color: rgba(214, 69, 69, .25); }
+.nav-item.danger { color: var(--fg-soft); }
+.nav-item.danger:hover { background: var(--neg-soft); border-color: rgba(214, 69, 69, .25); color: var(--neg); }
 
 .sidebar-foot { padding: 14px; }
 
@@ -444,12 +436,44 @@ main {
   color: var(--fg-soft);
 }
 
+/* ---------- Masonry wallet grid ---------- */
 .wallet-grid {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
-  grid-template-columns: 1fr;
 }
 
+.wallet-col {
+  display: contents;
+}
+
+.balance-hero { order: 1; }
+.stat-card { order: 2; }
+.breakdown { order: 3; }
+.chart-card { order: 4; }
+
+@media (min-width: 768px) {
+  .wallet-grid { gap: 16px; }
+}
+
+@media (min-width: 1280px) {
+  .wallet-grid {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .wallet-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+  .wallet-col.left-col { flex: 1.6 1 0; }
+  .wallet-col.right-col { flex: 1 1 0; }
+  .balance-hero, .stat-card, .breakdown, .chart-card { order: 0; }
+}
+
+/* ---------- Balance hero ---------- */
 .balance-hero {
   padding: 26px 24px 24px;
   border-radius: 32px;
@@ -478,7 +502,7 @@ main {
 
 .hero-label i {
   font-size: 1.15rem;
-  color: var(--pos);
+  color: var(--fg);
 }
 
 .chip {
@@ -520,7 +544,7 @@ main {
   font-size: .82rem;
   font-weight: 500;
   color: var(--fg-soft);
-  margin-top: 6px;
+  margin: 6px 0 0;
 }
 
 .hero-actions {
@@ -530,6 +554,7 @@ main {
   margin-top: 20px;
 }
 
+/* ---------- Stat card ---------- */
 .stat-card {
   padding: 22px;
   border-radius: 28px;
@@ -555,8 +580,8 @@ main {
 }
 
 .stat-icon {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 12px;
   display: inline-flex;
   align-items: center;
@@ -564,10 +589,10 @@ main {
   font-size: 1.1rem;
   border: 1px solid var(--glass-border);
   background: var(--btn-bg);
+  color: var(--fg);
+  -webkit-backdrop-filter: blur(6px) saturate(180%);
+  backdrop-filter: blur(6px) saturate(180%);
 }
-
-.stat-icon.pos { color: var(--pos); background: var(--pos-soft); border-color: transparent; }
-.stat-icon.info { color: var(--info); background: var(--info-soft); border-color: transparent; }
 
 .stat-value {
   font-size: clamp(1.55rem, 4.2vw, 1.9rem);
@@ -576,6 +601,7 @@ main {
   line-height: 1.05;
   font-variant-numeric: tabular-nums;
   word-break: break-all;
+  color: var(--fg);
 }
 
 .stat-value .cur {
@@ -592,6 +618,7 @@ main {
   margin-top: 2px;
 }
 
+/* ---------- Breakdown ---------- */
 .breakdown {
   padding: 24px;
   border-radius: 30px;
@@ -645,16 +672,13 @@ main {
 }
 
 .bd-item .bd-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 999px;
+  background: var(--fg);
+  opacity: .4;
   flex: none;
 }
-
-.bd-item.pos .bd-dot { background: var(--pos); }
-.bd-item.info .bd-dot { background: var(--info); }
-.bd-item.warn .bd-dot { background: #e09b2d; }
-.bd-item.neg .bd-dot { background: var(--neg); }
 
 .bd-item .bd-label {
   font-size: 9.5px;
@@ -670,10 +694,8 @@ main {
   letter-spacing: -.02em;
   font-variant-numeric: tabular-nums;
   word-break: break-all;
+  color: var(--fg);
 }
-
-.bd-item.neg .bd-value { color: var(--neg); }
-.bd-item.pos .bd-value { color: var(--fg); }
 
 .bd-note {
   font-size: .7rem;
@@ -682,6 +704,101 @@ main {
   margin-top: 2px;
 }
 
+/* ---------- Chart ---------- */
+.chart-card {
+  padding: 22px;
+  border-radius: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.chart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.chart-head h3 {
+  margin: 0;
+  font-size: .95rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+}
+
+.chart-total {
+  font-size: .95rem;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-body {
+  width: 100%;
+  position: relative;
+}
+
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 200px;
+  padding: 0 4px 26px;
+  position: relative;
+}
+
+.chart-bars::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 26px;
+  height: 1px;
+  background: var(--line);
+  pointer-events: none;
+}
+
+.chart-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  position: relative;
+  min-width: 0;
+}
+
+.chart-bar {
+  width: 100%;
+  max-width: 34px;
+  background: var(--fg);
+  border-radius: 8px 8px 3px 3px;
+  transition: height .5s cubic-bezier(.22, 1, .36, 1), background-color .3s ease;
+  min-height: 4px;
+}
+
+.chart-bar.empty {
+  background: var(--fg-soft);
+  opacity: .3;
+}
+
+.chart-day {
+  position: absolute;
+  bottom: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--fg-soft);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* ---------- Bottom nav ---------- */
 .bottomnav {
   position: fixed;
   left: 12px;
@@ -717,6 +834,7 @@ main {
 .bn-item i { font-size: 1.35rem; }
 .bn-item.active { color: var(--nav-active-fg); background: var(--nav-active-bg); }
 
+/* ---------- Context menu ---------- */
 #ctx-menu {
   position: fixed;
   z-index: 350;
@@ -762,6 +880,7 @@ main {
 
 .ctx-sep { height: 1px; margin: 6px 8px; background: var(--line); }
 
+/* ---------- Tooltip ---------- */
 #tip {
   position: fixed;
   left: 0;
@@ -792,6 +911,7 @@ main {
 #tip.below { transform: translate(-50%, 8px) scale(.96); }
 #tip.below.show { transform: translate(-50%, 8px) scale(1); }
 
+/* ---------- Scroll pill ---------- */
 #scroll-pill {
   position: fixed;
   right: 9px;
@@ -846,6 +966,7 @@ main {
 #scroll-pill.dragging { opacity: 1; width: 13px; }
 #scroll-pill.dragging { cursor: grabbing; }
 
+/* ---------- Devtools block ---------- */
 #dt-block {
   position: fixed;
   inset: 0;
@@ -919,10 +1040,10 @@ body.dt-open #dt-block { display: flex; }
 @media (min-width: 768px) {
   main { padding: 92px 26px 60px; }
   .page-head h1 { font-size: 1.85rem; }
-  .wallet-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-  .balance-hero { grid-column: 1 / -1; padding: 32px 30px 28px; }
-  .breakdown { grid-column: 1 / -1; padding: 28px; }
+  .balance-hero { padding: 32px 30px 28px; }
+  .breakdown { padding: 28px; }
   .breakdown-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .chart-card { padding: 26px; }
 }
 
 @media (max-width: 767px) {
@@ -957,12 +1078,6 @@ body.dt-open #dt-block { display: flex; }
   body.sb-collapsed #collapseBtn { display: none; }
   body.sb-collapsed .nav-item { justify-content: center; padding: 14px 0; }
   body.sb-collapsed .sidebar-nav { overflow: visible; padding: 16px 10px; }
-}
-
-@media (min-width: 1280px) {
-  .wallet-grid { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; }
-  .balance-hero { grid-column: auto; }
-  .breakdown { grid-column: auto; }
 }
 
 @media (min-width: 1600px) {
@@ -1081,76 +1196,90 @@ body.dt-open #dt-block { display: flex; }
     </div>
 
     <div class="wallet-grid">
-      <section class="balance-hero glass">
-        <div class="hero-top">
-          <span class="hero-label" data-tip="Your current spendable balance">
-            <i class="ph-duotone ph-wallet"></i>
-            Main Balance
-          </span>
-          <span class="chip" data-tip="Currency: US Dollar">
-            <i class="ph-duotone ph-currency-dollar"></i>
-            USD
-          </span>
-        </div>
-        <div class="hero-amount" id="main-balance" data-tip="Available balance in US dollars">
-          <span class="cur">$</span>0.00
-        </div>
-        <p class="hero-sub" data-tip="This is what you can withdraw right now">
-          Ready to spend or withdraw anytime.
-        </p>
-        <div class="hero-actions">
-          <a href="/" class="gbtn solid" data-tip="Go back to your dashboard">
-            <i class="ph-duotone ph-squares-four"></i>
-            Dashboard
-          </a>
-          <a href="transactions" class="gbtn" data-tip="See all transactions">
-            <i class="ph-duotone ph-arrows-left-right"></i>
-            History
-          </a>
-        </div>
-      </section>
+      <div class="wallet-col left-col">
+        <section class="balance-hero glass">
+          <div class="hero-top">
+            <span class="hero-label" data-tip="Your current spendable balance">
+              <i class="ph-duotone ph-wallet"></i>
+              Main Balance
+            </span>
+            <span class="chip" data-tip="Currency: US Dollar">
+              <i class="ph-duotone ph-currency-dollar"></i>
+              USD
+            </span>
+          </div>
+          <div class="hero-amount" id="main-balance" data-tip="Available balance in US dollars">
+            <span class="cur">$</span>0.00
+          </div>
+          <p class="hero-sub" data-tip="This is what you can withdraw right now">
+            Ready to spend or withdraw anytime.
+          </p>
+          <div class="hero-actions">
+            <a href="/" class="gbtn solid" data-tip="Go back to your dashboard">
+              <i class="ph-duotone ph-squares-four"></i>
+              Dashboard
+            </a>
+            <a href="transactions" class="gbtn" data-tip="See all transactions">
+              <i class="ph-duotone ph-arrows-left-right"></i>
+              History
+            </a>
+          </div>
+        </section>
 
-      <section class="stat-card glass">
-        <div class="stat-head">
-          <span class="stat-label" data-tip="Lifetime earnings from all sources">Total Earnings</span>
-          <span class="stat-icon info"><i class="ph-duotone ph-chart-line-up"></i></span>
-        </div>
-        <div class="stat-value" id="total-earnings-balance" data-tip="Sum of tasks, referrals, and bonuses">
-          <span class="cur">$</span>0.00
-        </div>
-        <span class="stat-foot" data-tip="Completed earnings added together">
-          All completed earnings combined
-        </span>
-      </section>
+        <section class="breakdown glass">
+          <div class="breakdown-head">
+            <h3 data-tip="Detailed breakdown of your earnings">Breakdown</h3>
+            <span>Earnings</span>
+          </div>
+          <div class="breakdown-grid">
+            <div class="bd-item" data-tip="Earnings from completing daily tasks">
+              <div class="bd-top"><span class="bd-dot"></span><span class="bd-label">Task Earnings</span></div>
+              <div class="bd-value" id="earnings-balance">$0.00</div>
+              <span class="bd-note">From completed tasks</span>
+            </div>
+            <div class="bd-item" data-tip="Bonuses earned through referrals">
+              <div class="bd-top"><span class="bd-dot"></span><span class="bd-label">Referrals</span></div>
+              <div class="bd-value" id="referral-balance">$0.00</div>
+              <span class="bd-note">Referral bonuses earned</span>
+            </div>
+            <div class="bd-item" data-tip="Promotional and bonus credits">
+              <div class="bd-top"><span class="bd-dot"></span><span class="bd-label">Bonuses</span></div>
+              <div class="bd-value" id="bonuses-balance">$0.00</div>
+              <span class="bd-note">Promotional credits</span>
+            </div>
+            <div class="bd-item" data-tip="Total amount you have withdrawn">
+              <div class="bd-top"><span class="bd-dot"></span><span class="bd-label">Withdrawn</span></div>
+              <div class="bd-value" id="withdrawn-balance">$0.00</div>
+              <span class="bd-note">Total payouts received</span>
+            </div>
+          </div>
+        </section>
+      </div>
 
-      <section class="breakdown glass">
-        <div class="breakdown-head">
-          <h3 data-tip="Detailed breakdown of your earnings">Breakdown</h3>
-          <span>Earnings</span>
-        </div>
-        <div class="breakdown-grid">
-          <div class="bd-item pos" data-tip="Earnings from completing daily tasks">
-            <div class="bd-top"><span class="bd-dot"></span><span class="bd-label">Task Earnings</span></div>
-            <div class="bd-value" id="earnings-balance">$0.00</div>
-            <span class="bd-note">From completed tasks</span>
+      <div class="wallet-col right-col">
+        <section class="stat-card glass">
+          <div class="stat-head">
+            <span class="stat-label" data-tip="Lifetime earnings from all sources">Total Earnings</span>
+            <span class="stat-icon"><i class="ph-duotone ph-chart-line-up"></i></span>
           </div>
-          <div class="bd-item info" data-tip="Bonuses earned through referrals">
-            <div class="bd-top"><span class="bd-dot"></span><span class="bd-label">Referrals</span></div>
-            <div class="bd-value" id="referral-balance">$0.00</div>
-            <span class="bd-note">Referral bonuses earned</span>
+          <div class="stat-value" id="total-earnings-balance" data-tip="Sum of tasks, referrals, and bonuses">
+            <span class="cur">$</span>0.00
           </div>
-          <div class="bd-item warn" data-tip="Promotional and bonus credits">
-            <div class="bd-top"><span class="bd-dot"></span><span class="bd-label">Bonuses</span></div>
-            <div class="bd-value" id="bonuses-balance">$0.00</div>
-            <span class="bd-note">Promotional credits</span>
+          <span class="stat-foot" data-tip="Completed earnings added together">
+            All completed earnings combined
+          </span>
+        </section>
+
+        <section class="chart-card glass">
+          <div class="chart-head">
+            <h3 data-tip="Earnings over the last seven days">Trend</h3>
+            <span class="chart-total" id="chart-total" data-tip="Total earned in the last 7 days">$0.00</span>
           </div>
-          <div class="bd-item neg" data-tip="Total amount you have withdrawn">
-            <div class="bd-top"><span class="bd-dot"></span><span class="bd-label">Withdrawn</span></div>
-            <div class="bd-value" id="withdrawn-balance">$0.00</div>
-            <span class="bd-note">Total payouts received</span>
+          <div class="chart-body">
+            <div class="chart-bars" id="chart-bars"></div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   </div>
 </main>
@@ -1287,9 +1416,7 @@ body.dt-open #dt-block { display: flex; }
     }
   };
 
-  window.showAlert = function (message) {
-    window.alert(message);
-  };
+  window.showAlert = function (message) { window.alert(message); };
 
   applyThemeIcon();
   updateMenuTip();
@@ -1301,6 +1428,7 @@ body.dt-open #dt-block { display: flex; }
     await loadUserData();
     await loadTransactions();
     updateBalancesUI();
+    buildChart();
   });
 
   async function loadUserData() {
@@ -1361,6 +1489,44 @@ body.dt-open #dt-block { display: flex; }
     document.getElementById('bonuses-balance').textContent = fmt(bonuses);
     document.getElementById('withdrawn-balance').textContent = fmt(withdrawn);
   }
+
+  function buildChart() {
+    const container = document.getElementById('chart-bars');
+    if (!container) return;
+
+    const labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().split('T')[0];
+      days.push({ key, amount: 0, label: labels[d.getDay()] });
+    }
+
+    allTransactions
+      .filter(t => t.status === 'completed' &&
+        (t.type === 'earning' || t.type === 'referral_bonus' || t.type === 'bonus'))
+      .forEach(t => {
+        const dayKey = (t.date || '').split('T')[0];
+        const found = days.find(d => d.key === dayKey);
+        if (found) found.amount += parseFloat(t.amount) || 0;
+      });
+
+    const total = days.reduce((s, d) => s + d.amount, 0);
+    const totalEl = document.getElementById('chart-total');
+    if (totalEl) totalEl.textContent = '$' + total.toFixed(2);
+
+    const max = Math.max(...days.map(d => d.amount), 1);
+
+    container.innerHTML = days.map(d => {
+      const pct = d.amount > 0 ? Math.max(8, (d.amount / max) * 100) : 3;
+      const emptyClass = d.amount > 0 ? '' : ' empty';
+      return '<div class="chart-bar-wrap" data-tip="' + d.label + ': $' + d.amount.toFixed(2) + '">' +
+        '<div class="chart-bar' + emptyClass + '" style="height:' + pct + '%"></div>' +
+        '<span class="chart-day">' + d.label + '</span>' +
+      '</div>';
+    }).join('');
+  }
 </script>
 
 <script>
@@ -1385,7 +1551,7 @@ body.dt-open #dt-block { display: flex; }
       const tw = tip.offsetWidth;
       const th = tip.offsetHeight;
 
-      let placeBelow = r.top - th - 14 < 4;
+      const placeBelow = r.top - th - 14 < 4;
       if (placeBelow) tip.classList.add('below');
 
       let left = r.left + r.width / 2;
@@ -1564,9 +1730,7 @@ body.dt-open #dt-block { display: flex; }
       });
     }
 
-    function hideMenu() {
-      ctxMenu.classList.remove('open');
-    }
+    function hideMenu() { ctxMenu.classList.remove('open'); }
 
     buildMenu();
 
