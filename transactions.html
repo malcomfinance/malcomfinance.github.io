@@ -1,203 +1,2135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <title>Malcom Finance | Transactions</title>
-  <link href="tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Malcom Finance · Transactions</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0b0b0b">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" href="logo.png">
+<link href="tailwind.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
 <script src="firebase-app-compat.js"></script>
-  <script src="firebase-auth-compat.js"></script>
-  <script src="firebase-firestore-compat.js"></script>
-  <script src="firebase-storage-compat.js"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+<script src="firebase-auth-compat.js"></script>
+<script src="firebase-firestore-compat.js"></script>
+<script src="firebase-storage-compat.js"></script>
+<script>
+(function () {
+  try {
+    if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+  } catch (e) {}
+})();
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&display=swap');
 
-    :root {
-      --bg-main: #f9fafb;
-      --bg-card: #ffffff;
-      --text-main: #111827;
-      --text-muted: #6b7280;
-      --border-color: #e5e7eb;
-      --accent-green: #059669;
-      --accent-soft: #ecfdf5;
-    }
+*, *::before, *::after { box-sizing: border-box; }
 
-    body.dark {
-      --bg-main: #0f172a;
-      --bg-card: #1e293b;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --border-color: #334155;
-      --accent-green: #10b981;
-      --accent-soft: #064e3b;
-    }
+:root {
+  --font: 'DM Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --sb-w: 290px;
+  --sb-rail: 86px;
+  --bg-1: #f5f5f3;
+  --bg-2: #e5e5e1;
+  --fg: #0b0b0b;
+  --fg-soft: #5f5f5c;
+  --line: rgba(11, 11, 11, 0.10);
+  --glass-tint: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.85);
+  --glass-shadow: 0 20px 45px rgba(20, 20, 20, 0.13);
+  --rim-1: rgba(255, 255, 255, 0.95);
+  --rim-2: rgba(255, 255, 255, 0.55);
+  --rim-inner: rgba(255, 255, 255, 0.08);
+  --btn-bg: rgba(255, 255, 255, 0.34);
+  --btn-hover: rgba(255, 255, 255, 0.62);
+  --tip-bg: #0b0b0b;
+  --tip-fg: #f6f6f4;
+  --solid: #0b0b0b;
+  --solid-fg: #f7f7f5;
+  --nav-active-bg: #0b0b0b;
+  --nav-active-fg: #ffffff;
+  --stripe: rgba(11, 11, 11, 0.045);
+  --scene-tint: rgba(245, 245, 243, 0.42);
+  --pos: #178a52;
+  --neg: #d64545;
+  --warn: #b8860b;
+  --pos-soft: rgba(23, 138, 82, 0.12);
+  --neg-soft: rgba(214, 69, 69, 0.10);
+  --warn-soft: rgba(184, 134, 11, 0.12);
+}
 
-html,body{overflow:hidden}html{overflow:scroll;scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar{display:none}
-    body { 
-      background-color: var(--bg-main); 
-      color: var(--text-main); 
-      transition: background-color 0.3s ease, color 0.3s ease; 
-      font-family: 'Inter', sans-serif; 
-    }
+html.dark {
+  --bg-1: #070707;
+  --bg-2: #161616;
+  --fg: #f4f4f1;
+  --fg-soft: #9c9c98;
+  --line: rgba(255, 255, 255, 0.12);
+  --glass-tint: rgba(255, 255, 255, 0.055);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-shadow: 0 20px 45px rgba(0, 0, 0, 0.62);
+  --rim-1: rgba(255, 255, 255, 0.45);
+  --rim-2: rgba(255, 255, 255, 0.14);
+  --rim-inner: rgba(255, 255, 255, 0.05);
+  --btn-bg: rgba(255, 255, 255, 0.07);
+  --btn-hover: rgba(255, 255, 255, 0.15);
+  --tip-bg: #f4f4f1;
+  --tip-fg: #070707;
+  --solid: #f4f4f1;
+  --solid-fg: #0a0a0a;
+  --nav-active-bg: #f4f4f1;
+  --nav-active-fg: #0a0a0a;
+  --stripe: rgba(255, 255, 255, 0.05);
+  --scene-tint: rgba(7, 7, 7, 0.72);
+  --pos: #34d399;
+  --neg: #f87171;
+  --warn: #facc15;
+  --pos-soft: rgba(52, 211, 153, 0.14);
+  --neg-soft: rgba(248, 113, 113, 0.12);
+  --warn-soft: rgba(250, 204, 21, 0.12);
+}
 
-    .card { 
-      background-color: var(--bg-card); 
-      border: 1px solid var(--border-color); 
-      border-radius: 1.5rem; 
-      transition: all 0.3s ease;
-    }
+html, body { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display: none; }
+html { scroll-behavior: smooth; }
 
-    .text-muted { color: var(--text-muted); }
-    .accent-bg { background-color: var(--accent-green); }
-    .accent-text { color: var(--accent-green); }
-    .soft-accent-bg { background-color: var(--accent-soft); }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg-1);
+  color: var(--fg);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color .35s ease, color .35s ease;
+}
 
-    .status-badge {
-      padding: 2px 8px;
-      border-radius: 99px;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-  </style>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
-      authDomain: "malcolm-finance.firebaseapp.com",
-      projectId: "malcolm-finance",
-      storageBucket: "malcolm-finance.firebasestorage.app",
-      messagingSenderId: "987613399580",
-      appId: "1:987613399580:web:0237b2c8c2c7df54222dd9"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+}
 
-    if (localStorage.getItem('theme') === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.body.classList.add('dark');
-    }
-  </script>
+.scene-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: .88;
+}
+
+html:not(.dark) .scene-video { filter: brightness(1.22) contrast(.92) saturate(1.05); }
+html.dark .scene-video { filter: brightness(.62) contrast(1.05) saturate(1.12); }
+
+.scene-tint {
+  position: absolute;
+  inset: 0;
+  background: var(--scene-tint);
+  pointer-events: none;
+}
+
+.scene .stripes {
+  position: absolute;
+  inset: -20%;
+  background: repeating-linear-gradient(115deg, transparent 0 58px, var(--stripe) 58px 60px);
+  opacity: .55;
+}
+
+.glass {
+  position: relative;
+  isolation: isolate;
+  border-radius: 28px;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  box-shadow:
+    var(--glass-shadow),
+    inset 1.5px 1.5px 1px -1px var(--rim-1),
+    inset -1px -1px 1px -1px var(--rim-2),
+    inset 0 0 24px 4px var(--rim-inner);
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -3;
+  -webkit-backdrop-filter: url(#glass-distortion);
+  backdrop-filter: url(#glass-distortion);
+  pointer-events: none;
+}
+
+.glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -2;
+  background: var(--glass-tint);
+  -webkit-backdrop-filter: blur(3px) saturate(180%) brightness(1.06);
+  backdrop-filter: blur(3px) saturate(180%) brightness(1.06);
+  pointer-events: none;
+}
+
+@supports not (backdrop-filter: url(#glass-distortion)) {
+  .glass::before {
+    -webkit-backdrop-filter: blur(16px) saturate(185%);
+    backdrop-filter: blur(16px) saturate(185%);
+  }
+}
+
+.gbtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 14px 22px;
+  border-radius: 18px;
+  border: 1px solid var(--glass-border);
+  background: var(--btn-bg);
+  color: var(--fg);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: .875rem;
+  letter-spacing: .01em;
+  cursor: pointer;
+  text-decoration: none;
+  -webkit-backdrop-filter: blur(6px) saturate(180%);
+  backdrop-filter: blur(6px) saturate(180%);
+  box-shadow:
+    inset 1.5px 1.5px 1px -1px var(--rim-1),
+    inset -1px -1px 1px -1px var(--rim-2),
+    0 8px 18px rgba(0, 0, 0, .12);
+  transition: transform .25s ease, background .25s ease, box-shadow .25s ease;
+}
+
+.gbtn i { font-size: 1.15rem; }
+.gbtn:hover { background: var(--btn-hover); transform: translateY(-2px); }
+.gbtn:active { transform: translateY(0) scale(.98); }
+
+.gbtn.solid {
+  background: var(--solid);
+  color: var(--solid-fg);
+  border-color: transparent;
+  box-shadow:
+    inset 1.5px 1.5px 1px -1px rgba(255, 255, 255, .35),
+    0 12px 26px rgba(0, 0, 0, .28);
+}
+.gbtn.solid:hover { background: var(--solid); opacity: .92; }
+
+.icon-btn {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--fg);
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: background .22s ease, border-color .22s ease, transform .18s ease;
+}
+
+.icon-btn:hover { background: var(--btn-bg); border-color: var(--glass-border); }
+.icon-btn:active { transform: scale(.93); }
+
+.topbar {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  height: 62px;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border-radius: 22px;
+  transition: left .32s cubic-bezier(.22, 1, .36, 1);
+}
+
+.topbar-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.brand-mini { display: flex; align-items: center; gap: 9px; flex: 1; min-width: 0; }
+.brand-mini img { width: 28px; height: 28px; border-radius: 9px; object-fit: cover; }
+.brand-mini span {
+  font-size: .95rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar-actions { display: flex; align-items: center; gap: 4px; }
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100dvh;
+  width: min(84vw, 300px);
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 30px 30px 0;
+  border-left: none;
+  transform: translateX(-104%);
+  transition: transform .38s cubic-bezier(.22, 1, .36, 1), width .32s cubic-bezier(.22, 1, .36, 1);
+}
+
+body.nav-open .sidebar { transform: translateX(0); }
+
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 18px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 1; }
+.brand img { width: 40px; height: 40px; border-radius: 13px; object-fit: cover; flex: none; }
+.brand-text { min-width: 0; }
+.brand-text h2 {
+  margin: 0;
+  font-size: .875rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.brand-text p {
+  margin: 2px 0 0;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+  white-space: nowrap;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sidebar-nav::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+.nav-section-title {
+  margin: 16px 0 6px;
+  padding: 0 12px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  color: var(--fg-soft);
+  font-size: .875rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+  transition: background .22s ease, color .22s ease, border-color .22s ease, transform .18s ease;
+}
+
+.nav-item i { font-size: 1.35rem; flex: none; }
+.nav-item:hover { background: var(--btn-bg); border-color: var(--glass-border); color: var(--fg); }
+.nav-item:active { transform: scale(.985); }
+
+.nav-item.active {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-fg);
+  border-color: transparent;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, .22);
+}
+
+.nav-item.danger { color: var(--fg-soft); }
+.nav-item.danger:hover { background: var(--neg-soft); border-color: rgba(214, 69, 69, .25); color: var(--neg); }
+
+.sidebar-foot { padding: 14px; }
+
+.support-card {
+  border-radius: 20px;
+  padding: 16px;
+  background: var(--btn-bg);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+  backdrop-filter: blur(10px) saturate(180%);
+}
+
+.support-card p:first-child {
+  margin: 0 0 4px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.support-card p:nth-child(2) {
+  margin: 0 0 12px;
+  font-size: .75rem;
+  line-height: 1.45;
+  color: var(--fg-soft);
+}
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(0, 0, 0, .45);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .3s ease, visibility .3s ease;
+}
+
+body.nav-open #overlay { opacity: 1; visibility: visible; }
+
+main {
+  padding: 88px 14px 118px;
+  transition: margin-left .32s cubic-bezier(.22, 1, .36, 1), padding .32s ease;
+}
+
+.wrap { max-width: 1240px; margin: 0 auto; }
+
+.page-head { margin-bottom: 18px; padding: 0 4px; }
+.page-head h1 {
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -.03em;
+}
+.page-head p {
+  margin: 5px 0 0;
+  font-size: .85rem;
+  font-weight: 500;
+  color: var(--fg-soft);
+}
+
+/* ---------- Toolbar (tabs + search) ---------- */
+.toolbar {
+  padding: 14px;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 2px;
+}
+
+.tabs::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--fg-soft);
+  font-family: inherit;
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .01em;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: none;
+  transition: background .22s ease, color .22s ease, border-color .22s ease, transform .18s ease;
+}
+
+.tab:hover { background: var(--btn-bg); color: var(--fg); }
+.tab:active { transform: scale(.97); }
+
+.tab.active {
+  background: var(--solid);
+  color: var(--solid-fg);
+  border-color: transparent;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, .22);
+}
+
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  background: var(--btn-bg);
+  color: var(--fg);
+  border: 1px solid var(--glass-border);
+}
+
+.tab.active .tab-count {
+  background: rgba(255, 255, 255, .16);
+  color: var(--solid-fg);
+  border-color: rgba(255, 255, 255, .12);
+}
+
+html.dark .tab.active .tab-count {
+  background: rgba(0, 0, 0, .12);
+  color: var(--solid-fg);
+  border-color: rgba(0, 0, 0, .10);
+}
+
+.search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--btn-bg);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
+  backdrop-filter: blur(8px) saturate(180%);
+  transition: border-color .22s ease, background .22s ease;
+}
+
+.search-wrap:focus-within {
+  border-color: var(--fg);
+  background: var(--btn-hover);
+}
+
+.search-wrap i {
+  font-size: 1.05rem;
+  color: var(--fg-soft);
+  flex: none;
+}
+
+.search-wrap input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--fg);
+  font-family: inherit;
+  font-size: .88rem;
+  font-weight: 500;
+  padding: 0;
+}
+
+.search-wrap input::placeholder { color: var(--fg-soft); font-weight: 500; }
+
+.search-clear {
+  display: none;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: none;
+  background: var(--btn-bg);
+  color: var(--fg-soft);
+  cursor: pointer;
+  flex: none;
+  font-size: .9rem;
+  padding: 0;
+  transition: background .18s ease, color .18s ease;
+}
+
+.search-clear:hover { background: var(--btn-hover); color: var(--fg); }
+.search-wrap.has-value .search-clear { display: inline-flex; }
+
+/* ---------- Result meta ---------- */
+.result-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 6px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.result-count {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--fg-soft);
+}
+
+.result-totals {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+.result-totals .in { color: var(--pos); }
+.result-totals .out { color: var(--neg); }
+.result-totals .sep { color: var(--fg-soft); font-weight: 500; }
+
+/* ---------- Transaction groups ---------- */
+.tx-group { margin-bottom: 18px; }
+
+.tx-group-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 6px 8px;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+}
+
+.tx-group-label span:last-child {
+  font-weight: 700;
+  letter-spacing: .04em;
+  opacity: .7;
+}
+
+.tx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tx-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 22px;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: transform .22s ease, box-shadow .22s ease;
+}
+
+.tx-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -3;
+  -webkit-backdrop-filter: url(#glass-distortion);
+  backdrop-filter: url(#glass-distortion);
+  pointer-events: none;
+}
+
+.tx-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -2;
+  background: var(--glass-tint);
+  -webkit-backdrop-filter: blur(3px) saturate(180%) brightness(1.06);
+  backdrop-filter: blur(3px) saturate(180%) brightness(1.06);
+  pointer-events: none;
+}
+
+.tx-card:hover { transform: translateY(-2px); }
+
+.tx-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex: none;
+  color: var(--fg);
+  background: var(--btn-bg);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(6px) saturate(180%);
+  backdrop-filter: blur(6px) saturate(180%);
+}
+
+.tx-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tx-row1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tx-type {
+  font-size: .9rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  color: var(--fg);
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tx-amount {
+  font-size: .95rem;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex: none;
+}
+
+.tx-amount.credit { color: var(--pos); }
+.tx-amount.debit { color: var(--neg); }
+.tx-amount.neutral { color: var(--fg); }
+
+.tx-row2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: .74rem;
+  font-weight: 500;
+  color: var(--fg-soft);
+}
+
+.tx-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.tx-status::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.tx-status.completed { color: var(--pos); background: var(--pos-soft); }
+.tx-status.pending { color: var(--warn); background: var(--warn-soft); }
+.tx-status.rejected { color: var(--neg); background: var(--neg-soft); }
+
+.tx-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--fg-soft);
+  opacity: .6;
+  flex: none;
+}
+
+.tx-date {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tx-desc {
+  font-size: .78rem;
+  line-height: 1.55;
+  color: var(--fg-soft);
+  padding-top: 8px;
+  margin-top: 4px;
+  border-top: 1px solid var(--line);
+  word-break: break-word;
+}
+
+/* ---------- Empty states ---------- */
+.empty-state {
+  padding: 40px 24px 44px;
+  border-radius: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.empty-icon {
+  width: 88px;
+  height: 88px;
+  border-radius: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+  color: var(--fg);
+  background: var(--btn-bg);
+  border: 1px solid var(--glass-border);
+  margin-bottom: 18px;
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
+  backdrop-filter: blur(8px) saturate(180%);
+  box-shadow:
+    inset 1.5px 1.5px 1px -1px var(--rim-1),
+    inset -1px -1px 1px -1px var(--rim-2);
+}
+
+.empty-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--fg);
+}
+
+.empty-text {
+  margin: 6px 0 22px;
+  font-size: .85rem;
+  line-height: 1.6;
+  color: var(--fg-soft);
+  max-width: 340px;
+}
+
+.empty-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+.empty-actions .gbtn { width: auto; padding: 12px 20px; font-size: .82rem; }
+
+/* ---------- Skeletons ---------- */
+.skeleton {
+  padding: 16px 18px;
+  border-radius: 22px;
+  border: 1px solid var(--glass-border);
+  background: var(--btn-bg);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  animation: skelPulse 1.6s ease-in-out infinite;
+}
+
+.skeleton-block {
+  border-radius: 8px;
+  background: var(--line);
+}
+
+.skeleton-icon { width: 44px; height: 44px; border-radius: 14px; flex: none; }
+.skeleton-lines { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.skeleton-line { height: 11px; }
+.skeleton-line.short { width: 40%; }
+
+@keyframes skelPulse {
+  0%, 100% { opacity: .55; }
+  50% { opacity: .85; }
+}
+
+/* ---------- Bottom nav ---------- */
+.bottomnav {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  height: 68px;
+  z-index: 75;
+  display: none;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 6px;
+  border-radius: 24px;
+}
+
+.bn-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex: 1;
+  height: 52px;
+  border-radius: 16px;
+  text-decoration: none;
+  color: var(--fg-soft);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  transition: color .22s ease, background .22s ease;
+}
+
+.bn-item i { font-size: 1.35rem; }
+.bn-item.active { color: var(--nav-active-fg); background: var(--nav-active-bg); }
+
+/* ---------- Context menu ---------- */
+#ctx-menu {
+  position: fixed;
+  z-index: 350;
+  min-width: 210px;
+  padding: 8px;
+  border-radius: 22px;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0;
+  transform: scale(.96);
+  transform-origin: top left;
+  transition: opacity .18s ease, transform .18s ease;
+}
+
+#ctx-menu.open { display: flex; opacity: 1; transform: scale(1); }
+
+.ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 13px;
+  border: none;
+  background: transparent;
+  color: var(--fg);
+  font-family: inherit;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background .16s ease, transform .12s ease;
+}
+
+.ctx-item i { font-size: 1.15rem; flex: none; }
+.ctx-item:hover { background: var(--btn-bg); }
+.ctx-item:active { transform: scale(.98); }
+
+.ctx-sep { height: 1px; margin: 6px 8px; background: var(--line); }
+
+/* ---------- Tooltip ---------- */
+#tip {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 500;
+  max-width: 78vw;
+  padding: 7px 11px;
+  border-radius: 10px;
+  font-family: var(--font);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--tip-fg);
+  background: var(--tip-bg);
+  border: 1px solid rgba(255, 255, 255, .14);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, .28);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, calc(-100% - 8px)) scale(.96);
+  transition: opacity .16s ease, transform .16s ease;
+}
+
+#tip.show { opacity: 1; transform: translate(-50%, calc(-100% - 8px)) scale(1); }
+#tip.below { transform: translate(-50%, 8px) scale(.96); }
+#tip.below.show { transform: translate(-50%, 8px) scale(1); }
+
+/* ---------- Scroll pill ---------- */
+#scroll-pill {
+  position: fixed;
+  right: 9px;
+  top: 0;
+  width: 8px;
+  height: 60px;
+  border-radius: 999px;
+  z-index: 110;
+  opacity: 0;
+  cursor: grab;
+  touch-action: none;
+  background: var(--glass-tint);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    inset 1.5px 1.5px 1px -1px var(--rim-1),
+    inset -1px -1px 1px -1px var(--rim-2),
+    0 6px 18px rgba(0, 0, 0, .28);
+  -webkit-backdrop-filter: blur(4px) saturate(180%) brightness(1.06);
+  backdrop-filter: blur(4px) saturate(180%) brightness(1.06);
+  transition: opacity .35s ease, width .24s cubic-bezier(.22, 1, .36, 1), box-shadow .24s ease;
+  overflow: hidden;
+  will-change: transform, height;
+}
+
+#scroll-pill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -1;
+  -webkit-backdrop-filter: url(#glass-distortion);
+  backdrop-filter: url(#glass-distortion);
+  pointer-events: none;
+}
+
+#scroll-pill::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  bottom: 10%;
+  width: 1px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, .05));
+  opacity: .55;
+  pointer-events: none;
+}
+
+#scroll-pill.visible { opacity: .6; }
+#scroll-pill.hover,
+#scroll-pill.dragging { opacity: 1; width: 13px; }
+#scroll-pill.dragging { cursor: grabbing; }
+
+/* ---------- Devtools block ---------- */
+#dt-block {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 28px;
+  text-align: center;
+  background: #08080a;
+  color: #f4f4f1;
+  font-family: var(--font);
+}
+
+body.dt-open { overflow: hidden; }
+body.dt-open > *:not(#dt-block) { display: none !important; }
+body.dt-open #dt-block { display: flex; }
+
+#dt-block .dt-badge {
+  width: 84px;
+  height: 84px;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  background: rgba(255, 255, 255, .06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  margin-bottom: 10px;
+}
+
+#dt-block .dt-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  margin: 0;
+}
+
+#dt-block .dt-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  color: #e05252;
+  letter-spacing: .02em;
+  word-break: break-word;
+  max-width: 520px;
+  margin: 0;
+}
+
+#dt-block .dt-hint {
+  font-size: 13.5px;
+  color: #9c9c98;
+  max-width: 400px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+#dt-block .dt-foot {
+  font-size: 10px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #5f5f5c;
+  margin: 18px 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+@media (min-width: 768px) {
+  main { padding: 92px 26px 60px; }
+  .page-head h1 { font-size: 1.85rem; }
+  .toolbar { flex-direction: row; align-items: center; gap: 14px; padding: 12px; }
+  .tabs { flex: 1; overflow: visible; padding-bottom: 0; }
+  .search-wrap { flex: 0 0 340px; }
+}
+
+@media (max-width: 767px) {
+  .bottomnav { display: flex; }
+  .brand-mini { display: flex; }
+  .topbar-title { display: none; }
+}
+
+@media (min-width: 768px) {
+  .brand-mini { display: none; }
+}
+
+@media (min-width: 1024px) {
+  .sidebar { transform: none; width: var(--sb-w); }
+  main { margin-left: var(--sb-w); padding: 96px 30px 48px; }
+  .topbar { left: calc(var(--sb-w) + 12px); }
+  #overlay { display: none; }
+  body.nav-open .sidebar { transform: none; }
+  .bottomnav { display: none; }
+
+  body.sb-collapsed .sidebar { width: var(--sb-rail); }
+  body.sb-collapsed main { margin-left: var(--sb-rail); }
+  body.sb-collapsed .topbar { left: calc(var(--sb-rail) + 12px); }
+
+  body.sb-collapsed .brand-text,
+  body.sb-collapsed .nav-label,
+  body.sb-collapsed .nav-section-title,
+  body.sb-collapsed .support-card { display: none; }
+
+  body.sb-collapsed .sidebar-head { justify-content: center; padding: 22px 8px 18px; }
+  body.sb-collapsed .brand { flex: none; justify-content: center; }
+  body.sb-collapsed #collapseBtn { display: none; }
+  body.sb-collapsed .nav-item { justify-content: center; padding: 14px 0; }
+  body.sb-collapsed .sidebar-nav { overflow: visible; padding: 16px 10px; }
+}
+
+@media (min-width: 1600px) {
+  .wrap { max-width: 1440px; }
+}
+</style>
 </head>
-<body class="antialiased pb-24">
-  <script>
-    let currentUser, userData, allTransactions = [];
 
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) { window.location.href = 'auth.html'; return; }
-      currentUser = user;
-      window.currentUser = currentUser;
-      await loadUserData();
-      loadTransactions();
-    });
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="92" result="noise" />
+    <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+    <feDisplacementMap in="SourceGraphic" in2="blurred" scale="70" xChannelSelector="R" yChannelSelector="G" />
+  </filter>
+</svg>
 
-    async function loadUserData() {
-      try {
-        const doc = await db.collection('users').doc(currentUser.uid).get();
-        if (doc.exists) {
-          userData = doc.data(); userData.id = currentUser.uid;
-          window.userData = userData;
-          if (typeof updateSidebar === 'function') updateSidebar();
-        }
-      } catch (e) {}
-    }
+<div class="scene" aria-hidden="true">
+  <video class="scene-video" id="scene-video" autoplay loop muted playsinline preload="auto">
+    <source src="https://www.shutterstock.com/shutterstock/videos/3995007179/preview/stock-footage-abstract-background-with-reeded-glass-effect-k-seamless-loop-d-animation.webm" type="video/webm">
+  </video>
+  <div class="scene-tint"></div>
+  <div class="stripes"></div>
+</div>
 
-    function loadTransactions() {
-      db.collection('transactions')
-        .where('userId', '==', currentUser.uid)
-        .orderBy('date', 'desc')
-        .onSnapshot(snap => {
-          allTransactions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-          renderTransactions();
-        }, err => {
-            // Fallback for missing index during development
-            db.collection('transactions')
-              .where('userId', '==', currentUser.uid)
-              .get()
-              .then(snap => {
-                allTransactions = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-                  .sort((a,b) => new Date(b.date) - new Date(a.date));
-                renderTransactions();
-              });
-        });
-    }
+<header class="topbar glass">
+  <button class="icon-btn" id="menuBtn" data-tip="Open menu" aria-label="Open menu">
+    <i class="ph ph-list"></i>
+  </button>
+  <div class="brand-mini">
+    <img src="logo.png" alt="Malcom Finance logo">
+    <span>Malcom Finance</span>
+  </div>
+  <div class="topbar-title">Transactions</div>
+  <div class="topbar-actions">
+    <button class="icon-btn" onclick="toggleFullScreen()" data-tip="Toggle fullscreen" aria-label="Toggle fullscreen">
+      <i class="ph ph-corners-out"></i>
+    </button>
+    <button class="icon-btn" id="themeBtn" data-tip="Switch theme" aria-label="Switch theme">
+      <i class="ph ph-moon" id="themeIcon"></i>
+    </button>
+  </div>
+</header>
 
-    function getIcon(type) {
-      switch(type) {
-        case 'deposit': return 'fa-arrow-down';
-        case 'withdrawal': return 'fa-arrow-up';
-        case 'earning': return 'fa-tasks';
-        case 'referral_bonus': return 'fa-users';
-        case 'bonus': return 'fa-gift';
-        default: return 'fa-exchange-alt';
-      }
-    }
+<aside id="sidebar" class="sidebar glass" aria-label="Main navigation">
+  <div class="sidebar-head">
+    <div class="brand">
+      <img src="logo.png" alt="Malcom Finance logo">
+      <div class="brand-text">
+        <h2>Malcom Finance</h2>
+        <p>Premium Account</p>
+      </div>
+    </div>
+    <button class="icon-btn" id="collapseBtn" data-tip="Close sidebar" aria-label="Close sidebar">
+      <i class="ph ph-x"></i>
+    </button>
+  </div>
 
-    function getIconColor(type) {
-      if (['deposit','earning','referral_bonus','bonus'].includes(type)) return '#10b981';
-      return '#ef4444';
-    }
+  <nav class="sidebar-nav">
+    <a href="/" class="nav-item" data-tip="Dashboard overview">
+      <i class="ph-duotone ph-squares-four"></i>
+      <span class="nav-label">Dashboard</span>
+    </a>
+    <a href="balances" class="nav-item" data-tip="View all your balances">
+      <i class="ph-duotone ph-wallet"></i>
+      <span class="nav-label">My Balances</span>
+    </a>
+    <a href="transactions" class="nav-item active" data-tip="See your transaction history">
+      <i class="ph-duotone ph-arrows-left-right"></i>
+      <span class="nav-label">Transactions</span>
+    </a>
+    <a href="daily-activities" class="nav-item" data-tip="Complete today's tasks">
+      <i class="ph-duotone ph-list-checks"></i>
+      <span class="nav-label">Daily Tasks</span>
+    </a>
+    <a href="offers" class="nav-item" data-tip="Browse special offers">
+      <i class="ph-duotone ph-gift"></i>
+      <span class="nav-label">Special Offers</span>
+    </a>
 
-    function renderTransactions() {
-      const container = document.getElementById('transactions-container');
-      if (!allTransactions || allTransactions.length === 0) {
-        container.innerHTML = `
-          <div class="card p-12 text-center">
-            <div class="w-16 h-16 soft-accent-bg rounded-full flex items-center justify-center mx-auto mb-4">
-               <i class="fas fa-history text-2xl accent-text"></i>
-            </div>
-            <p class="text-muted font-medium">No transactions found</p>
-          </div>`;
-        return;
-      }
+    <div class="nav-section-title">Account</div>
 
-      container.innerHTML = allTransactions.map(t => {
-        const isPositive = ['deposit','earning','referral_bonus','bonus'].includes(t.type);
-        const statusClass = t.status === 'completed' ? 'bg-green-500/10 text-green-500' : 
-                          t.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500' : 'bg-red-500/10 text-red-500';
+    <a href="account-settings" class="nav-item" data-tip="Manage your account">
+      <i class="ph-duotone ph-gear-six"></i>
+      <span class="nav-label">Settings</span>
+    </a>
+    <a href="contact" class="nav-item" data-tip="Talk to a support agent">
+      <i class="ph-duotone ph-lifebuoy"></i>
+      <span class="nav-label">Support</span>
+    </a>
+    <button class="nav-item danger" onclick="firebase.auth().signOut()" data-tip="Sign out of your account">
+      <i class="ph-duotone ph-sign-out"></i>
+      <span class="nav-label">Logout</span>
+    </button>
+  </nav>
 
-        return `
-          <div class="card p-5 mb-4 hover:shadow-md transition cursor-default">
-            <div class="flex justify-between items-start mb-3">
-              <div class="flex items-center">
-                <div class="w-10 h-10 rounded-2xl flex items-center justify-center mr-3" style="background-color: ${getIconColor(t.type)}15">
-                  <i class="fas ${getIcon(t.type)} text-sm" style="color:${getIconColor(t.type)}"></i>
-                </div>
-                <div>
-                  <span class="block font-bold text-sm capitalize">${t.type.replace('_',' ')}</span>
-                  <span class="status-badge ${statusClass}">${t.status || 'completed'}</span>
-                </div>
-              </div>
-              <div class="text-right">
-                <span class="block font-bold text-base ${isPositive ? 'text-green-500' : 'text-red-500'}">
-                  ${isPositive ? '+' : '-'}$${Math.abs(parseFloat(t.amount)||0).toFixed(2)}
-                </span>
-                <span class="text-[10px] text-muted font-medium">
-                   ${new Date(t.date).toLocaleDateString([], { month: 'short', day: 'numeric' })}
-                </span>
-              </div>
-            </div>
-            ${t.description ? `<p class="text-xs text-muted leading-relaxed border-t border-[var(--border-color)] pt-3 mt-1">${t.description}</p>` : ''}
-          </div>
-        `;
-      }).join('');
-    }
-  </script>
+  <div class="sidebar-foot">
+    <div class="support-card">
+      <p>Support Available</p>
+      <p>Need help with your investment?</p>
+      <a href="contact" class="gbtn solid" style="width:100%;padding:11px 14px;font-size:.78rem;border-radius:14px;" data-tip="Contact a support agent">
+        <i class="ph-duotone ph-chat-circle-dots"></i>
+        Contact Agent
+      </a>
+    </div>
+  </div>
+</aside>
 
-  <main id="page-root" class="max-w-xl mx-auto px-6 pt-10">
-    <div class="mb-8">
-      <h1 class="text-2xl font-bold">Activity</h1>
-      <p class="text-sm text-muted">Tracking your financial history</p>
+<div id="overlay"></div>
+
+<main>
+  <div class="wrap">
+    <div class="page-head">
+      <h1>Activity</h1>
+      <p>Tracking your financial history.</p>
+    </div>
+
+    <div class="toolbar glass">
+      <div class="tabs" role="tablist" aria-label="Filter by status">
+        <button class="tab active" data-tab="all" role="tab" aria-selected="true" data-tip="Show all transactions">
+          <span>All</span>
+          <span class="tab-count" data-count="all">0</span>
+        </button>
+        <button class="tab" data-tab="pending" role="tab" aria-selected="false" data-tip="Show pending transactions">
+          <span>Pending</span>
+          <span class="tab-count" data-count="pending">0</span>
+        </button>
+        <button class="tab" data-tab="completed" role="tab" aria-selected="false" data-tip="Show completed transactions">
+          <span>Completed</span>
+          <span class="tab-count" data-count="completed">0</span>
+        </button>
+        <button class="tab" data-tab="rejected" role="tab" aria-selected="false" data-tip="Show rejected transactions">
+          <span>Rejected</span>
+          <span class="tab-count" data-count="rejected">0</span>
+        </button>
+      </div>
+      <div class="search-wrap" id="search-wrap">
+        <i class="ph ph-magnifying-glass"></i>
+        <input type="text" id="search-input" placeholder="Search by type, amount, or description…" data-tip="Type to filter transactions" autocomplete="off" spellcheck="false">
+        <button class="search-clear" id="search-clear" data-tip="Clear search" aria-label="Clear search">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="result-meta" id="result-meta" style="display:none;">
+      <span class="result-count" id="result-count">—</span>
+      <span class="result-totals" id="result-totals"></span>
     </div>
 
     <div id="transactions-container">
-      <div class="flex justify-center p-12">
-        <i class="fas fa-circle-notch fa-spin accent-text text-2xl"></i>
-      </div>
+      <div class="skeleton"><div class="skeleton-block skeleton-icon"></div><div class="skeleton-lines"><div class="skeleton-block skeleton-line"></div><div class="skeleton-block skeleton-line short"></div></div></div>
+      <div class="skeleton"><div class="skeleton-block skeleton-icon"></div><div class="skeleton-lines"><div class="skeleton-block skeleton-line"></div><div class="skeleton-block skeleton-line short"></div></div></div>
+      <div class="skeleton"><div class="skeleton-block skeleton-icon"></div><div class="skeleton-lines"><div class="skeleton-block skeleton-line"></div><div class="skeleton-block skeleton-line short"></div></div></div>
     </div>
-  </main>
+  </div>
+</main>
 
-  <script src="sidebar.js"></script>
+<nav class="bottomnav glass" aria-label="Quick navigation">
+  <a href="/" class="bn-item" data-tip="Dashboard">
+    <i class="ph-duotone ph-squares-four"></i>
+    <span>Home</span>
+  </a>
+  <a href="balances" class="bn-item" data-tip="My Balances">
+    <i class="ph-duotone ph-wallet"></i>
+    <span>Balances</span>
+  </a>
+  <a href="daily-activities" class="bn-item" data-tip="Daily Tasks">
+    <i class="ph-duotone ph-list-checks"></i>
+    <span>Tasks</span>
+  </a>
+  <a href="offers" class="bn-item" data-tip="Special Offers">
+    <i class="ph-duotone ph-gift"></i>
+    <span>Offers</span>
+  </a>
+  <a href="account-settings" class="bn-item" data-tip="Account Settings">
+    <i class="ph-duotone ph-gear-six"></i>
+    <span>Settings</span>
+  </a>
+</nav>
+
+<div id="ctx-menu" class="glass" role="menu" aria-label="Quick actions"></div>
+<div id="tip" role="tooltip"></div>
+<div id="scroll-pill" aria-hidden="true"></div>
+
+<div id="dt-block" role="alertdialog" aria-modal="true">
+  <div class="dt-badge">&#9888;&#65039;</div>
+  <h1 class="dt-title">Access Blocked</h1>
+  <p class="dt-code">ERR_DEVTOOLS_DETECTED :: session terminated</p>
+  <p class="dt-hint">Developer tools are not permitted on this application. Close developer tools to continue.</p>
+  <p class="dt-foot">Malcom Finance &middot; Security</p>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
+    authDomain: "malcolm-finance.firebaseapp.com",
+    projectId: "malcolm-finance",
+    storageBucket: "malcolm-finance.firebasestorage.app",
+    messagingSenderId: "987613399580",
+    appId: "1:987613399580:web:0237b2c8c2c7df54222dd9"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  const rootEl = document.documentElement;
+  const menuBtn = document.getElementById('menuBtn');
+  const collapseBtn = document.getElementById('collapseBtn');
+  const overlay = document.getElementById('overlay');
+  const themeBtn = document.getElementById('themeBtn');
+  const themeIcon = document.getElementById('themeIcon');
+  const isDesktop = () => window.matchMedia('(min-width: 1024px)').matches;
+
+  function applyThemeIcon() {
+    const dark = rootEl.classList.contains('dark');
+    themeIcon.className = dark ? 'ph ph-sun' : 'ph ph-moon';
+    themeBtn.setAttribute('data-tip', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+  }
+
+  function updateMenuTip() {
+    if (isDesktop()) {
+      const collapsed = document.body.classList.contains('sb-collapsed');
+      menuBtn.setAttribute('data-tip', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+      menuBtn.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+    } else {
+      menuBtn.setAttribute('data-tip', 'Open menu');
+      menuBtn.setAttribute('aria-label', 'Open menu');
+    }
+  }
+
+  function openNav() { document.body.classList.add('nav-open'); }
+  function closeNav() { document.body.classList.remove('nav-open'); }
+
+  menuBtn.addEventListener('click', () => {
+    if (isDesktop()) {
+      document.body.classList.toggle('sb-collapsed');
+      updateMenuTip();
+    } else {
+      document.body.classList.contains('nav-open') ? closeNav() : openNav();
+    }
+  });
+
+  collapseBtn.addEventListener('click', () => {
+    if (isDesktop()) {
+      document.body.classList.add('sb-collapsed');
+      updateMenuTip();
+    } else {
+      closeNav();
+    }
+  });
+
+  overlay.addEventListener('click', closeNav);
+
+  themeBtn.addEventListener('click', () => {
+    const dark = rootEl.classList.toggle('dark');
+    try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+    applyThemeIcon();
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#070707' : '#f5f5f3');
+  });
+
+  window.addEventListener('resize', () => {
+    if (isDesktop()) closeNav();
+    updateMenuTip();
+  });
+
+  document.querySelectorAll('#sidebar a').forEach(link => {
+    link.addEventListener('click', closeNav);
+  });
+
+  window.toggleFullScreen = function () {
+    if (!document.fullscreenElement) {
+      const el = document.documentElement;
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      else if (el.msRequestFullscreen) el.msRequestFullscreen();
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if (document.msExitFullscreen) document.msExitFullscreen();
+    }
+  };
+
+  applyThemeIcon();
+  updateMenuTip();
+
+  /* ---------- Video safety net ---------- */
+  (function () {
+    const video = document.getElementById('scene-video');
+    if (!video) return;
+    let failed = false;
+    function fail() {
+      if (failed) return;
+      failed = true;
+      video.style.display = 'none';
+    }
+    const source = video.querySelector('source');
+    if (source) source.addEventListener('error', fail);
+    video.addEventListener('error', fail);
+    video.addEventListener('stalled', () => {
+      setTimeout(() => {
+        if (video.readyState < 2) fail();
+      }, 4000);
+    });
+    const tryPlay = () => {
+      const p = video.play();
+      if (p && p.catch) p.catch(() => {
+        setTimeout(() => { if (video.readyState < 2) fail(); }, 2500);
+      });
+    };
+    if (video.readyState >= 1) tryPlay();
+    else video.addEventListener('loadedmetadata', tryPlay, { once: true });
+    setTimeout(() => { if (video.readyState < 2) fail(); }, 6000);
+  })();
+
+  /* ---------- Data ---------- */
+  let currentUser = null;
+  let userData = null;
+  let allTransactions = [];
+  let currentTab = 'all';
+  let currentSearch = '';
+  let loading = true;
+
+  function getStatus(t) {
+    const s = (t.status || 'completed').toLowerCase();
+    if (s === 'completed') return 'completed';
+    if (s === 'pending') return 'pending';
+    return 'rejected';
+  }
+
+  function isCredit(type) {
+    return ['deposit', 'earning', 'referral_bonus', 'bonus'].includes(type);
+  }
+
+  function typeLabel(type) {
+    switch (type) {
+      case 'deposit': return 'Deposit';
+      case 'withdrawal': return 'Withdrawal';
+      case 'earning': return 'Task Earning';
+      case 'referral_bonus': return 'Referral Bonus';
+      case 'bonus': return 'Bonus';
+      default: return 'Transaction';
+    }
+  }
+
+  function typeIcon(type) {
+    switch (type) {
+      case 'deposit': return 'ph-arrow-down';
+      case 'withdrawal': return 'ph-arrow-up';
+      case 'earning': return 'ph-check-circle';
+      case 'referral_bonus': return 'ph-users';
+      case 'bonus': return 'ph-gift';
+      default: return 'ph-arrows-left-right';
+    }
+  }
+
+  function fmtMoney(amount) {
+    return '$' + Math.abs(parseFloat(amount) || 0).toFixed(2);
+  }
+
+  function formatTime(date) {
+    return new Date(date).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  }
+
+  function getGroupLabel(date) {
+    const d = new Date(date);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+    const dDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    if (dDay.getTime() === today.getTime()) return 'Today';
+    if (dDay.getTime() === yesterday.getTime()) return 'Yesterday';
+    const sameYear = d.getFullYear() === now.getFullYear();
+    return d.toLocaleDateString([], {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: sameYear ? undefined : 'numeric'
+    });
+  }
+
+  function formatRowDate(date) {
+    const d = new Date(date);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+    const dDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const t = formatTime(d);
+    if (dDay.getTime() === today.getTime()) return t;
+    if (dDay.getTime() === yesterday.getTime()) return 'Yesterday · ' + t;
+    return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' · ' + t;
+  }
+
+  function groupByDay(transactions) {
+    const groups = new Map();
+    transactions.forEach(t => {
+      const d = new Date(t.date);
+      const key = d.toDateString();
+      if (!groups.has(key)) groups.set(key, { date: d, items: [] });
+      groups.get(key).items.push(t);
+    });
+    return Array.from(groups.values()).sort((a, b) => b.date - a.date);
+  }
+
+  function matchesSearch(t, query) {
+    if (!query) return true;
+    const q = query.toLowerCase().trim();
+    if (!q) return true;
+    const amount = parseFloat(t.amount) || 0;
+    const haystack = [
+      t.type || '',
+      typeLabel(t.type),
+      t.status || '',
+      getStatus(t),
+      t.description || '',
+      String(amount),
+      amount.toFixed(2),
+      '$' + amount.toFixed(2),
+      t.date || ''
+    ].join(' ').toLowerCase();
+    return haystack.includes(q);
+  }
+
+  function filterTransactions() {
+    return allTransactions.filter(t => {
+      if (currentTab !== 'all' && getStatus(t) !== currentTab) return false;
+      if (!matchesSearch(t, currentSearch)) return false;
+      return true;
+    });
+  }
+
+  function updateTabCounts() {
+    const counts = { all: allTransactions.length, pending: 0, completed: 0, rejected: 0 };
+    allTransactions.forEach(t => {
+      const s = getStatus(t);
+      if (counts[s] !== undefined) counts[s]++;
+    });
+    document.querySelectorAll('.tab-count').forEach(el => {
+      const key = el.getAttribute('data-count');
+      if (key && counts[key] !== undefined) el.textContent = counts[key];
+    });
+  }
+
+  function renderCard(t) {
+    const status = getStatus(t);
+    const credit = isCredit(t.type);
+    const amountCls = credit ? 'credit' : 'debit';
+    const sign = credit ? '+' : '-';
+    const desc = t.description ? '<div class="tx-desc">' + escapeHtml(t.description) + '</div>' : '';
+    return (
+      '<div class="tx-card">' +
+        '<div class="tx-icon"><i class="ph-duotone ' + typeIcon(t.type) + '"></i></div>' +
+        '<div class="tx-main">' +
+          '<div class="tx-row1">' +
+            '<span class="tx-type">' + escapeHtml(typeLabel(t.type)) + '</span>' +
+            '<span class="tx-amount ' + amountCls + '">' + sign + fmtMoney(t.amount) + '</span>' +
+          '</div>' +
+          '<div class="tx-row2">' +
+            '<span class="tx-status ' + status + '">' + status + '</span>' +
+            '<span class="tx-dot"></span>' +
+            '<span class="tx-date">' + formatRowDate(t.date) + '</span>' +
+          '</div>' +
+          desc +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function renderEmptyNoData() {
+    return (
+      '<div class="empty-state glass">' +
+        '<div class="empty-icon"><i class="ph-duotone ph-receipt"></i></div>' +
+        '<h2 class="empty-title">No activity yet</h2>' +
+        '<p class="empty-text">Your financial journey starts here. Complete a task, receive a bonus, or make your first deposit — your transactions will appear here.</p>' +
+        '<div class="empty-actions">' +
+          '<a href="daily-activities" class="gbtn solid" data-tip="Go complete your first task">' +
+            '<i class="ph-duotone ph-rocket-launch"></i> Start earning' +
+          '</a>' +
+          '<a href="/" class="gbtn" data-tip="Return to dashboard">' +
+            '<i class="ph-duotone ph-squares-four"></i> Dashboard' +
+          '</a>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderEmptyNoMatch() {
+    const tabLabel = currentTab === 'all' ? '' : currentTab + ' ';
+    const hasSearch = currentSearch.trim().length > 0;
+    const title = hasSearch ? 'No matches found' : 'Nothing here yet';
+    const text = hasSearch
+      ? 'We couldn\'t find any ' + tabLabel + 'transaction matching "' + escapeHtml(currentSearch) + '". Try a different search or switch tabs.'
+      : 'You don\'t have any ' + (tabLabel || '') + 'transactions yet. Try a different filter.';
+    const clearBtn = hasSearch
+      ? '<button class="gbtn solid" onclick="clearSearch()" data-tip="Clear search filter"><i class="ph-duotone ph-x"></i> Clear search</button>'
+      : '<button class="gbtn solid" onclick="setTab(\'all\')" data-tip="Show all transactions"><i class="ph-duotone ph-list"></i> Show all</button>';
+    return (
+      '<div class="empty-state glass">' +
+        '<div class="empty-icon"><i class="ph-duotone ph-magnifying-glass"></i></div>' +
+        '<h2 class="empty-title">' + title + '</h2>' +
+        '<p class="empty-text">' + text + '</p>' +
+        '<div class="empty-actions">' + clearBtn +
+          '<a href="/" class="gbtn" data-tip="Return to dashboard"><i class="ph-duotone ph-squares-four"></i> Dashboard</a>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function updateResultMeta(filtered) {
+    const meta = document.getElementById('result-meta');
+    const count = document.getElementById('result-count');
+    const totals = document.getElementById('result-totals');
+    if (!meta || !count || !totals) return;
+
+    if (loading || (allTransactions.length === 0 && !currentSearch && currentTab === 'all')) {
+      meta.style.display = 'none';
+      return;
+    }
+
+    meta.style.display = 'flex';
+    const n = filtered.length;
+    count.textContent = n + (n === 1 ? ' transaction' : ' transactions');
+
+    let credit = 0, debit = 0;
+    filtered.forEach(t => {
+      const a = parseFloat(t.amount) || 0;
+      if (isCredit(t.type)) credit += a;
+      else debit += a;
+    });
+
+    if (n === 0) {
+      totals.innerHTML = '';
+      return;
+    }
+
+    const parts = [];
+    if (credit > 0) parts.push('<span class="in">+' + fmtMoney(credit) + ' in</span>');
+    if (debit > 0) parts.push('<span class="out">-' + fmtMoney(debit) + ' out</span>');
+    totals.innerHTML = parts.join('<span class="sep">·</span>');
+  }
+
+  function renderTransactions() {
+    const container = document.getElementById('transactions-container');
+    if (!container) return;
+
+    if (loading) {
+      container.innerHTML =
+        '<div class="skeleton"><div class="skeleton-block skeleton-icon"></div><div class="skeleton-lines"><div class="skeleton-block skeleton-line"></div><div class="skeleton-block skeleton-line short"></div></div></div>' +
+        '<div class="skeleton"><div class="skeleton-block skeleton-icon"></div><div class="skeleton-lines"><div class="skeleton-block skeleton-line"></div><div class="skeleton-block skeleton-line short"></div></div></div>' +
+        '<div class="skeleton"><div class="skeleton-block skeleton-icon"></div><div class="skeleton-lines"><div class="skeleton-block skeleton-line"></div><div class="skeleton-block skeleton-line short"></div></div></div>';
+      return;
+    }
+
+    if (allTransactions.length === 0) {
+      container.innerHTML = renderEmptyNoData();
+      updateResultMeta([]);
+      return;
+    }
+
+    const filtered = filterTransactions();
+    updateResultMeta(filtered);
+
+    if (filtered.length === 0) {
+      container.innerHTML = renderEmptyNoMatch();
+      return;
+    }
+
+    const groups = groupByDay(filtered);
+    container.innerHTML = groups.map(g => {
+      const label = getGroupLabel(g.date);
+      const list = g.items.map(renderCard).join('');
+      return (
+        '<div class="tx-group">' +
+          '<div class="tx-group-label"><span>' + label + '</span><span>' + g.items.length + '</span></div>' +
+          '<div class="tx-list">' + list + '</div>' +
+        '</div>'
+      );
+    }).join('');
+  }
+
+  window.setTab = function (tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(btn => {
+      const active = btn.getAttribute('data-tab') === tab;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    renderTransactions();
+  };
+
+  window.clearSearch = function () {
+    const input = document.getElementById('search-input');
+    const wrap = document.getElementById('search-wrap');
+    input.value = '';
+    currentSearch = '';
+    wrap.classList.remove('has-value');
+    renderTransactions();
+    input.focus();
+  };
+
+  /* ---------- Events ---------- */
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => setTab(btn.getAttribute('data-tab')));
+  });
+
+  const searchInput = document.getElementById('search-input');
+  const searchWrap = document.getElementById('search-wrap');
+  const searchClear = document.getElementById('search-clear');
+
+  searchInput.addEventListener('input', (e) => {
+    currentSearch = e.target.value;
+    searchWrap.classList.toggle('has-value', currentSearch.length > 0);
+    renderTransactions();
+  });
+
+  searchClear.addEventListener('click', clearSearch);
+
+  /* ---------- Firebase auth + data ---------- */
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) { window.location.href = 'auth'; return; }
+    currentUser = user;
+    window.currentUser = currentUser;
+    await loadUserData();
+    loadTransactions();
+  });
+
+  async function loadUserData() {
+    try {
+      const doc = await db.collection('users').doc(currentUser.uid).get();
+      if (doc.exists) {
+        userData = doc.data();
+        userData.id = currentUser.uid;
+        window.userData = userData;
+      }
+    } catch (e) {}
+  }
+
+  function loadTransactions() {
+    db.collection('transactions')
+      .where('userId', '==', currentUser.uid)
+      .orderBy('date', 'desc')
+      .onSnapshot(snap => {
+        allTransactions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        loading = false;
+        updateTabCounts();
+        renderTransactions();
+      }, () => {
+        // Fallback when the composite index isn't ready yet
+        db.collection('transactions')
+          .where('userId', '==', currentUser.uid)
+          .get()
+          .then(snap => {
+            allTransactions = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+              .sort((a, b) => new Date(b.date) - new Date(a.date));
+            loading = false;
+            updateTabCounts();
+            renderTransactions();
+          })
+          .catch(() => {
+            loading = false;
+            allTransactions = [];
+            updateTabCounts();
+            renderTransactions();
+          });
+      });
+  }
+
+  /* ---------- Tooltip ---------- */
+  (function () {
+    const tip = document.getElementById('tip');
+    let target = null;
+
+    function hide() {
+      target = null;
+      tip.classList.remove('show');
+    }
+
+    function show(el) {
+      const text = el.getAttribute('data-tip');
+      if (!text) return;
+      target = el;
+      tip.textContent = text;
+      tip.classList.remove('below');
+      tip.classList.add('show');
+
+      const r = el.getBoundingClientRect();
+      const tw = tip.offsetWidth;
+      const th = tip.offsetHeight;
+
+      const placeBelow = r.top - th - 14 < 4;
+      if (placeBelow) tip.classList.add('below');
+
+      let left = r.left + r.width / 2;
+      left = Math.min(Math.max(left, tw / 2 + 8), window.innerWidth - tw / 2 - 8);
+
+      const top = placeBelow ? r.bottom : r.top;
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+    }
+
+    document.addEventListener('mouseover', (e) => {
+      const el = e.target.closest('[data-tip]');
+      if (el && el !== target) show(el);
+    }, true);
+
+    document.addEventListener('mouseout', (e) => {
+      const el = e.target.closest('[data-tip]');
+      if (el && !el.contains(e.relatedTarget)) hide();
+    }, true);
+
+    document.addEventListener('focusin', (e) => {
+      const el = e.target.closest('[data-tip]');
+      if (el) show(el);
+    });
+
+    document.addEventListener('focusout', hide);
+    document.addEventListener('scroll', hide, true);
+    window.addEventListener('resize', hide);
+    document.addEventListener('click', hide, true);
+  })();
+
+  /* ---------- Scroll pill ---------- */
+  (function () {
+    const pill = document.getElementById('scroll-pill');
+    if (!pill) return;
+
+    let hideTimer = null;
+    let drag = null;
+
+    function vh() { return window.innerHeight; }
+    function dh() { return Math.max(document.documentElement.scrollHeight, document.body.scrollHeight); }
+    function maxScroll() { return Math.max(0, dh() - vh()); }
+    function trackTop() { return 14; }
+    function trackBottom() { return window.innerWidth < 768 ? 104 : 18; }
+
+    function layout() {
+      const total = dh();
+      const view = vh();
+      if (total <= view + 4) {
+        pill.classList.remove('visible');
+        pill.style.height = '0px';
+        return;
+      }
+      const tTop = trackTop();
+      const tBot = trackBottom();
+      const tH = Math.max(40, view - tTop - tBot);
+      const ratio = view / total;
+      const h = Math.max(44, Math.round(tH * ratio));
+      const travel = Math.max(1, tH - h);
+      const progress = maxScroll() > 0 ? window.scrollY / maxScroll() : 0;
+      const y = tTop + progress * travel;
+      pill.style.height = h + 'px';
+      pill.style.transform = 'translateY(' + y + 'px)';
+    }
+
+    function reveal() {
+      pill.classList.add('visible');
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => {
+        if (!drag) pill.classList.remove('visible');
+      }, 1100);
+    }
+
+    window.addEventListener('scroll', () => { layout(); reveal(); }, { passive: true });
+    window.addEventListener('resize', () => { layout(); reveal(); });
+
+    pill.addEventListener('pointerenter', () => pill.classList.add('hover'));
+    pill.addEventListener('pointerleave', () => { if (!drag) pill.classList.remove('hover'); });
+
+    pill.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      try { pill.setPointerCapture(e.pointerId); } catch (err) {}
+      drag = { y: e.clientY, scroll: window.scrollY };
+      pill.classList.add('dragging');
+      clearTimeout(hideTimer);
+    });
+
+    pill.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const tTop = trackTop();
+      const tBot = trackBottom();
+      const tH = Math.max(40, vh() - tTop - tBot);
+      const h = pill.offsetHeight;
+      const travel = Math.max(1, tH - h);
+      const dy = e.clientY - drag.y;
+      window.scrollTo(0, drag.scroll + (dy / travel) * maxScroll());
+    });
+
+    function endDrag(e) {
+      if (!drag) return;
+      drag = null;
+      pill.classList.remove('dragging');
+      try { pill.releasePointerCapture(e.pointerId); } catch (err) {}
+      hideTimer = setTimeout(() => pill.classList.remove('visible'), 900);
+    }
+
+    pill.addEventListener('pointerup', endDrag);
+    pill.addEventListener('pointercancel', endDrag);
+
+    if (window.ResizeObserver) {
+      new ResizeObserver(() => { layout(); }).observe(document.body);
+    }
+
+    window.addEventListener('load', () => { layout(); reveal(); });
+    layout();
+    setTimeout(reveal, 400);
+  })();
+
+  /* ---------- Context menu ---------- */
+  (function () {
+    const ctxMenu = document.getElementById('ctx-menu');
+    let pressTimer = null;
+    let pressStart = null;
+    let longPressed = false;
+
+    const items = [
+      { icon: 'ph-arrow-clockwise', label: 'Reload', run: () => window.location.reload() },
+      { icon: 'ph-wallet', label: 'Wallet', run: () => { window.location.href = 'balances'; } },
+      { icon: 'ph-list-checks', label: 'Tasks', run: () => { window.location.href = 'daily-activities'; } },
+      { icon: 'ph-gift', label: 'Offers', run: () => { window.location.href = 'offers'; } },
+      { icon: 'ph-gear-six', label: 'Settings', run: () => { window.location.href = 'account-settings'; } },
+      { sep: true },
+      { icon: 'ph-question', label: 'Help', run: () => alert('Need help? Reach us at support@malcomfinance.com or use the Contact Agent button in the sidebar.') },
+      { icon: 'ph-lifebuoy', label: 'Support', run: () => { window.location.href = 'contact'; } }
+    ];
+
+    function buildMenu() {
+      ctxMenu.innerHTML = '';
+      items.forEach(item => {
+        if (item.sep) {
+          const sep = document.createElement('div');
+          sep.className = 'ctx-sep';
+          ctxMenu.appendChild(sep);
+          return;
+        }
+        const btn = document.createElement('button');
+        btn.className = 'ctx-item';
+        btn.type = 'button';
+        btn.innerHTML = '<i class="ph ' + item.icon + '"></i><span>' + item.label + '</span>';
+        btn.addEventListener('click', () => { hideMenu(); item.run(); });
+        ctxMenu.appendChild(btn);
+      });
+    }
+
+    function showMenu(x, y) {
+      document.getElementById('tip').classList.remove('show');
+      ctxMenu.classList.add('open');
+      ctxMenu.style.left = '0px';
+      ctxMenu.style.top = '0px';
+      requestAnimationFrame(() => {
+        const rect = ctxMenu.getBoundingClientRect();
+        const maxX = window.innerWidth - rect.width - 12;
+        const maxY = window.innerHeight - rect.height - 12;
+        ctxMenu.style.left = Math.max(8, Math.min(x, maxX)) + 'px';
+        ctxMenu.style.top = Math.max(8, Math.min(y, maxY)) + 'px';
+      });
+    }
+
+    function hideMenu() { ctxMenu.classList.remove('open'); }
+
+    buildMenu();
+
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showMenu(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('mousedown', (e) => {
+      if (ctxMenu.classList.contains('open') && !ctxMenu.contains(e.target)) hideMenu();
+    });
+
+    document.addEventListener('scroll', hideMenu, true);
+    window.addEventListener('resize', hideMenu);
+
+    document.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0];
+      pressStart = { x: t.clientX, y: t.clientY };
+      longPressed = false;
+      pressTimer = setTimeout(() => {
+        longPressed = true;
+        showMenu(pressStart.x, pressStart.y);
+      }, 600);
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+      if (!pressStart) return;
+      const t = e.touches[0];
+      const dx = Math.abs(t.clientX - pressStart.x);
+      const dy = Math.abs(t.clientY - pressStart.y);
+      if (dx > 10 || dy > 10) {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+        pressStart = null;
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchend', () => {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+      pressStart = null;
+    }, { passive: true });
+
+    document.addEventListener('touchcancel', () => {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+      pressStart = null;
+    }, { passive: true });
+
+    document.addEventListener('click', (e) => {
+      if (longPressed) {
+        longPressed = false;
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      if (ctxMenu.classList.contains('open') && !ctxMenu.contains(e.target)) hideMenu();
+    }, true);
+  })();
+
+  /* ---------- Devtools blocker ---------- */
+  (function () {
+    let locked = false;
+    const THRESHOLD = 200;
+
+    function devtoolsOpen() {
+      const w = window.outerWidth - window.innerWidth;
+      const h = window.outerHeight - window.innerHeight;
+      return w > THRESHOLD || h > THRESHOLD;
+    }
+
+    function loop() {
+      if (!locked) return;
+      if (!devtoolsOpen()) {
+        locked = false;
+        document.body.classList.remove('dt-open');
+        return;
+      }
+      setTimeout(() => {
+        if (!locked) return;
+        alert('Close developer tools to continue');
+        loop();
+      }, 260);
+    }
+
+    function check() {
+      const open = devtoolsOpen();
+      if (open && !locked) {
+        locked = true;
+        document.body.classList.add('dt-open');
+        loop();
+      }
+    }
+
+    setInterval(check, 800);
+    window.addEventListener('resize', check);
+
+    document.addEventListener('keydown', (e) => {
+      const key = (e.key || '').toUpperCase();
+      if (e.key === 'F12' ||
+          (e.ctrlKey && e.shiftKey && (key === 'I' || key === 'J' || key === 'C')) ||
+          (e.ctrlKey && key === 'U')) {
+        e.preventDefault();
+        e.stopPropagation();
+        check();
+        return false;
+      }
+    }, true);
+  })();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
+</script>
 </body>
 </html>
