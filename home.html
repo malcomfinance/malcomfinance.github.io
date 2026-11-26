@@ -2,220 +2,1268 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
   <title>Malcom Finance · Dashboard</title>
   <link href="tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
   <script src="firebase-app-compat.js"></script>
   <script src="firebase-auth-compat.js"></script>
   <script src="firebase-firestore-compat.js"></script>
   <script src="firebase-storage-compat.js"></script>
 
-    <link rel="manifest" href="/manifest.json">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0b0b0b">
+  <link rel="apple-touch-icon" href="logo.png">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <meta name="theme-color" content="#4A90E2">
-
-    <link rel="apple-touch-icon" href="faivcon.png">
-
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    
-    :root { --bg-main: #f9fafb; --bg-card: #ffffff; --text-main: #111827; --text-muted: #6b7280; --border-color: #e5e7eb; --accent-green: #059669; --accent-soft: #ecfdf5; --input-bg: #f3f4f6; }
-   
-html,body{overflow:hidden}html{overflow:scroll;scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar{display:none}
-    body.dark { --bg-main: #0f172a; --bg-card: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --border-color: #334155; --accent-green: #10b981; --accent-soft: #064e3b; --input-bg: #0f172a; }
-    body { background-color: var(--bg-main); color: var(--text-main); transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; font-family: 'Inter', sans-serif; }
-    .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 1.5rem; transition: all 0.3s ease; }
-    .text-muted { color: var(--text-muted); }
-    .accent-bg { background-color: var(--accent-green); }
-    .accent-text { color: var(--accent-green); }
-    .accent-border { border-color: var(--accent-green); }
-    .soft-accent-bg { background-color: var(--accent-soft); }
-    input, select { background-color: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color); }
-    input:focus, select:focus { border-color: var(--accent-green); outline: none; }
-    .modal-backdrop { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
-  </style>
   <script>
-    const firebaseConfig = { apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4", authDomain: "malcolm-finance.firebaseapp.com", projectId: "malcolm-finance", storageBucket: "malcolm-finance.firebasestorage.app", messagingSenderId: "987613399580", appId: "1:987613399580:web:0237b2c8c2c7df54222dd9" };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    if (localStorage.getItem('theme') === 'dark') { document.documentElement.classList.add('dark'); document.body.classList.add('dark'); }
+    (function () {
+      try {
+        if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
   </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --sb-w: 290px;
+      --sb-rail: 86px;
+      --bg-1: #f5f5f3;
+      --bg-2: #e5e5e1;
+      --fg: #0b0b0b;
+      --fg-soft: #5f5f5c;
+      --line: rgba(11, 11, 11, 0.10);
+      --glass-tint: rgba(255, 255, 255, 0.45);
+      --glass-border: rgba(255, 255, 255, 0.85);
+      --glass-shadow: 0 20px 45px rgba(20, 20, 20, 0.13);
+      --rim-1: rgba(255, 255, 255, 0.95);
+      --rim-2: rgba(255, 255, 255, 0.55);
+      --rim-inner: rgba(255, 255, 255, 0.08);
+      --btn-bg: rgba(255, 255, 255, 0.34);
+      --btn-hover: rgba(255, 255, 255, 0.62);
+      --tip-bg: #0b0b0b;
+      --tip-fg: #f6f6f4;
+      --solid: #0b0b0b;
+      --solid-fg: #f7f7f5;
+      --nav-active-bg: #0b0b0b;
+      --nav-active-fg: #ffffff;
+      --blob-a: linear-gradient(45deg, #3d3d3d, #9a9a9a);
+      --blob-b: linear-gradient(45deg, #b9b9b3, #6e6e6a);
+      --stripe: rgba(11, 11, 11, 0.045);
+    }
+
+    html.dark {
+      --bg-1: #070707;
+      --bg-2: #161616;
+      --fg: #f4f4f1;
+      --fg-soft: #9c9c98;
+      --line: rgba(255, 255, 255, 0.12);
+      --glass-tint: rgba(255, 255, 255, 0.055);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --glass-shadow: 0 20px 45px rgba(0, 0, 0, 0.62);
+      --rim-1: rgba(255, 255, 255, 0.45);
+      --rim-2: rgba(255, 255, 255, 0.14);
+      --rim-inner: rgba(255, 255, 255, 0.05);
+      --btn-bg: rgba(255, 255, 255, 0.07);
+      --btn-hover: rgba(255, 255, 255, 0.15);
+      --tip-bg: #f4f4f1;
+      --tip-fg: #070707;
+      --solid: #f4f4f1;
+      --solid-fg: #0a0a0a;
+      --nav-active-bg: #f4f4f1;
+      --nav-active-fg: #0a0a0a;
+      --blob-a: linear-gradient(45deg, #ffffff, #6b6b6b);
+      --blob-b: linear-gradient(45deg, #8f8f8f, #d8d8d2);
+      --stripe: rgba(255, 255, 255, 0.05);
+    }
+
+    html { scrollbar-width: none; -ms-overflow-style: none; }
+    html::-webkit-scrollbar { display: none; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg-1);
+      color: var(--fg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color .35s ease, color .35s ease;
+    }
+
+    .scene {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+    }
+
+    .scene .stripes {
+      position: absolute;
+      inset: -20%;
+      background: repeating-linear-gradient(115deg, transparent 0 58px, var(--stripe) 58px 60px);
+    }
+
+    .blob { position: absolute; border-radius: 50%; }
+    .blob-1 {
+      width: 420px; height: 420px;
+      top: 6%; left: 8%;
+      background: var(--blob-a);
+      opacity: .22;
+      animation: drift1 18s ease-in-out infinite alternate;
+    }
+    .blob-2 {
+      width: 340px; height: 340px;
+      bottom: 8%; right: 8%;
+      background: var(--blob-b);
+      opacity: .20;
+      animation: drift2 21s ease-in-out infinite alternate;
+    }
+    .blob-3 {
+      width: 240px; height: 240px;
+      top: 46%; left: 52%;
+      background: var(--blob-b);
+      opacity: .14;
+      animation: drift1 25s ease-in-out infinite alternate-reverse;
+    }
+    html.dark .blob-1 { opacity: .10; }
+    html.dark .blob-2 { opacity: .09; }
+    html.dark .blob-3 { opacity: .07; }
+
+    @keyframes drift1 { to { transform: translate(70px, 55px) scale(1.12); } }
+    @keyframes drift2 { to { transform: translate(-65px, -45px) scale(1.06); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .blob { animation: none !important; }
+      * { transition: none !important; }
+    }
+
+    .glass {
+      position: relative;
+      isolation: isolate;
+      border-radius: 28px;
+      border: 1px solid var(--glass-border);
+      background: transparent;
+      box-shadow:
+        var(--glass-shadow),
+        inset 1.5px 1.5px 1px -1px var(--rim-1),
+        inset -1px -1px 1px -1px var(--rim-2),
+        inset 0 0 24px 4px var(--rim-inner);
+    }
+
+    .glass::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      z-index: -3;
+      -webkit-backdrop-filter: url(#glass-distortion);
+      backdrop-filter: url(#glass-distortion);
+    }
+
+    .glass::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      z-index: -2;
+      background: var(--glass-tint);
+      -webkit-backdrop-filter: blur(3px) saturate(180%) brightness(1.06);
+      backdrop-filter: blur(3px) saturate(180%) brightness(1.06);
+    }
+
+    @supports not (backdrop-filter: url(#glass-distortion)) {
+      .glass::before {
+        -webkit-backdrop-filter: blur(16px) saturate(185%);
+        backdrop-filter: blur(16px) saturate(185%);
+      }
+    }
+
+    [data-tip] { position: relative; }
+
+    [data-tip]::after {
+      content: attr(data-tip);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 10px);
+      transform: translate(-50%, 5px);
+      background: var(--tip-bg);
+      color: var(--tip-fg);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .01em;
+      line-height: 1;
+      padding: 7px 11px;
+      border-radius: 9px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 400;
+      transition: opacity .18s ease, transform .18s ease;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, .22);
+    }
+
+    [data-tip]:hover::after { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 767px) {
+      [data-tip]::after { display: none; }
+    }
+
+    .gbtn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 14px 22px;
+      border-radius: 18px;
+      border: 1px solid var(--glass-border);
+      background: var(--btn-bg);
+      color: var(--fg);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: .875rem;
+      letter-spacing: .01em;
+      cursor: pointer;
+      text-decoration: none;
+      -webkit-backdrop-filter: blur(6px) saturate(180%);
+      backdrop-filter: blur(6px) saturate(180%);
+      box-shadow:
+        inset 1.5px 1.5px 1px -1px var(--rim-1),
+        inset -1px -1px 1px -1px var(--rim-2),
+        0 8px 18px rgba(0, 0, 0, .12);
+      transition: transform .25s ease, background .25s ease, box-shadow .25s ease;
+    }
+
+    .gbtn i { font-size: 1.15rem; }
+
+    .gbtn:hover { background: var(--btn-hover); transform: translateY(-2px); }
+
+    .gbtn:active { transform: translateY(0) scale(.98); }
+
+    .gbtn.solid {
+      background: var(--solid);
+      color: var(--solid-fg);
+      border-color: transparent;
+      box-shadow:
+        inset 1.5px 1.5px 1px -1px rgba(255, 255, 255, .35),
+        0 12px 26px rgba(0, 0, 0, .28);
+    }
+
+    .gbtn.solid:hover { background: var(--solid); opacity: .92; }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--fg);
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: background .22s ease, border-color .22s ease, transform .18s ease;
+    }
+
+    .icon-btn:hover { background: var(--btn-bg); border-color: var(--glass-border); }
+    .icon-btn:active { transform: scale(.93); }
+
+    .topbar {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      height: 62px;
+      z-index: 70;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      border-radius: 22px;
+      transition: left .32s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .topbar-title {
+      flex: 1;
+      min-width: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-mini { display: flex; align-items: center; gap: 9px; flex: 1; min-width: 0; }
+    .brand-mini img { width: 28px; height: 28px; border-radius: 9px; object-fit: cover; }
+    .brand-mini span {
+      font-size: .95rem;
+      font-weight: 800;
+      letter-spacing: -.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topbar-actions { display: flex; align-items: center; gap: 4px; }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100dvh;
+      width: min(84vw, 300px);
+      z-index: 90;
+      display: flex;
+      flex-direction: column;
+      border-radius: 0 30px 30px 0;
+      border-left: none;
+      transform: translateX(-104%);
+      transition: transform .38s cubic-bezier(.22, 1, .36, 1), width .32s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    body.nav-open .sidebar { transform: translateX(0); }
+
+    .sidebar-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 22px 18px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 1; }
+    .brand img { width: 40px; height: 40px; border-radius: 13px; object-fit: cover; flex: none; }
+    .brand-text { min-width: 0; }
+    .brand-text h2 {
+      margin: 0;
+      font-size: .875rem;
+      font-weight: 800;
+      letter-spacing: -.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .brand-text p {
+      margin: 2px 0 0;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--fg-soft);
+      white-space: nowrap;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-section-title {
+      margin: 16px 0 6px;
+      padding: 0 12px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--fg-soft);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid transparent;
+      color: var(--fg-soft);
+      font-size: .875rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      background: transparent;
+      font-family: inherit;
+      width: 100%;
+      text-align: left;
+      transition: background .22s ease, color .22s ease, border-color .22s ease, transform .18s ease;
+    }
+
+    .nav-item i { font-size: 1.35rem; flex: none; }
+    .nav-item:hover { background: var(--btn-bg); border-color: var(--glass-border); color: var(--fg); }
+    .nav-item:active { transform: scale(.985); }
+
+    .nav-item.active {
+      background: var(--nav-active-bg);
+      color: var(--nav-active-fg);
+      border-color: transparent;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, .22);
+    }
+
+    .nav-item.danger { color: #d64545; }
+    .nav-item.danger:hover { background: rgba(214, 69, 69, .1); border-color: rgba(214, 69, 69, .25); }
+
+    .sidebar-foot { padding: 14px; }
+
+    .support-card {
+      border-radius: 20px;
+      padding: 16px;
+      background: var(--btn-bg);
+      border: 1px solid var(--glass-border);
+      -webkit-backdrop-filter: blur(10px) saturate(180%);
+      backdrop-filter: blur(10px) saturate(180%);
+    }
+
+    .support-card p:first-child {
+      margin: 0 0 4px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--fg);
+    }
+
+    .support-card p:nth-child(2) {
+      margin: 0 0 12px;
+      font-size: .75rem;
+      line-height: 1.45;
+      color: var(--fg-soft);
+    }
+
+    #overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(0, 0, 0, .45);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .3s ease, visibility .3s ease;
+    }
+
+    body.nav-open #overlay { opacity: 1; visibility: visible; }
+
+    main {
+      padding: 88px 14px 118px;
+      transition: margin-left .32s cubic-bezier(.22, 1, .36, 1), padding .32s ease;
+    }
+
+    .wrap { max-width: 1240px; margin: 0 auto; }
+
+    .dash-grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+
+    .balance-card { padding: 26px 24px; border-radius: 30px; }
+
+    .bc-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+
+    .bc-label { font-size: .82rem; font-weight: 600; color: var(--fg-soft); }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      border: 1px solid var(--glass-border);
+      background: var(--btn-bg);
+      color: var(--fg);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
+
+    .bc-amount {
+      font-size: clamp(2.5rem, 9vw, 3.6rem);
+      font-weight: 800;
+      letter-spacing: -.035em;
+      line-height: 1;
+      margin-bottom: 26px;
+      word-break: break-all;
+    }
+
+    .bc-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .quick-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+
+    .qcard {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 9px;
+      padding: 20px 8px;
+      border-radius: 24px;
+      text-decoration: none;
+      color: var(--fg);
+      cursor: pointer;
+      transition: transform .25s ease;
+    }
+
+    .qcard:hover { transform: translateY(-3px); }
+    .qcard i { font-size: 1.8rem; }
+    .qcard span { font-size: .72rem; font-weight: 700; letter-spacing: .01em; color: var(--fg-soft); }
+    .qcard:hover span { color: var(--fg); }
+
+    .insight-card { padding: 24px; border-radius: 30px; }
+
+    .insight-head {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 16px;
+      font-size: .95rem;
+      font-weight: 800;
+      letter-spacing: -.01em;
+    }
+
+    .insight-head i { font-size: 1.3rem; }
+
+    .quote {
+      font-size: .95rem;
+      line-height: 1.6;
+      font-style: italic;
+      color: var(--fg-soft);
+      margin: 0 0 10px;
+    }
+
+    .quote-author { font-size: .8rem; font-weight: 800; color: var(--fg); margin: 0 0 22px; }
+
+    .bottomnav {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      bottom: calc(12px + env(safe-area-inset-bottom));
+      height: 68px;
+      z-index: 75;
+      display: none;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 6px;
+      border-radius: 24px;
+    }
+
+    .bn-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      flex: 1;
+      height: 52px;
+      border-radius: 16px;
+      text-decoration: none;
+      color: var(--fg-soft);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      transition: color .22s ease, background .22s ease;
+    }
+
+    .bn-item i { font-size: 1.35rem; }
+    .bn-item.active { color: var(--nav-active-fg); background: var(--nav-active-bg); }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, .5);
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+      overflow-y: auto;
+    }
+
+    .modal.open { display: flex; }
+
+    .modal-card {
+      width: 100%;
+      max-width: 400px;
+      padding: 26px 22px;
+      border-radius: 30px;
+      margin: auto;
+    }
+
+    .modal-title {
+      margin: 0 0 18px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -.015em;
+    }
+
+    .field { margin-bottom: 14px; }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--fg-soft);
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      background: var(--btn-bg);
+      color: var(--fg);
+      font-family: inherit;
+      font-size: .9rem;
+      font-weight: 600;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      transition: border-color .22s ease, background .22s ease;
+    }
+
+    .field input::placeholder { color: var(--fg-soft); font-weight: 500; }
+    .field input:focus,
+    .field select:focus { border-color: var(--fg); background: var(--btn-hover); }
+
+    .pay-box {
+      border-radius: 20px;
+      padding: 14px;
+      margin-bottom: 12px;
+      border: 1px dashed var(--glass-border);
+      background: var(--btn-bg);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .pay-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+    .pay-tag {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--fg-soft);
+    }
+
+    .pay-val { font-size: .82rem; font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+    .pay-go {
+      padding: 6px 12px;
+      border-radius: 11px;
+      border: none;
+      background: var(--solid);
+      color: var(--solid-fg);
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+
+    .modal-note { font-size: .8rem; line-height: 1.5; color: var(--fg-soft); margin: 0 0 14px; }
+
+    .confirm-box {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid var(--glass-border);
+      background: var(--btn-bg);
+      font-size: .85rem;
+      line-height: 1.9;
+    }
+
+    .confirm-box strong { font-weight: 800; }
+
+    .ref-link {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px dashed var(--glass-border);
+      background: var(--btn-bg);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      word-break: break-all;
+      color: var(--fg);
+      margin-bottom: 16px;
+    }
+
+    @media (min-width: 768px) {
+      main { padding: 92px 26px 60px; }
+      .balance-card { padding: 32px 30px; }
+      .insight-card { padding: 28px; }
+      .dash-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .balance-card { grid-column: 1 / -1; }
+      .modal-card { padding: 30px 28px; }
+    }
+
+    @media (max-width: 767px) {
+      .bottomnav { display: flex; }
+      .brand-mini { display: flex; }
+      .topbar-title { display: none; }
+    }
+
+    @media (min-width: 768px) {
+      .brand-mini { display: none; }
+    }
+
+    @media (min-width: 1024px) {
+      .sidebar { transform: none; width: var(--sb-w); }
+      main { margin-left: var(--sb-w); padding: 96px 30px 48px; }
+      .topbar { left: calc(var(--sb-w) + 12px); }
+      #overlay { display: none; }
+      body.nav-open .sidebar { transform: none; }
+      .bottomnav { display: none; }
+
+      body.sb-collapsed .sidebar { width: var(--sb-rail); }
+      body.sb-collapsed main { margin-left: var(--sb-rail); }
+      body.sb-collapsed .topbar { left: calc(var(--sb-rail) + 12px); }
+
+      body.sb-collapsed .brand-text,
+      body.sb-collapsed .nav-label,
+      body.sb-collapsed .nav-section-title,
+      body.sb-collapsed .support-card { display: none; }
+
+      body.sb-collapsed .sidebar-head { justify-content: center; padding: 22px 8px 18px; }
+      body.sb-collapsed .brand { flex: none; justify-content: center; }
+      body.sb-collapsed #collapseBtn { display: none; }
+      body.sb-collapsed .nav-item { justify-content: center; padding: 14px 0; }
+      body.sb-collapsed .sidebar-nav { overflow: visible; padding: 16px 10px; }
+
+      body.sb-collapsed .nav-item[data-tip]::after {
+        left: calc(100% + 14px);
+        bottom: auto;
+        top: 50%;
+        transform: translate(-5px, -50%);
+      }
+
+      body.sb-collapsed .nav-item[data-tip]:hover::after { transform: translate(0, -50%); }
+    }
+
+    @media (min-width: 1280px) {
+      .dash-grid {
+        grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+        align-items: start;
+      }
+      .balance-card { grid-column: 1 / -1; }
+    }
+
+    @media (min-width: 1600px) {
+      .wrap { max-width: 1440px; }
+    }
+  </style>
 </head>
-<body class="antialiased pb-20">
-  <main class="max-w-xl mx-auto px-6 pt-10">
-    <div class="flex items-center justify-between mb-8">
-      <div><h1 class="text-2xl font-bold">Malcom Finance</h1><p class="text-sm text-muted">Financial Growth Dashboard</p></div>
-      <div id="theme-toggle-container"></div>
+
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="92" result="noise" />
+      <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+      <feDisplacementMap in="SourceGraphic" in2="blurred" scale="70" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
+
+  <div class="scene" aria-hidden="true">
+    <div class="stripes"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <header class="topbar glass">
+    <button class="icon-btn" id="menuBtn" data-tip="Open menu" title="Open menu" aria-label="Open menu">
+      <i class="ph-duotone ph-list"></i>
+    </button>
+
+    <div class="brand-mini">
+      <img src="logo.png" alt="Malcom Finance logo">
+      <span>Malcom Finance</span>
     </div>
-    <div class="card p-8 mb-8 shadow-sm">
-      <div class="flex justify-between items-center mb-4"><span class="text-muted font-medium">Available Balance</span><span class="soft-accent-bg accent-text px-3 py-1 rounded-full text-xs font-bold uppercase">USD</span></div>
-      <div class="text-5xl font-bold accent-text tracking-tight" id="accbal">0.00</div>
-      <div class="flex gap-4 mt-8">
-        <button onclick="showDepositModal()" class="flex-1 accent-bg text-white font-bold py-4 rounded-2xl shadow-lg">Deposit</button>
-        <button onclick="showWithdrawModal()" class="flex-1 border-2 accent-border accent-text font-bold py-4 rounded-2xl">Withdraw</button>
+
+    <div class="topbar-title">Dashboard</div>
+
+    <div class="topbar-actions">
+      <button class="icon-btn" onclick="toggleFullScreen()" data-tip="Toggle fullscreen" title="Toggle fullscreen" aria-label="Toggle fullscreen">
+        <i class="ph-duotone ph-arrows-out"></i>
+      </button>
+      <button class="icon-btn" id="themeBtn" data-tip="Switch theme" title="Switch theme" aria-label="Switch theme">
+        <i class="ph-duotone ph-moon" id="themeIcon"></i>
+      </button>
+    </div>
+  </header>
+
+  <aside id="sidebar" class="sidebar glass" aria-label="Main navigation">
+    <div class="sidebar-head">
+      <div class="brand">
+        <img src="logo.png" alt="Malcom Finance logo">
+        <div class="brand-text">
+          <h2>Malcom Finance</h2>
+          <p>Premium Account</p>
+        </div>
+      </div>
+      <button class="icon-btn" id="collapseBtn" data-tip="Close sidebar" title="Close sidebar" aria-label="Close sidebar">
+        <i class="ph-duotone ph-x"></i>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="/" class="nav-item active" data-tip="Dashboard overview" title="Dashboard overview">
+        <i class="ph-duotone ph-squares-four"></i>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="balances" class="nav-item" data-tip="View all your balances" title="View all your balances">
+        <i class="ph-duotone ph-wallet"></i>
+        <span class="nav-label">My Balances</span>
+      </a>
+      <a href="transactions" class="nav-item" data-tip="See your transaction history" title="See your transaction history">
+        <i class="ph-duotone ph-arrows-left-right"></i>
+        <span class="nav-label">Transactions</span>
+      </a>
+      <a href="daily-activities" class="nav-item" data-tip="Complete today's tasks" title="Complete today's tasks">
+        <i class="ph-duotone ph-list-checks"></i>
+        <span class="nav-label">Daily Tasks</span>
+      </a>
+      <a href="offers" class="nav-item" data-tip="Browse special offers" title="Browse special offers">
+        <i class="ph-duotone ph-gift"></i>
+        <span class="nav-label">Special Offers</span>
+      </a>
+
+      <div class="nav-section-title">Account</div>
+
+      <a href="account-settings" class="nav-item" data-tip="Manage your account" title="Manage your account">
+        <i class="ph-duotone ph-gear-six"></i>
+        <span class="nav-label">Settings</span>
+      </a>
+      <a href="contact" class="nav-item" data-tip="Talk to a support agent" title="Talk to a support agent">
+        <i class="ph-duotone ph-lifebuoy"></i>
+        <span class="nav-label">Support</span>
+      </a>
+      <button class="nav-item danger" onclick="firebase.auth().signOut()" data-tip="Sign out of your account" title="Sign out of your account">
+        <i class="ph-duotone ph-sign-out"></i>
+        <span class="nav-label">Logout</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="support-card">
+        <p>Support Available</p>
+        <p>Need help with your investment?</p>
+        <a href="contact" class="gbtn solid" style="width:100%;padding:11px 14px;font-size:.78rem;border-radius:14px;" data-tip="Contact a support agent" title="Contact a support agent">
+          <i class="ph-duotone ph-chat-circle-dots"></i>
+          Contact Agent
+        </a>
       </div>
     </div>
-    <div class="grid grid-cols-3 gap-4 mb-8">
-      <div onclick="location.href='balances.html'" class="card p-5 text-center cursor-pointer"><i class="fas fa-wallet text-2xl accent-text mb-2"></i></div>
-      <div onclick="location.href='transactions.html'" class="card p-5 text-center cursor-pointer"><i class="fas fa-history text-2xl accent-text mb-2"></i></div>
-      <div onclick="showReferralModal()" class="card p-5 text-center cursor-pointer"><i class="fas fa-user-friends text-2xl accent-text mb-2"></i></div>
-    </div>
-    <div class="card p-6 border-l-4 accent-border">
-      <h3 class="text-lg font-bold mb-3"><i class="fas fa-bolt accent-text mr-2"></i> Daily Insight</h3>
-      <div class="text-muted italic text-sm" id="quote-text">"The best time to start was yesterday."</div>
-      <div class="accent-text font-bold mt-2 text-sm" id="quote-author">Icii White</div>
-      <button onclick="location.href='daily-activities.html'" class="mt-6 w-full soft-accent-bg accent-text font-bold py-4 rounded-2xl">Launch Activities</button>
+  </aside>
+
+  <div id="overlay"></div>
+
+  <main>
+    <div class="wrap">
+      <div class="dash-grid">
+
+        <section class="balance-card glass" title="Your available account balance">
+          <div class="bc-top">
+            <span class="bc-label" title="Your available balance">Available Balance</span>
+            <span class="chip" title="Currency: US Dollar">
+              <i class="ph-duotone ph-currency-dollar"></i>
+              USD
+            </span>
+          </div>
+          <div class="bc-amount" id="accbal" title="Available balance in US dollars">0.00</div>
+          <div class="bc-actions">
+            <button class="gbtn solid" onclick="showDepositModal()" data-tip="Add funds to your account" title="Add funds to your account">
+              <i class="ph-duotone ph-arrow-down-left"></i>
+              Deposit
+            </button>
+            <button class="gbtn" onclick="showWithdrawModal()" data-tip="Request a payout" title="Request a payout">
+              <i class="ph-duotone ph-arrow-up-right"></i>
+              Withdraw
+            </button>
+          </div>
+        </section>
+
+        <section class="quick-grid">
+          <a href="balances" class="qcard glass" title="Open My Balances">
+            <i class="ph-duotone ph-wallet"></i>
+            <span>Balances</span>
+          </a>
+          <a href="transactions" class="qcard glass" title="Open Transaction History">
+            <i class="ph-duotone ph-clock-counter-clockwise"></i>
+            <span>History</span>
+          </a>
+          <button class="qcard glass" onclick="showReferralModal()" title="Refer a friend and earn" style="border:none;font-family:inherit;">
+            <i class="ph-duotone ph-users-three"></i>
+            <span>Referrals</span>
+          </button>
+        </section>
+
+        <section class="insight-card glass">
+          <div class="insight-head" title="A fresh idea for today">
+            <i class="ph-duotone ph-lightning"></i>
+            Daily Insight
+          </div>
+          <p class="quote" id="quote-text">"The best time to start was yesterday."</p>
+          <p class="quote-author" id="quote-author">Icii White</p>
+          <a href="daily-activities" class="gbtn solid" style="width:100%;" data-tip="Open today's activities" title="Open today's activities">
+            <i class="ph-duotone ph-rocket-launch"></i>
+            Launch Activities
+          </a>
+        </section>
+
+      </div>
     </div>
   </main>
 
-  <div id="deposit-modal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-6">
-    <div class="card max-w-sm w-full p-8 shadow-2xl">
-      <h3 class="text-xl font-bold accent-text mb-6">Activate Account</h3>
-      <p class="text-muted text-sm mb-4">Send <span class="accent-text font-bold">UGX 18,500</span> to:</p>
-      <div class="soft-accent-bg rounded-2xl p-5 space-y-4 border accent-border">
-        <div class="flex justify-between items-center"><span class="text-xs font-bold uppercase text-muted">MTN</span><span class="text-sm font-mono">+256 787591025</span><button class="mt-1 accent-bg text-white font-bold py-1 rounded-2xl shadow-lg" style="padding: 3px 7px" onclick="window.location.href='tel:*185*1*1#'">Go</button></div>
-        <div class="flex justify-between items-center"><span class="text-xs font-bold uppercase text-muted">Airtel</span><span class="text-sm font-mono">+256 730101447</span><button class="mt-1 accent-bg text-white font-bold py-1 rounded-2xl shadow-lg" style="padding: 3px 7px" onclick="window.location.href='tel:*185*1#'">Go</button></div>
-      </div>
-      <br>
-      <div class="soft-accent-bg rounded-2xl p-5 space-y-4 border accent-border">
-        <div class="flex justify-between items-center"><span class="text-xs font-bold uppercase text-muted">MTN</span><span class="text-sm font-mono">GLORIA NAKIDDE</span></div>
-        <div class="flex justify-between items-center"><span class="text-xs font-bold uppercase text-muted">Airtel</span><span class="text-sm font-mono">ALLAN ELVIS LUTAAYA</span></div>
-      </div>
-      <button onclick="closeModal('deposit-modal')" class="mt-8 w-full accent-bg text-white font-bold py-4 rounded-2xl shadow-lg">I've made payment</button>
-    </div>
-  </div>
+  <nav class="bottomnav glass" aria-label="Quick navigation">
+    <a href="/" class="bn-item active" title="Dashboard">
+      <i class="ph-duotone ph-squares-four"></i>
+      <span>Home</span>
+    </a>
+    <a href="balances" class="bn-item" title="My Balances">
+      <i class="ph-duotone ph-wallet"></i>
+      <span>Balances</span>
+    </a>
+    <a href="daily-activities" class="bn-item" title="Daily Tasks">
+      <i class="ph-duotone ph-list-checks"></i>
+      <span>Tasks</span>
+    </a>
+    <a href="offers" class="bn-item" title="Special Offers">
+      <i class="ph-duotone ph-gift"></i>
+      <span>Offers</span>
+    </a>
+    <a href="account-settings" class="bn-item" title="Account Settings">
+      <i class="ph-duotone ph-gear-six"></i>
+      <span>Settings</span>
+    </a>
+  </nav>
 
-  <div id="withdraw-modal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-6">
-    <div class="card max-w-sm w-full p-8 shadow-2xl">
-      <h3 class="text-xl font-bold accent-text mb-6">Request Withdrawal</h3>
-      <div class="space-y-4">
-        <div>
-          <label class="text-xs font-bold uppercase text-muted">Amount (USD)</label>
-          <input type="number" id="withdraw-amount" placeholder="Min $6" class="w-full p-4 rounded-2xl mt-1">
+  <div id="deposit-modal" class="modal">
+    <div class="modal-card glass">
+      <h3 class="modal-title">Activate Account</h3>
+      <p class="modal-note">Send <strong>UGX 18,500</strong> to either of the numbers below, then confirm.</p>
+
+      <div class="pay-box">
+        <div class="pay-row">
+          <span class="pay-tag">MTN</span>
+          <span class="pay-val">+256 787591025</span>
+          <button class="pay-go" onclick="window.location.href='tel:*185*1*1#'" title="Dial MTN mobile money">Go</button>
         </div>
-        <div>
-          <label class="text-xs font-bold uppercase text-muted">Method</label>
-          <select id="withdraw-method" class="w-full p-4 rounded-2xl mt-1">
-            <option value="mtn">MTN Mobile Money</option>
-            <option value="airtel">Airtel Money</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-xs font-bold uppercase text-muted">Wallet Number</label>
-          <input type="text" id="withdraw-wallet" placeholder="07XXXXXXXX" class="w-full p-4 rounded-2xl mt-1">
-        </div>
-        <div>
-          <label class="text-xs font-bold uppercase text-muted">Password</label>
-          <input type="password" id="withdraw-password" placeholder="••••••••" class="w-full p-4 rounded-2xl mt-1">
+        <div class="pay-row">
+          <span class="pay-tag">Airtel</span>
+          <span class="pay-val">+256 730101447</span>
+          <button class="pay-go" onclick="window.location.href='tel:*185*1#'" title="Dial Airtel money">Go</button>
         </div>
       </div>
-      <div class="flex gap-3 mt-8">
-        <button onclick="confirmWithdrawal()" class="flex-1 accent-bg text-white font-bold py-4 rounded-2xl shadow-lg">Continue</button>
-        <button onclick="closeModal('withdraw-modal')" class="flex-1 bg-black/5 font-bold py-4 rounded-2xl text-muted">Cancel</button>
+
+      <div class="pay-box">
+        <div class="pay-row">
+          <span class="pay-tag">MTN Name</span>
+          <span class="pay-val">GLORIA NAKIDDE</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-tag">Airtel Name</span>
+          <span class="pay-val">ALLAN ELVIS LUTAAYA</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="gbtn solid" onclick="closeModal('deposit-modal')" data-tip="Confirm you have paid" title="Confirm you have paid">
+          <i class="ph-duotone ph-check-circle"></i>
+          I've paid
+        </button>
+        <button class="gbtn" onclick="closeModal('deposit-modal')" data-tip="Close this window" title="Close this window">
+          Close
+        </button>
       </div>
     </div>
   </div>
 
-  <div id="withdraw-confirm-modal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-6">
-    <div class="card max-w-sm w-full p-8 shadow-2xl">
-      <h3 class="text-xl font-bold accent-text mb-6 text-center">Confirm Withdrawal</h3>
-      <div id="withdraw-confirm-details" class="mb-6"></div>
-      <div class="flex gap-3">
-        <button onclick="submitWithdrawal()" class="flex-1 accent-bg text-white font-bold py-4 rounded-2xl shadow-lg">Submit</button>
-        <button onclick="closeModal('withdraw-confirm-modal')" class="flex-1 bg-black/5 font-bold py-4 rounded-2xl text-muted">Cancel</button>
+  <div id="withdraw-modal" class="modal">
+    <div class="modal-card glass">
+      <h3 class="modal-title">Request Withdrawal</h3>
+
+      <div class="field">
+        <label for="withdraw-amount">Amount (USD)</label>
+        <input type="number" id="withdraw-amount" placeholder="Minimum $6" title="Enter the amount you want to withdraw">
+      </div>
+
+      <div class="field">
+        <label for="withdraw-method">Method</label>
+        <select id="withdraw-method" title="Choose your payout method">
+          <option value="mtn">MTN Mobile Money</option>
+          <option value="airtel">Airtel Money</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="withdraw-wallet">Wallet Number</label>
+        <input type="text" id="withdraw-wallet" placeholder="07XXXXXXXX" title="Your mobile money number">
+      </div>
+
+      <div class="field">
+        <label for="withdraw-password">Password</label>
+        <input type="password" id="withdraw-password" placeholder="••••••••" title="Your account password">
+      </div>
+
+      <div class="modal-actions">
+        <button class="gbtn solid" onclick="confirmWithdrawal()" data-tip="Review your withdrawal" title="Review your withdrawal">
+          <i class="ph-duotone ph-arrow-right"></i>
+          Continue
+        </button>
+        <button class="gbtn" onclick="closeModal('withdraw-modal')" data-tip="Cancel withdrawal" title="Cancel withdrawal">
+          Cancel
+        </button>
       </div>
     </div>
   </div>
 
-  <div id="referral-modal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-6">
-    <div class="card max-w-sm w-full p-8 shadow-2xl">
-      <h3 class="text-xl font-bold accent-text mb-2 text-center">Refer & Earn</h3>
-      <div class="soft-accent-bg p-4 rounded-2xl border border-dashed accent-border mb-6">
-        <div class="text-[11px] break-all font-mono accent-text" id="referral-link-display">...</div>
+  <div id="withdraw-confirm-modal" class="modal">
+    <div class="modal-card glass">
+      <h3 class="modal-title" style="text-align:center;">Confirm Withdrawal</h3>
+      <div id="withdraw-confirm-details" class="confirm-box"></div>
+      <div class="modal-actions">
+        <button class="gbtn solid" onclick="submitWithdrawal()" data-tip="Send your request" title="Send your request">
+          <i class="ph-duotone ph-paper-plane-tilt"></i>
+          Submit
+        </button>
+        <button class="gbtn" onclick="closeModal('withdraw-confirm-modal')" data-tip="Go back" title="Go back">
+          Cancel
+        </button>
       </div>
-      <button onclick="shareReferral()" class="w-full accent-bg text-white font-bold py-4 rounded-2xl flex items-center justify-center shadow-lg"><i class="fas fa-share-nodes mr-2"></i> Share Invitation</button>
-      <button onclick="closeModal('referral-modal')" class="w-full text-muted text-sm font-bold py-2">Close</button>
     </div>
   </div>
 
-  <div id="alert-modal" class="fixed inset-0 modal-backdrop z-50 hidden items-center justify-center p-6">
-    <div class="card max-w-sm w-full p-8 shadow-2xl">
-      <h3 class="text-xl font-bold accent-text mb-4 text-center">Alert</h3>
-      <p id="alert-message" class="text-center text-muted mb-6">Message</p>
-      <button onclick="closeModal('alert-modal')" class="w-full accent-bg text-white font-bold py-4 rounded-2xl shadow-lg">OK</button>
+  <div id="referral-modal" class="modal">
+    <div class="modal-card glass">
+      <h3 class="modal-title" style="text-align:center;">Refer &amp; Earn</h3>
+      <p class="modal-note" style="text-align:center;">Share your link and earn from every friend who joins.</p>
+      <div class="ref-link" id="referral-link-display">...</div>
+      <button class="gbtn solid" style="width:100%;margin-bottom:10px;" onclick="shareReferral()" data-tip="Share your invite link" title="Share your invite link">
+        <i class="ph-duotone ph-share-network"></i>
+        Share Invitation
+      </button>
+      <button class="gbtn" style="width:100%;" onclick="closeModal('referral-modal')" data-tip="Close this window" title="Close this window">
+        Close
+      </button>
     </div>
   </div>
 
-  <script src="sidebar.js"></script>
+  <div id="alert-modal" class="modal">
+    <div class="modal-card glass">
+      <h3 class="modal-title" style="text-align:center;">Alert</h3>
+      <p id="alert-message" class="modal-note" style="text-align:center;margin-bottom:20px;">Message</p>
+      <button class="gbtn solid" style="width:100%;" onclick="closeModal('alert-modal')" data-tip="Dismiss this message" title="Dismiss this message">
+        OK
+      </button>
+    </div>
+  </div>
 
   <script>
-    let currentUser, userData, pendingWithdrawalData;
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJaFVETxpy8Vr5e6RXDWi3NBhEUaZEPN4",
+      authDomain: "malcolm-finance.firebaseapp.com",
+      projectId: "malcolm-finance",
+      storageBucket: "malcolm-finance.firebasestorage.app",
+      messagingSenderId: "987613399580",
+      appId: "1:987613399580:web:0237b2c8c2c7df54222dd9"
+    };
 
-    window.showAlert = function(message) {
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+    let userData = null;
+    let pendingWithdrawalData = null;
+
+    const rootEl = document.documentElement;
+    const menuBtn = document.getElementById('menuBtn');
+    const collapseBtn = document.getElementById('collapseBtn');
+    const overlay = document.getElementById('overlay');
+    const themeBtn = document.getElementById('themeBtn');
+    const themeIcon = document.getElementById('themeIcon');
+    const isDesktop = () => window.matchMedia('(min-width: 1024px)').matches;
+
+    function applyThemeIcon() {
+      const dark = rootEl.classList.contains('dark');
+      themeIcon.className = dark ? 'ph-duotone ph-sun' : 'ph-duotone ph-moon';
+      themeBtn.setAttribute('data-tip', dark ? 'Switch to light theme' : 'Switch to dark theme');
+      themeBtn.setAttribute('title', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+
+    function updateMenuTip() {
+      if (isDesktop()) {
+        const collapsed = document.body.classList.contains('sb-collapsed');
+        menuBtn.setAttribute('data-tip', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+        menuBtn.setAttribute('title', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+        menuBtn.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+      } else {
+        menuBtn.setAttribute('data-tip', 'Open menu');
+        menuBtn.setAttribute('title', 'Open menu');
+        menuBtn.setAttribute('aria-label', 'Open menu');
+      }
+    }
+
+    function openNav() { document.body.classList.add('nav-open'); }
+    function closeNav() { document.body.classList.remove('nav-open'); }
+
+    menuBtn.addEventListener('click', () => {
+      if (isDesktop()) {
+        document.body.classList.toggle('sb-collapsed');
+        updateMenuTip();
+      } else {
+        document.body.classList.contains('nav-open') ? closeNav() : openNav();
+      }
+    });
+
+    collapseBtn.addEventListener('click', () => {
+      if (isDesktop()) {
+        document.body.classList.add('sb-collapsed');
+        updateMenuTip();
+      } else {
+        closeNav();
+      }
+    });
+
+    overlay.addEventListener('click', closeNav);
+
+    themeBtn.addEventListener('click', () => {
+      const dark = rootEl.classList.toggle('dark');
+      try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+      applyThemeIcon();
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', dark ? '#070707' : '#f5f5f3');
+    });
+
+    window.addEventListener('resize', () => {
+      if (isDesktop()) closeNav();
+      updateMenuTip();
+    });
+
+    document.querySelectorAll('#sidebar a').forEach(link => {
+      link.addEventListener('click', closeNav);
+    });
+
+    window.toggleFullScreen = function () {
+      if (!document.fullscreenElement) {
+        const el = document.documentElement;
+        if (el.requestFullscreen) el.requestFullscreen();
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        else if (el.msRequestFullscreen) el.msRequestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if (document.msExitFullscreen) document.msExitFullscreen();
+      }
+    };
+
+    window.showAlert = function (message) {
       document.getElementById('alert-message').innerText = message;
-      document.getElementById('alert-modal').classList.replace('hidden', 'flex');
+      document.getElementById('alert-modal').classList.add('open');
     };
 
-    window.showDepositModal = function() {
-      document.getElementById('deposit-modal').classList.replace('hidden', 'flex');
+    window.showDepositModal = function () {
+      document.getElementById('deposit-modal').classList.add('open');
     };
 
-    window.closeModal = function(id) {
-      document.getElementById(id).classList.replace('flex', 'hidden');
+    window.closeModal = function (id) {
+      document.getElementById(id).classList.remove('open');
     };
 
-    window.showWithdrawModal = function() {
+    window.showWithdrawModal = function () {
       if (!userData || !userData.isActive) { showAlert('Activate account first'); return; }
-      ['withdraw-amount', 'withdraw-wallet', 'withdraw-password'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('withdraw-modal').classList.replace('hidden', 'flex');
+      ['withdraw-amount', 'withdraw-wallet', 'withdraw-password'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('withdraw-modal').classList.add('open');
     };
 
-    window.confirmWithdrawal = async function() {
+    window.confirmWithdrawal = async function () {
       const amount = parseFloat(document.getElementById('withdraw-amount').value);
       const method = document.getElementById('withdraw-method').value;
-      const wallet = document.getElementById('withdraw-wallet').value;
+      const wallet = document.getElementById('withdraw-wallet').value.trim();
       const password = document.getElementById('withdraw-password').value;
-      if (!amount || amount < 6 || !wallet || !password || amount > userData.balance) { showAlert('Check inputs or balance'); return; }
+
+      if (!amount || amount < 6 || !wallet || !password || amount > userData.balance) {
+        showAlert('Check inputs or balance');
+        return;
+      }
+
       try {
-        await currentUser.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(currentUser.email, password));
+        await currentUser.reauthenticateWithCredential(
+          firebase.auth.EmailAuthProvider.credential(currentUser.email, password)
+        );
         const fee = amount * 0.05;
         pendingWithdrawalData = { amount, method, wallet, fee, netAmount: amount - fee };
-        document.getElementById('withdraw-confirm-details').innerHTML = `<div class="p-4 soft-accent-bg rounded-xl border accent-border"><p><strong>Amount:</strong> $${amount.toFixed(2)}</p><p><strong>Fee (5%):</strong> $${fee.toFixed(2)}</p><p class="text-lg accent-text"><strong>Net: $${(amount - fee).toFixed(2)}</strong></p></div>`;
+        document.getElementById('withdraw-confirm-details').innerHTML =
+          '<div>Amount: <strong>$' + amount.toFixed(2) + '</strong></div>' +
+          '<div>Fee (5%): <strong>$' + fee.toFixed(2) + '</strong></div>' +
+          '<div>Net payout: <strong>$' + (amount - fee).toFixed(2) + '</strong></div>';
         closeModal('withdraw-modal');
-        document.getElementById('withdraw-confirm-modal').classList.replace('hidden', 'flex');
-      } catch { showAlert('Incorrect password'); }
+        document.getElementById('withdraw-confirm-modal').classList.add('open');
+      } catch (e) {
+        showAlert('Incorrect password');
+      }
     };
 
-    window.submitWithdrawal = async function() {
+    window.submitWithdrawal = async function () {
       if (!pendingWithdrawalData) return;
       try {
-        await db.collection('transactions').add({ ...pendingWithdrawalData, userId: currentUser.uid, type: 'withdrawal', status: 'pending', date: new Date().toISOString() });
-        showAlert('Submitted'); closeModal('withdraw-confirm-modal'); pendingWithdrawalData = null;
-      } catch { showAlert('Error'); }
+        await db.collection('transactions').add({
+          ...pendingWithdrawalData,
+          userId: currentUser.uid,
+          type: 'withdrawal',
+          status: 'pending',
+          date: new Date().toISOString()
+        });
+        showAlert('Submitted');
+        closeModal('withdraw-confirm-modal');
+        pendingWithdrawalData = null;
+      } catch (e) {
+        showAlert('Error');
+      }
     };
 
-    window.showReferralModal = function() {
-      if (!userData?.referralCode) return;
-      document.getElementById('referral-link-display').innerHTML = `https://malcomfinance.github.io/auth.html?ref=${userData.referralCode}`;
-      document.getElementById('referral-modal').classList.replace('hidden', 'flex');
+    window.showReferralModal = function () {
+      if (!userData || !userData.referralCode) return;
+      document.getElementById('referral-link-display').textContent =
+        'https://malcomfinance.github.io/auth?ref=' + userData.referralCode;
+      document.getElementById('referral-modal').classList.add('open');
     };
 
-    window.shareReferral = async function() {
-      if (!userData?.referralCode) return;
-      const link = `https://malcomfinance.github.io/auth.html?ref=${userData.referralCode}`;
-      const text = `Join Malcom Finance and start earning. Use my referral link: ${link}`;
+    window.shareReferral = async function () {
+      if (!userData || !userData.referralCode) return;
+      const link = 'https://malcomfinance.github.io/auth?ref=' + userData.referralCode;
+      const text = 'Join Malcom Finance and start earning. Use my referral link: ' + link;
       if (navigator.share) {
-        try { await navigator.share({ title: 'Malcom Finance', text: text, url: link }); } catch (e) { console.log('Share cancelled'); }
+        try { await navigator.share({ title: 'Malcom Finance', text: text, url: link }); } catch (e) {}
       } else {
-        try { await navigator.clipboard.writeText(link); showAlert('Referral link copied to clipboard!'); } catch { showAlert('Sharing not supported'); }
+        try {
+          await navigator.clipboard.writeText(link);
+          showAlert('Referral link copied to clipboard!');
+        } catch (e) {
+          showAlert('Sharing not supported');
+        }
       }
     };
 
     auth.onAuthStateChanged(async (user) => {
-      if (!user) { window.location.href = 'auth.html'; return; }
+      if (!user) { window.location.href = 'auth'; return; }
       currentUser = user;
       await loadUserData();
       await loadTodaysActivities();
@@ -223,12 +1271,17 @@ html,body{overflow:hidden}html{overflow:scroll;scrollbar-width:none;-ms-overflow
     });
 
     async function loadUserData() {
-      const cached = localStorage.getItem(`user_${currentUser.uid}`);
-      if (cached) { try { userData = JSON.parse(cached); } catch {} }
+      const cached = localStorage.getItem('user_' + currentUser.uid);
+      if (cached) { try { userData = JSON.parse(cached); } catch (e) {} }
       try {
         const doc = await db.collection('users').doc(currentUser.uid).get();
-        if (doc.exists) { userData = doc.data(); userData.id = currentUser.uid; localStorage.setItem(`user_${currentUser.uid}`, JSON.stringify(userData)); renderUI(); }
-      } catch {}
+        if (doc.exists) {
+          userData = doc.data();
+          userData.id = currentUser.uid;
+          localStorage.setItem('user_' + currentUser.uid, JSON.stringify(userData));
+          renderUI();
+        }
+      } catch (e) {}
     }
 
     async function loadTodaysActivities() {
@@ -238,46 +1291,27 @@ html,body{overflow:hidden}html{overflow:scroll;scrollbar-width:none;-ms-overflow
         if (doc.exists) {
           const data = doc.data();
           const quote = data.quote || { text: 'The best time to start was yesterday.', author: 'Icii White' };
-          document.getElementById('quote-text').innerHTML = `"${quote.text}"`;
-          document.getElementById('quote-author').innerHTML = quote.author;
+          document.getElementById('quote-text').textContent = '"' + quote.text + '"';
+          document.getElementById('quote-author').textContent = quote.author;
         }
-      } catch {}
+      } catch (e) {}
     }
 
     function renderUI() {
       if (!userData) return;
-      document.getElementById('accbal').innerHTML = (userData.balance || 0).toFixed(2);
+      document.getElementById('accbal').textContent = (userData.balance || 0).toFixed(2);
+    }
+
+    applyThemeIcon();
+    updateMenuTip();
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
     }
   </script>
-    <script>
-
-        if ('serviceWorker' in navigator) {
-
-            window.addEventListener('load', () => {
-
-                navigator.serviceWorker.register('/sw.js')
-
-                    .then((registration) => {
-
-                        console.log('Service Worker registered with scope:', registration.scope);
-
-                    })
-
-                    .catch((error) => {
-
-                        console.error('Service Worker registration failed:', error);
-
-                    });
-
-            });
-
-        }
-
-    </script>
 </body>
 </html>
-  
-  
-  
-  
-  
