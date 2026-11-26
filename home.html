@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <title>Malcom Finance · Dashboard</title>
+  <title>Malcom Ventures · Dashboard</title>
   <link href="tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -991,8 +991,8 @@
     </button>
 
     <div class="brand-mini">
-      <img src="logo.png" alt="Malcom Finance logo">
-      <span>Malcom Finance</span>
+      <img src="logo.png" alt="Malcom Ventures logo">
+      <span>Malcom Ventures</span>
     </div>
 
     <div class="topbar-title">Dashboard</div>
@@ -1010,9 +1010,9 @@
   <aside id="sidebar" class="sidebar glass" aria-label="Main navigation">
     <div class="sidebar-head">
       <div class="brand">
-        <img src="logo.png" alt="Malcom Finance logo">
+        <img src="logo.png" alt="Malcom Ventures logo">
         <div class="brand-text">
-          <h2>Malcom Finance</h2>
+          <h2>Malcom Ventures</h2>
           <p>Premium Account</p>
         </div>
       </div>
@@ -1284,7 +1284,7 @@
     <h1 class="dt-title">Access Blocked</h1>
     <p class="dt-code">ERR_DEVTOOLS_DETECTED :: session terminated</p>
     <p class="dt-hint">Developer tools are not permitted on this application. Close developer tools to continue.</p>
-    <p class="dt-foot">Malcom Finance &middot; Security</p>
+    <p class="dt-foot">Malcom Ventures &middot; Security</p>
   </div>
 
   <script>
@@ -1461,9 +1461,9 @@
     window.shareReferral = async function () {
       if (!userData || !userData.referralCode) return;
       const link = 'https://malcomfinance.github.io/auth?ref=' + userData.referralCode;
-      const text = 'Join Malcom Finance and start earning. Use my referral link: ' + link;
+      const text = 'Join Malcom Ventures and start earning. Use my referral link: ' + link;
       if (navigator.share) {
-        try { await navigator.share({ title: 'Malcom Finance', text: text, url: link }); } catch (e) {}
+        try { await navigator.share({ title: 'Malcom Ventures', text: text, url: link }); } catch (e) {}
       } else {
         try {
           await navigator.clipboard.writeText(link);
