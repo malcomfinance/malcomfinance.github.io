@@ -436,7 +436,7 @@ main {
   transition: margin-left .32s cubic-bezier(.22, 1, .36, 1), padding .32s ease;
 }
 
-.wrap { max-width: 720px; margin: 0 auto; }
+.wrap { max-width: 1240px; margin: 0 auto; }
 
 .page-head { margin-bottom: 18px; padding: 0 4px; }
 .page-head h1 {
@@ -452,15 +452,53 @@ main {
   color: var(--fg-soft);
 }
 
+/* ---------- Account layout ---------- */
+.account-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.account-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* ---------- Shared card head ---------- */
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 20px 22px 14px;
+}
+
+.card-head h3 {
+  margin: 0;
+  font-size: .95rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+}
+
+.card-head span {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+}
+
+/* ---------- Profile card ---------- */
 .profile-card {
-  padding: 26px 22px 24px;
-  border-radius: 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 4px;
-  margin-bottom: 14px;
+  gap: 14px;
+  padding: 28px 24px 26px;
+  border-radius: 28px;
 }
 
 .avatar-wrap {
@@ -468,7 +506,6 @@ main {
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  margin-bottom: 14px;
   cursor: pointer;
   border: none;
   padding: 0;
@@ -505,15 +542,17 @@ main {
 
 .avatar-wrap:hover .avatar-overlay { opacity: 1; }
 
-.profile-card h2 {
+.profile-info { min-width: 0; }
+
+.profile-info h2 {
   margin: 0;
   font-size: 1.2rem;
   font-weight: 800;
   letter-spacing: -.02em;
 }
 
-.profile-card p {
-  margin: 2px 0 0;
+.profile-info p {
+  margin: 4px 0 0;
   font-size: .82rem;
   font-weight: 500;
   color: var(--fg-soft);
@@ -535,11 +574,13 @@ main {
   color: var(--fg);
 }
 
+/* ---------- Details card ---------- */
 .details-card {
   border-radius: 28px;
   overflow: hidden;
-  margin-bottom: 14px;
 }
+
+.details-body { display: block; }
 
 .detail-row {
   display: flex;
@@ -547,11 +588,9 @@ main {
   justify-content: space-between;
   gap: 16px;
   padding: 16px 22px;
-  border-bottom: 1px solid var(--line);
+  border-top: 1px solid var(--line);
   min-width: 0;
 }
-
-.detail-row:last-child { border-bottom: none; }
 
 .detail-label {
   display: inline-flex;
@@ -584,16 +623,133 @@ main {
 
 .detail-value.muted { color: var(--fg-soft); font-weight: 500; }
 
+/* ---------- Actions card ---------- */
 .actions-card {
   border-radius: 28px;
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  overflow: hidden;
 }
 
-.actions-card .gbtn { width: 100%; }
+.actions-body { display: block; }
 
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border: none;
+  border-top: 1px solid var(--line);
+  background: transparent;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: var(--fg);
+  transition: background .2s ease;
+}
+
+.action-row:hover { background: var(--btn-bg); }
+.action-row:active { background: var(--btn-hover); }
+
+.action-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--btn-bg);
+  border: 1px solid var(--glass-border);
+  font-size: 1.3rem;
+  color: var(--fg);
+  flex: none;
+}
+
+.action-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.action-title {
+  font-size: .88rem;
+  font-weight: 700;
+  letter-spacing: -.005em;
+  color: var(--fg);
+}
+
+.action-desc {
+  font-size: .74rem;
+  font-weight: 500;
+  color: var(--fg-soft);
+}
+
+.action-arrow {
+  font-size: 1.1rem;
+  color: var(--fg-soft);
+  flex: none;
+  transition: color .2s ease, transform .2s ease;
+}
+
+.action-row:hover .action-arrow {
+  color: var(--fg);
+  transform: translateX(3px);
+}
+
+.action-row.danger .action-icon {
+  background: var(--neg-soft);
+  border-color: var(--neg-border);
+  color: var(--neg);
+}
+
+.action-row.danger:hover { background: var(--neg-soft); }
+
+.action-row.danger .action-arrow { color: var(--neg); opacity: .7; }
+.action-row.danger:hover .action-arrow { color: var(--neg); opacity: 1; }
+
+/* ---------- Tips card ---------- */
+.tips-card {
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.tips-body { display: block; }
+
+.tip-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--line);
+}
+
+.tip-row i {
+  font-size: 1.4rem;
+  color: var(--fg);
+  flex: none;
+  margin-top: 2px;
+}
+
+.tip-text { min-width: 0; }
+
+.tip-title {
+  margin: 0;
+  font-size: .85rem;
+  font-weight: 700;
+  letter-spacing: -.005em;
+  color: var(--fg);
+}
+
+.tip-desc {
+  margin: 2px 0 0;
+  font-size: .74rem;
+  font-weight: 500;
+  color: var(--fg-soft);
+  line-height: 1.5;
+}
+
+/* ---------- Bottom nav ---------- */
 .bottomnav {
   position: fixed;
   left: 12px;
@@ -629,6 +785,7 @@ main {
 .bn-item i { font-size: 1.35rem; }
 .bn-item.active { color: var(--nav-active-fg); background: var(--nav-active-bg); }
 
+/* ---------- Context menu ---------- */
 #ctx-menu {
   position: fixed;
   z-index: 350;
@@ -674,6 +831,7 @@ main {
 
 .ctx-sep { height: 1px; margin: 6px 8px; background: var(--line); }
 
+/* ---------- Tooltip ---------- */
 #tip {
   position: fixed;
   left: 0;
@@ -704,6 +862,7 @@ main {
 #tip.below { transform: translate(-50%, 8px) scale(.96); }
 #tip.below.show { transform: translate(-50%, 8px) scale(1); }
 
+/* ---------- Scroll pill ---------- */
 #scroll-pill {
   position: fixed;
   right: 9px;
@@ -758,6 +917,7 @@ main {
 #scroll-pill.dragging { opacity: 1; width: 13px; }
 #scroll-pill.dragging { cursor: grabbing; }
 
+/* ---------- Modal ---------- */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -838,6 +998,7 @@ main {
 
 .modal-actions .gbtn { flex: 1; padding: 13px 16px; font-size: .82rem; }
 
+/* ---------- Devtools block ---------- */
 #dt-block {
   position: fixed;
   inset: 0;
@@ -904,18 +1065,24 @@ body.dt-open #dt-block { display: flex; }
   margin: 18px 0 0;
 }
 
+/* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
 
+/* ---------- Responsive ---------- */
 @media (min-width: 768px) {
   main { padding: 92px 26px 60px; }
   .page-head h1 { font-size: 1.85rem; }
-  .profile-card { padding: 32px 30px 28px; }
-  .avatar-wrap { width: 112px; height: 112px; }
-  .profile-card h2 { font-size: 1.35rem; }
+  .account-grid { gap: 16px; }
+  .account-col { gap: 16px; }
+  .profile-card { padding: 30px 28px 28px; }
+  .avatar-wrap { width: 104px; height: 104px; }
+  .profile-info h2 { font-size: 1.35rem; }
   .detail-row { padding: 18px 26px; }
-  .actions-card { padding: 20px; }
+  .card-head { padding: 22px 26px 14px; }
+  .action-row { padding: 18px 24px; }
+  .tip-row { padding: 16px 24px; }
 }
 
 @media (max-width: 767px) {
@@ -950,10 +1117,56 @@ body.dt-open #dt-block { display: flex; }
   body.sb-collapsed #collapseBtn { display: none; }
   body.sb-collapsed .nav-item { justify-content: center; padding: 14px 0; }
   body.sb-collapsed .sidebar-nav { overflow: visible; padding: 16px 10px; }
+
+  /* Two-column desktop layout */
+  .account-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .account-col { gap: 18px; }
+
+  /* Profile card horizontal on desktop */
+  .profile-card {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    gap: 22px;
+    padding: 28px 32px;
+  }
+  .avatar-wrap {
+    width: 104px;
+    height: 104px;
+    flex: none;
+  }
+  .profile-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .profile-info h2 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .profile-info p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .profile-badge { margin-top: 10px; }
+}
+
+@media (min-width: 1280px) {
+  .account-grid {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 20px;
+  }
+  .account-col { gap: 20px; }
 }
 
 @media (min-width: 1600px) {
-  .wrap { max-width: 800px; }
+  .wrap { max-width: 1320px; }
 }
 </style>
 </head>
@@ -1067,52 +1280,118 @@ body.dt-open #dt-block { display: flex; }
       <p>Your personal profile and details.</p>
     </div>
 
-    <section class="profile-card glass">
-      <button class="avatar-wrap" onclick="openProfileModal()" data-tip="Change your profile photo" aria-label="Change profile photo">
-        <img id="profile-img" src="logo.png" alt="Profile photo">
-        <span class="avatar-overlay"><i class="ph ph-camera"></i></span>
-      </button>
-      <h2 id="name-display">Loading...</h2>
-      <p id="email-display">Fetching your details</p>
-      <span class="profile-badge" data-tip="Your account tier">
-        <i class="ph-duotone ph-seal-check"></i>
-        Premium Member
-      </span>
-    </section>
+    <div class="account-grid">
+      <div class="account-col left-col">
+        <section class="profile-card glass">
+          <button class="avatar-wrap" onclick="openProfileModal()" data-tip="Change your profile photo" aria-label="Change profile photo">
+            <img id="profile-img" src="logo.png" alt="Profile photo">
+            <span class="avatar-overlay"><i class="ph ph-camera"></i></span>
+          </button>
+          <div class="profile-info">
+            <h2 id="name-display">Loading...</h2>
+            <p id="email-display">Fetching your details</p>
+            <span class="profile-badge" data-tip="Your account tier">
+              <i class="ph-duotone ph-seal-check"></i>
+              Premium Member
+            </span>
+          </div>
+        </section>
 
-    <section class="details-card glass">
-      <div class="detail-row">
-        <span class="detail-label"><i class="ph-duotone ph-user"></i> Name</span>
-        <span id="display-name" class="detail-value">N/A</span>
+        <section class="details-card glass">
+          <div class="card-head">
+            <h3>Personal Information</h3>
+            <span>Details</span>
+          </div>
+          <div class="details-body">
+            <div class="detail-row">
+              <span class="detail-label"><i class="ph-duotone ph-user"></i> Name</span>
+              <span id="display-name" class="detail-value">N/A</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label"><i class="ph-duotone ph-envelope-simple"></i> Email</span>
+              <span id="display-email" class="detail-value">N/A</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label"><i class="ph-duotone ph-phone"></i> Phone</span>
+              <span id="display-phone" class="detail-value">N/A</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label"><i class="ph-duotone ph-identification-badge"></i> Referral</span>
+              <span id="display-referral" class="detail-value mono">N/A</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label"><i class="ph-duotone ph-calendar-blank"></i> Joined</span>
+              <span id="display-joined" class="detail-value muted">N/A</span>
+            </div>
+          </div>
+        </section>
       </div>
-      <div class="detail-row">
-        <span class="detail-label"><i class="ph-duotone ph-envelope-simple"></i> Email</span>
-        <span id="display-email" class="detail-value">N/A</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label"><i class="ph-duotone ph-phone"></i> Phone</span>
-        <span id="display-phone" class="detail-value">N/A</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label"><i class="ph-duotone ph-identification-badge"></i> Referral</span>
-        <span id="display-referral" class="detail-value mono">N/A</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label"><i class="ph-duotone ph-calendar-blank"></i> Joined</span>
-        <span id="display-joined" class="detail-value muted">N/A</span>
-      </div>
-    </section>
 
-    <section class="actions-card glass">
-      <button class="gbtn" type="button" onclick="openProfileModal()" data-tip="Upload a new profile photo">
-        <i class="ph-duotone ph-camera"></i>
-        Change Photo
-      </button>
-      <button class="gbtn danger" type="button" onclick="logout()" data-tip="Sign out of your account">
-        <i class="ph-duotone ph-sign-out"></i>
-        Sign Out
-      </button>
-    </section>
+      <div class="account-col right-col">
+        <section class="actions-card glass">
+          <div class="card-head">
+            <h3>Quick Actions</h3>
+            <span>Manage</span>
+          </div>
+          <div class="actions-body">
+            <button class="action-row" type="button" onclick="openProfileModal()" data-tip="Upload a new profile photo">
+              <span class="action-icon"><i class="ph-duotone ph-camera"></i></span>
+              <span class="action-text">
+                <span class="action-title">Change Photo</span>
+                <span class="action-desc">Update your profile picture</span>
+              </span>
+              <i class="ph ph-caret-right action-arrow"></i>
+            </button>
+            <button class="action-row" type="button" onclick="window.location.href='contact'" data-tip="Reach out to support">
+              <span class="action-icon"><i class="ph-duotone ph-headset"></i></span>
+              <span class="action-text">
+                <span class="action-title">Contact Support</span>
+                <span class="action-desc">Talk to a real agent</span>
+              </span>
+              <i class="ph ph-caret-right action-arrow"></i>
+            </button>
+            <button class="action-row danger" type="button" onclick="logout()" data-tip="Sign out of your account">
+              <span class="action-icon"><i class="ph-duotone ph-sign-out"></i></span>
+              <span class="action-text">
+                <span class="action-title">Sign Out</span>
+                <span class="action-desc">End your current session</span>
+              </span>
+              <i class="ph ph-caret-right action-arrow"></i>
+            </button>
+          </div>
+        </section>
+
+        <section class="tips-card glass">
+          <div class="card-head">
+            <h3>Account Security</h3>
+            <span>Tips</span>
+          </div>
+          <div class="tips-body">
+            <div class="tip-row">
+              <i class="ph-duotone ph-shield-check"></i>
+              <div class="tip-text">
+                <p class="tip-title">Your account is verified</p>
+                <p class="tip-desc">Email and phone are confirmed.</p>
+              </div>
+            </div>
+            <div class="tip-row">
+              <i class="ph-duotone ph-lock-key"></i>
+              <div class="tip-text">
+                <p class="tip-title">Keep your password private</p>
+                <p class="tip-desc">Never share it with anyone.</p>
+              </div>
+            </div>
+            <div class="tip-row">
+              <i class="ph-duotone ph-eye"></i>
+              <div class="tip-text">
+                <p class="tip-title">Monitor your activity</p>
+                <p class="tip-desc">Review transactions regularly.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
   </div>
 </main>
 
