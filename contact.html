@@ -57,8 +57,10 @@
   --neg-border: rgba(214, 69, 69, 0.25);
   --wa: #1da851;
   --wa-soft: rgba(37, 211, 102, 0.14);
+  --wa-border: rgba(37, 211, 102, 0.28);
   --mail: #7c5cff;
   --mail-soft: rgba(124, 92, 255, 0.12);
+  --mail-border: rgba(124, 92, 255, 0.26);
   --online: #10b981;
 }
 
@@ -89,8 +91,10 @@ html.dark {
   --neg-border: rgba(248, 113, 113, 0.25);
   --wa: #34d399;
   --wa-soft: rgba(52, 211, 153, 0.14);
+  --wa-border: rgba(52, 211, 153, 0.3);
   --mail: #a78bfa;
   --mail-soft: rgba(167, 139, 250, 0.14);
+  --mail-border: rgba(167, 139, 250, 0.3);
   --online: #34d399;
 }
 
@@ -439,9 +443,16 @@ main {
   transition: margin-left .32s cubic-bezier(.22, 1, .36, 1), padding .32s ease;
 }
 
-.wrap { max-width: 720px; margin: 0 auto; }
+.wrap { max-width: 1080px; margin: 0 auto; }
 
-.page-head { margin-bottom: 18px; padding: 0 4px; }
+.page-top {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding: 0 4px;
+}
+
 .page-head h1 {
   margin: 0;
   font-size: 1.55rem;
@@ -456,13 +467,11 @@ main {
 }
 
 .status-card {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 10px;
-  padding: 14px 20px;
+  padding: 12px 18px;
   border-radius: 999px;
-  margin: 0 auto 20px;
   width: fit-content;
   max-width: 100%;
   font-size: 11px;
@@ -487,24 +496,35 @@ main {
   100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
+.section-label {
+  margin: 0 4px 12px;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+}
+
 .support-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 12px;
 }
 
 .support-tile {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 18px 20px;
-  border-radius: 24px;
+  border-radius: 26px;
   text-decoration: none;
   color: var(--fg);
   transition: transform .25s ease, box-shadow .25s ease;
+  min-width: 0;
 }
 
-.support-tile:hover { transform: translateY(-2px); }
+.support-tile:hover { transform: translateY(-3px); }
 .support-tile:active { transform: translateY(0) scale(.99); }
 
 .support-icon {
@@ -519,8 +539,16 @@ main {
   border: 1px solid var(--glass-border);
 }
 
-.support-icon.wa { background: var(--wa-soft); color: var(--wa); }
-.support-icon.mail { background: var(--mail-soft); color: var(--mail); }
+.support-icon.wa {
+  background: var(--wa-soft);
+  color: var(--wa);
+  border-color: var(--wa-border);
+}
+.support-icon.mail {
+  background: var(--mail-soft);
+  color: var(--mail);
+  border-color: var(--mail-border);
+}
 
 .support-body { flex: 1; min-width: 0; }
 
@@ -548,6 +576,33 @@ main {
 
 .support-tile:hover .support-arrow { color: var(--fg); transform: translate(2px, -2px); }
 
+.support-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 12px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  border: 1px solid var(--glass-border);
+  background: var(--btn-bg);
+  color: var(--fg-soft);
+}
+
+.support-tile[data-accent="wa"] .support-tag {
+  background: var(--wa-soft);
+  border-color: var(--wa-border);
+  color: var(--wa);
+}
+.support-tile[data-accent="mail"] .support-tag {
+  background: var(--mail-soft);
+  border-color: var(--mail-border);
+  color: var(--mail);
+}
+
 .section-title {
   margin: 30px 4px 14px;
   font-size: 1.05rem;
@@ -556,8 +611,8 @@ main {
 }
 
 .faq-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 10px;
 }
 
@@ -601,7 +656,7 @@ main {
 }
 
 .footer-note {
-  margin-top: 34px;
+  margin-top: 36px;
   text-align: center;
   padding: 6px 0 4px;
 }
@@ -859,10 +914,79 @@ body.dt-open #dt-block { display: flex; }
 
 @media (min-width: 768px) {
   main { padding: 92px 26px 60px; }
+
+  .page-top {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 26px;
+  }
+
   .page-head h1 { font-size: 1.85rem; }
-  .support-tile { padding: 20px 24px; }
-  .support-list { gap: 14px; }
-  .section-title { margin-top: 34px; }
+  .page-head p { font-size: .92rem; }
+
+  .status-card {
+    padding: 12px 20px;
+    font-size: 11.5px;
+    flex: none;
+  }
+
+  .support-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .support-tile {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 26px 24px 24px;
+    gap: 16px;
+    border-radius: 28px;
+  }
+
+  .support-icon {
+    width: 56px;
+    height: 56px;
+    font-size: 1.7rem;
+    border-radius: 20px;
+  }
+
+  .support-body { flex: none; width: 100%; }
+
+  .support-title { font-size: 1.02rem; }
+  .support-sub { font-size: .82rem; margin-top: 4px; line-height: 1.5; }
+
+  .support-arrow {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    font-size: 1.15rem;
+  }
+
+  .support-tag { margin-top: 14px; }
+
+  .section-title {
+    margin-top: 40px;
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+  }
+
+  .faq-list { gap: 12px; }
+
+  .faq-card summary {
+    padding: 20px 22px;
+    font-size: .95rem;
+  }
+
+  .faq-body {
+    padding: 0 22px 20px;
+    font-size: .85rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .faq-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 767px) {
@@ -900,7 +1024,7 @@ body.dt-open #dt-block { display: flex; }
 }
 
 @media (min-width: 1600px) {
-  .wrap { max-width: 800px; }
+  .wrap { max-width: 1200px; }
 }
 </style>
 </head>
@@ -1009,40 +1133,46 @@ body.dt-open #dt-block { display: flex; }
 
 <main>
   <div class="wrap">
-    <div class="page-head">
-      <h1>Customer Care</h1>
-      <p>How can we help you today?</p>
+    <div class="page-top">
+      <div class="page-head">
+        <h1>Customer Care</h1>
+        <p>How can we help you today?</p>
+      </div>
+      <div class="status-card glass" data-tip="Our support team is online right now">
+        <span class="status-dot"></span>
+        <span>Support agents online</span>
+      </div>
     </div>
 
-    <div class="status-card glass" data-tip="Our support team is online right now">
-      <span class="status-dot"></span>
-      <span>Support agents online</span>
-    </div>
+    <h2 class="section-label">Get in touch</h2>
 
     <div class="support-list">
-      <a href="https://wa.me/256709264094" target="_blank" rel="noopener" class="support-tile glass" data-tip="Fastest way to reach us">
+      <a href="https://wa.me/256709264094" target="_blank" rel="noopener" class="support-tile glass" data-accent="wa" data-tip="Fastest way to reach us">
         <span class="support-icon wa"><i class="ph-duotone ph-whatsapp-logo"></i></span>
         <span class="support-body">
           <span class="support-title">WhatsApp Chat</span>
-          <span class="support-sub">Instant response (Recommended)</span>
+          <span class="support-sub">Instant response from a live agent.</span>
+          <span class="support-tag"><i class="ph ph-lightning"></i> Recommended</span>
         </span>
         <span class="support-arrow"><i class="ph ph-arrow-up-right"></i></span>
       </a>
 
-      <a href="https://wa.me/256759832339" target="_blank" rel="noopener" class="support-tile glass" data-tip="Second line for help and updates">
+      <a href="https://wa.me/256759832339" target="_blank" rel="noopener" class="support-tile glass" data-accent="wa" data-tip="Second line for help and updates">
         <span class="support-icon wa"><i class="ph-duotone ph-whatsapp-logo"></i></span>
         <span class="support-body">
           <span class="support-title">WhatsApp Support</span>
-          <span class="support-sub">Help &amp; official updates</span>
+          <span class="support-sub">Help line and official updates.</span>
+          <span class="support-tag"><i class="ph ph-megaphone"></i> Updates</span>
         </span>
         <span class="support-arrow"><i class="ph ph-arrow-up-right"></i></span>
       </a>
 
-      <a href="mailto:enockmalcom972@gmail.com" class="support-tile glass" data-tip="For formal inquiries and documents">
+      <a href="mailto:enockmalcom972@gmail.com" class="support-tile glass" data-accent="mail" data-tip="For formal inquiries and documents">
         <span class="support-icon mail"><i class="ph-duotone ph-envelope-simple"></i></span>
         <span class="support-body">
           <span class="support-title">Email Support</span>
-          <span class="support-sub">For formal inquiries</span>
+          <span class="support-sub">Best for formal inquiries and receipts.</span>
+          <span class="support-tag"><i class="ph ph-paper-plane-tilt"></i> Formal</span>
         </span>
         <span class="support-arrow"><i class="ph ph-arrow-up-right"></i></span>
       </a>
@@ -1078,6 +1208,16 @@ body.dt-open #dt-block { display: flex; }
         </summary>
         <div class="faq-body">
           We pay a competitive 30% commission on every account activation made through your unique referral link. Commissions are credited instantly to your balance.
+        </div>
+      </details>
+
+      <details class="faq-card glass">
+        <summary>
+          <span>Is my money safe with Malcom Ventures?</span>
+          <i class="ph ph-caret-down"></i>
+        </summary>
+        <div class="faq-body">
+          Yes. All balances are tracked securely and withdrawals are reviewed by our compliance team before payout. Never share your password or one-time codes with anyone.
         </div>
       </details>
     </div>
